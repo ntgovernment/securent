@@ -9,6 +9,16 @@ header.ntg-header {
   background-color: #343741;
 }
 
+/* Overrides ntgbase's 10.5rem x 3.75rem + padding-right, which squeezes the SVG wordmark */
+header.ntg-header .site-logo-lockup img.site-logo {
+  display: block;
+  width: 150px;
+  height: 46px;
+  margin: 0;
+  padding: 0;
+  border: 0 !important;
+}
+
 @media (min-width: 768px) {
   header.ntg-header .navbar {
     min-height: 72px;
@@ -27,15 +37,6 @@ header.ntg-header {
     flex: 0 0 auto;
     align-items: center;
     white-space: nowrap;
-  }
-
-  header.ntg-header .site-logo-lockup img.site-logo {
-    display: block;
-    width: 150px;
-    height: auto;
-    margin: 0;
-    padding: 0;
-    border: 0 !important;
   }
 
   nav.nav-masthead .ps-4 {
