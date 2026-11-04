@@ -75,7 +75,7 @@ import "./local-conditions.css";
       seg.style.background = colour;
       bar.appendChild(seg);
     });
-    if (data.level >= 0) {
+    if (data.level > 0) {
       var marker = el("span", "lc-fire__marker");
       // Centre the marker in the segment for the current level (levels 1-4).
       var idx = Math.min(Math.max(data.level - 1, 0), 3);

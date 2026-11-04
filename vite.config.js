@@ -1,7 +1,27 @@
 import { defineConfig } from "vite";
 
+// Dev-only stand-in for the deployed proxy in src/local-conditions/worker.js.
+const localConditionsMock = {
+  name: "local-conditions-mock",
+  configureServer(server) {
+    server.middlewares.use("/api/local-conditions", (req, res) => {
+      const key = new URL(req.url, "http://localhost").searchParams.get("location");
+      const body = {
+        location: key,
+        updated: new Date().toISOString(),
+        temperature: { min: 27, max: 32 },
+        fireDanger: { label: "Moderate", level: 1 },
+        airQuality: key === "darwin" ? { category: "Fair", pm25: 17, station: "Winnellie" } : null,
+      };
+      res.setHeader("Content-Type", "application/json");
+      res.end(JSON.stringify(body));
+    });
+  },
+};
+
 export default defineConfig({
   root: ".",
+  plugins: [localConditionsMock],
   build: {
     rollupOptions: {
       input: {
