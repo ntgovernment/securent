@@ -1,0 +1,16 @@
+.event-page__header-accent {
+  height: 12px;
+  background-color: var(--clr-status-neutral);
+}
+
+.event-page__header-accent.warning-level-advice {
+  background-color: var(--clr-status-advice);
+}
+
+.event-page__header-accent.warning-level-watch_act {
+  background-color: var(--clr-status-watch-act);
+}
+
+.event-page__header-accent.warning-level-emergency_warning {
+  background-color: var(--clr-status-emergency-warning);
+}

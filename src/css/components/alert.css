@@ -3,6 +3,12 @@
    ========================================================================== */
 
 :root {
+  /* Recovery-page status colours */
+  --clr-status-neutral: #848491;
+  --clr-status-advice: #fbe032;
+  --clr-status-watch-act: #ff7900;
+  --clr-status-emergency-warning: #d6001c;
+
   /* Status background colours — match Levels 2-4 from the response framework */
   --clr-status-information: #ffc72c; /* Level 2 – yellow */
   --clr-status-warning: #d6410a; /* Level 3 – orange */

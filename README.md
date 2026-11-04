@@ -1,6 +1,6 @@
 # securent
 
-Source and build tooling for the **Fuel Security** NT Government page (`https://cmsexternal.nt.gov.au/fuel-security`).
+Source and build tooling for the **SecureNT** NT Government site (`https://cmsexternal.nt.gov.au/securent`).
 
 ## Project structure
 
@@ -26,11 +26,11 @@ securent/
 │   └── theme.js
 ├── SecureNT.html                     # Local page capture (gitignored)
 ├── SecureNT_files/                   # Local page assets (gitignored)
-├── vite.config.js
+├── vite.config.mjs
 └── package.json
 ```
 
-The local page capture and its assets are excluded from Git. `vite.config.js` currently expects an HTML entry named `Fuel security.html`; the capture in this workspace is named `SecureNT.html`. Provide the expected snapshot locally (or update the Vite entry to match your capture) before running the development server or build. The `dist/` files are tracked because they are consumed by the Squiz Matrix file bridge.
+The local page capture and its assets are excluded from Git. `vite.config.mjs` includes `SecureNT.html` as the local HTML entry when the capture exists. The `dist/` files are tracked because they are consumed by the Squiz Matrix file bridge.
 
 ## Prerequisites
 
