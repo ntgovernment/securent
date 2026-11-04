@@ -252,7 +252,7 @@
 
   nav.nav-masthead .ntg-main-nav__links > li > a:hover,
   nav.nav-masthead .ntg-main-nav__links > li > a:focus {
-    background-color: #484b55;
+    background-color: #343741;
     color: #ffffff;
     border-bottom: 0;
     text-decoration: underline;
@@ -276,7 +276,7 @@
   nav.nav-masthead .ntg-main-nav__links > li > ul > li > a:focus,
   nav.nav-masthead .ntg-main-nav__links > li > ul > li > ul > li > a:hover,
   nav.nav-masthead .ntg-main-nav__links > li > ul > li > ul > li > a:focus {
-    background-color: #484b55;
+    background-color: #343741;
     color: #ffffff;
     text-decoration: underline;
     text-decoration-thickness: 2px;
