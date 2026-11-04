@@ -193,3 +193,73 @@
 .alert.alert-information.alert-dismissible .btn-close:focus {
   box-shadow: 0 0 0 2px var(--clr-text-on-information);
 }
+
+/* ==========================================================================
+   Hazard alert banner (.ntg-alert) – light tint, coloured border, hazard icon
+   ========================================================================== */
+.alert.ntg-alert {
+  --ntg-alert-accent: var(--clr-status-warning);
+  align-items: center;
+  gap: 24px;
+  margin: 0;
+  border: 2px solid var(--ntg-alert-accent);
+  border-radius: 0;
+  background: color-mix(in srgb, var(--ntg-alert-accent) 12%, #fff);
+  color: var(--clr-text-on-information);
+  font-family: "Lato", sans-serif;
+}
+
+.ntg-alert[data-level="advice"] {
+  --ntg-alert-accent: var(--clr-status-advice);
+}
+
+.ntg-alert[data-level="watch_act"] {
+  --ntg-alert-accent: var(--clr-status-watch-act);
+}
+
+.ntg-alert[data-level="emergency_warning"] {
+  --ntg-alert-accent: var(--clr-status-warning);
+}
+
+.ntg-alert__icon {
+  flex: 0 0 auto;
+}
+
+.ntg-alert__icon:empty {
+  display: none;
+}
+
+.ntg-alert__icon img {
+  display: block;
+  width: 64px;
+  height: auto;
+}
+
+.ntg-alert__text h3 {
+  margin: 0 0 16px;
+  color: var(--clr-text-on-information);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.ntg-alert__text p {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+@media (max-width: 575.98px) {
+  .ntg-alert__icon img {
+    width: 48px;
+  }
+
+  .ntg-alert__text h3 {
+    margin-bottom: 8px;
+    font-size: 22px;
+  }
+
+  .ntg-alert__text p {
+    font-size: 16px;
+  }
+}
