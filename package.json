@@ -6,10 +6,13 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "npm run build && wrangler dev",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && wrangler deploy",
+    "worker:whoami": "dotenv -e .env -- wrangler whoami --config src/local-conditions/wrangler.toml",
+    "worker:deploy": "dotenv -e .env -- wrangler deploy --config src/local-conditions/wrangler.toml"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.67.0",
+    "dotenv-cli": "^11.1.0",
     "vite": "^6.0.0",
     "wrangler": "^4.157.0"
   }
