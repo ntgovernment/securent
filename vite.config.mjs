@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import { existsSync } from "node:fs";
 
 import { cloudflare } from "@cloudflare/vite-plugin";
 
@@ -21,13 +22,17 @@ const localConditionsMock = {
   },
 };
 
+const includeLocalCapture =
+  process.env.SECURENT_NO_LOCAL_CAPTURE !== "1" &&
+  existsSync(new URL("./SecureNT.html", import.meta.url));
+
 export default defineConfig({
   root: ".",
   plugins: [localConditionsMock, cloudflare()],
   build: {
     rollupOptions: {
       input: {
-        page: "./SecureNT.html",
+        ...(includeLocalCapture ? { page: "./SecureNT.html" } : {}),
         theme: "./src/js/main.js",
         "local-conditions": "./src/local-conditions/local-conditions.js",
       },
