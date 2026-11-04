@@ -1,0 +1,16 @@
+/* ==========================================================================
+   alt.css – Main entry point
+   Compiled by Vite into Fuel security_files/alt.css
+
+   To add a new component stylesheet:
+     1. Create a .css file in src/css/components/
+     2. Add an @import line below, in the desired cascade order
+   ========================================================================== */
+
+@import "./components/mainmenu-dropdown.css";
+@import "./components/header-footer.css";
+@import "./components/statistics.css";
+@import "./components/main.css";
+@import "./components/buttons.css";
+@import "./components/alert.css";
+@import "../local-conditions/local-conditions.css";

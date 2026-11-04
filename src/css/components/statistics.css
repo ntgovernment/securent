@@ -1,0 +1,32 @@
+/* ==========================================================================
+   Statistics section overrides
+   Background: Sand (#D9DED4) with black text and icons
+   ========================================================================== */
+
+.statistics-wrapper {
+  background: #d9ded4 !important;
+}
+
+.statistics-wrapper h2 {
+  color: #000000 !important;
+}
+
+.statistics a:link {
+  color: #000000 !important;
+}
+
+.statistic-icon img {
+  filter: brightness(0) !important;
+}
+
+.full-statistic {
+  color: #000000 !important;
+}
+
+.statistic .description {
+  color: #000000 !important;
+}
+
+.statistics-wrapper p {
+  color: #000000 !important;
+}

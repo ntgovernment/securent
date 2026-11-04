@@ -1,0 +1,33 @@
+/* ==========================================================================
+   #header-footer – Brand colour overrides
+   Overrides the default navy (#1f1f5f) from ntgbase.min.css with
+   NTG Charcoal (#343741) per the Accessible Colours brand guidelines (May 2025).
+   ========================================================================== */
+
+/* ---- Header ---- */
+header.ntg-header {
+  background-color: #343741;
+}
+
+/* ---- Footer ---- */
+.ntg-footer,
+.ntg-footer__text {
+  background-color: #343741;
+}
+
+/* ---- Mobile search banner ---- */
+.mobile-banner {
+  background-color: #343741;
+}
+
+/* ---- Search submit button ---- */
+/* Default: Territory orange (#D6410A); Hover: deep red (#C33826) */
+form.search .input-group-append button {
+  background: #d6410a;
+  background-image: none;
+}
+
+form.search .input-group-append button:hover {
+  background: #c33826;
+  background-image: none;
+}

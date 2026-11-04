@@ -1,0 +1,361 @@
+/* ==========================================================================
+   #mainmenu – Navigation Dropdown Menu Styles
+   Targets: nav#mainmenu .ntg-main-nav__links
+   ========================================================================== */
+
+/* ---- Top-level nav bar ---- */
+#mainmenu {
+  background-color: #ffffff;
+  position: relative;
+  z-index: 1000;
+}
+
+#mainmenu .container {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* The logo and hero banner use .container-xl (100% wide until 1200px).
+   Override .container's breakpoint max-widths so the nav left edge matches. */
+@media (min-width: 576px) and (max-width: 1199.98px) {
+  #mainmenu .container {
+    max-width: 100% !important;
+  }
+}
+
+/* Strip Bootstrap row/col gutters and any wrapper padding so the ul
+   sits flush with the .container left edge */
+#mainmenu .row {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+#mainmenu .col-md-12,
+#mainmenu .au-main-nav__content,
+#mainmenu .au-main-nav__menu,
+#mainmenu .au-main-nav__menu-inner,
+#mainmenu .au-main-nav__menu-inner-wrap {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* ---- Primary link list (horizontal bar) ---- */
+.ntg-main-nav__links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+/* ---- Top-level list items ---- */
+.ntg-main-nav__links > li {
+  position: relative;
+}
+
+.ntg-main-nav__links > li > a {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: #000000;
+  text-decoration: none;
+  font-size: 0.9375rem;
+  font-weight: bold;
+  white-space: nowrap;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.ntg-main-nav__links > li > a:hover,
+.ntg-main-nav__links > li > a:focus {
+  background-color: #fcccbb;
+  color: #000000;
+  border-bottom: 3px solid #fcccbb;
+}
+
+/* Arrow indicator for items with children */
+.ntg-main-nav__links > li.has-children > a::after {
+  content: "\f078"; /* fa-chevron-down */
+  font-family: "Font Awesome 6 Pro";
+  font-weight: 900;
+  display: inline-block;
+  margin-left: 0.4em;
+  vertical-align: middle;
+  font-size: 0.65em;
+  transition: transform 0.3s ease;
+}
+
+.ntg-main-nav__links > li.has-children.open > a::after {
+  content: "\f078";
+  transform: rotate(-180deg) translateX(-4px);
+}
+
+/* ---- Second-level dropdown ---- */
+.ntg-main-nav__links > li > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 240px;
+  background-color: #ffffff;
+  border: 1px solid #d6d6d6;
+  border-left: 3px solid #f4551a;
+  border-radius: 0 4px 4px 0;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease,
+    transform 0.2s ease;
+  z-index: 1010;
+}
+
+/* Show dropdown when .open is toggled via JS */
+.ntg-main-nav__links > li.open > ul {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Rotate caret when open — handled by content swap above */
+
+/* ---- Second-level items ---- */
+.ntg-main-nav__links > li > ul > li > a {
+  display: block;
+  padding: 0.5rem 1.25rem;
+  color: #000000;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: bold;
+  white-space: nowrap;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.ntg-main-nav__links > li > ul > li > a:hover,
+.ntg-main-nav__links > li > ul > li > a:focus {
+  background-color: #fcccbb;
+  color: #000000;
+}
+
+/* Arrow for third-level parents – hidden */
+.ntg-main-nav__links > li > ul > li.has-children > a::after {
+  display: none;
+}
+
+/* ---- Third-level dropdown (fly-out) – hidden ---- */
+.ntg-main-nav__links > li > ul > li > ul {
+  display: none;
+}
+
+/* Show third-level when .open is toggled via JS */
+.ntg-main-nav__links > li > ul > li.open > ul {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+/* Third-level items need relative positioning for fly-out */
+.ntg-main-nav__links > li > ul > li.has-children {
+  position: relative;
+}
+
+/* ---- Third-level links ---- */
+.ntg-main-nav__links > li > ul > li > ul > li > a {
+  display: block;
+  padding: 0.5rem 1.25rem;
+  color: #000000;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: bold;
+  white-space: nowrap;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.ntg-main-nav__links > li > ul > li > ul > li > a:hover,
+.ntg-main-nav__links > li > ul > li > ul > li > a:focus {
+  background-color: #fcccbb;
+  color: #000000;
+}
+
+/* ---- Active / current page highlight ---- */
+.ntg-main-nav__links > li.active > a,
+.ntg-main-nav__links > li.current > a {
+  background-color: #fcccbb;
+  color: #000000;
+  border-bottom: 3px solid #f4551a;
+}
+
+/* ==========================================================================
+   Responsive – Collapse to vertical accordion on small screens
+   ========================================================================== */
+
+/* ---- Hamburger toggle button ---- */
+.ntg-menu-toggle {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  .ntg-menu-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: #ffffff;
+    color: #000000;
+    font-size: 0.9375rem;
+    font-weight: bold;
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .ntg-menu-toggle:hover,
+  .ntg-menu-toggle:focus {
+    background-color: #fcccbb;
+  }
+
+  .ntg-menu-toggle[aria-expanded="true"] .fas::before {
+    content: "\f00d"; /* fa-xmark / fa-times */
+  }
+
+  /* Hide the nav links by default on mobile */
+  #mainmenu .row {
+    display: none;
+  }
+
+  #mainmenu.menu-open .row {
+    display: block;
+  }
+
+  .ntg-main-nav__links {
+    flex-direction: column;
+  }
+
+  .ntg-main-nav__links > li > a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #000000;
+    font-weight: bold;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .ntg-main-nav__links > li > a:hover,
+  .ntg-main-nav__links > li > a:focus {
+    background-color: #fcccbb;
+    color: #000000;
+    border-bottom-color: rgba(0, 0, 0, 0.1);
+  }
+
+  .ntg-main-nav__links > li.active > a,
+  .ntg-main-nav__links > li.current > a {
+    background-color: #fcccbb;
+    color: #000000;
+    border-left: 3px solid #f4551a;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  /* Left accent border on expanded level 1 item */
+  .ntg-main-nav__links > li.open > a {
+    border-left: 3px solid #f4551a;
+  }
+
+  /* Stack dropdowns vertically instead of absolute positioning */
+  .ntg-main-nav__links > li > ul,
+  .ntg-main-nav__links > li > ul > li > ul {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    border: none;
+    border-top: none;
+    border-radius: 0;
+    background-color: #ffffff;
+    display: none;
+  }
+
+  /* Left accent border on expanded level 2 dropdown */
+  .ntg-main-nav__links > li.open > ul {
+    border-left: 3px solid #f4551a;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  /* Show nested lists when .open is toggled via JS */
+  .ntg-main-nav__links > li.open > ul,
+  .ntg-main-nav__links > li > ul > li.open > ul {
+    display: block;
+  }
+
+  .ntg-main-nav__links > li > ul > li > a,
+  .ntg-main-nav__links > li > ul > li > ul > li > a {
+    color: #000000;
+    font-weight: bold;
+    padding-left: 2rem;
+  }
+
+  .ntg-main-nav__links > li > ul > li > ul > li > a {
+    padding-left: 3rem;
+  }
+
+  .ntg-main-nav__links > li > ul > li > a:hover,
+  .ntg-main-nav__links > li > ul > li > a:focus,
+  .ntg-main-nav__links > li > ul > li > ul > li > a:hover,
+  .ntg-main-nav__links > li > ul > li > ul > li > a:focus {
+    background-color: #fcccbb;
+    color: #000000;
+  }
+
+  /* Reset border-left on third-level mobile */
+  .ntg-main-nav__links > li > ul > li > ul {
+    border-left: none;
+  }
+
+  /* Remove bottom border accent on hover for mobile */
+  .ntg-main-nav__links > li > a:hover,
+  .ntg-main-nav__links > li > a:focus {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  /* Carets for mobile – FA chevrons matching desktop */
+  .ntg-main-nav__links > li.has-children > a::after {
+    content: "\f078"; /* fa-chevron-down */
+    font-family: "Font Awesome 6 Pro";
+    font-weight: 900;
+    width: auto;
+    height: auto;
+    border: none;
+    font-size: 0.65em;
+    transform: none;
+    transition: transform 0.3s ease;
+  }
+
+  .ntg-main-nav__links > li.has-children.open > a::after {
+    content: "\f078";
+    transform: rotate(-180deg) translateX(-4px);
+  }
+
+  .ntg-main-nav__links > li > ul > li.has-children > a::after {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Accessibility
+   ========================================================================== */
+.ntg-main-nav__links a:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: -2px;
+}

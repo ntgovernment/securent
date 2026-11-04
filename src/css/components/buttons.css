@@ -1,0 +1,37 @@
+/* ==========================================================================
+   Button overrides
+   Overrides the default navy (#1f1f5f) from ntgbase.min.css with
+   NTG Charcoal (#343741) per the Accessible Colours brand guidelines.
+   ========================================================================== */
+
+/* ---- Primary button ---- */
+.btn.ntg-btn {
+  background: #343741;
+}
+
+.btn.ntg-btn--primary:active,
+.ntg-featured-content-small__text .btn.ntg-btn--secondary:active:hover {
+  background: #343741;
+}
+
+/* ---- Secondary (outline) button ---- */
+.btn.ntg-btn--secondary {
+  background: #fff;
+  color: #343741;
+  box-shadow: 0 0 0 1.5px #343741 inset;
+}
+
+.btn.ntg-btn--secondary:active {
+  color: #343741;
+}
+
+/* ---- Secondary hover (existing) ---- */
+.btn.ntg-btn--secondary:hover {
+  background-color: #d6410a;
+  box-shadow: 0 0 0 1.5px #d6410a inset;
+  color: #fff;
+}
+
+.homepage-news .btn.ntg-btn {
+  border-radius: 0;
+}

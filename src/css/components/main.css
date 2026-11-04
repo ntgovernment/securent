@@ -1,0 +1,135 @@
+/* ==========================================================================
+   Main element overrides
+   ========================================================================== */
+
+main.ntg-body {
+  margin-bottom: 0 !important;
+}
+
+/* ==========================================================================
+   Display cards – icon colour matches heading hover colour (#c84c01)
+   ========================================================================== */
+
+.ntg-display-cards .card i,
+.ntg-display-cards a.outer-link i {
+  color: #f4551a;
+}
+
+.ntg-display-cards .card:hover i,
+.ntg-display-cards a.outer-link:hover i {
+  color: #c84c01;
+}
+
+.ntg-display-cards .card-title {
+  display: flex;
+  align-items: center;
+  color: #343741 !important;
+}
+
+.ntg-display-cards .card-title::after {
+  content: "\f178";
+  font-family: "Font Awesome 6 Pro";
+  font-weight: 900;
+  color: #f4551a;
+  margin-left: auto;
+  font-size: inherit;
+  transform: translateX(-4px);
+  transition: transform 0.2s ease;
+}
+
+.ntg-display-cards .card:hover .card-title::after {
+  color: #c84c01;
+  transform: translateX(0);
+}
+
+/* ==========================================================================
+   Homepage news
+   ========================================================================== */
+
+.homepage-news .text-ntg-sky-blue {
+  color: #000 !important;
+}
+
+.homepage-news .card-title {
+  color: #343741 !important;
+}
+
+.homepage-news .card:hover .card-title {
+  color: #c84c01 !important;
+}
+
+.homepage-news .card {
+  border-radius: 0;
+}
+
+.homepage-news .card-header {
+  border-bottom: 0;
+}
+
+.homepage-news .card-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.15em 0.65em;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 2px;
+  line-height: 1.6;
+  background-color: #ffffff;
+  color: #1f1e27;
+  border: 1px solid #d3d3d7;
+}
+
+/* ==========================================================================
+   Fuel levels
+   ========================================================================== */
+
+/* Landing page layout */
+.fuel-levels .container {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: stretch;
+  max-width: 1320px;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+/* Content page layout */
+.fuel-levels p:last-of-type {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+/* Shared image styles */
+.fuel-levels .container img,
+.fuel-levels p:last-of-type img {
+  width: 25%;
+  height: auto;
+  display: block;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .fuel-levels .container,
+  .fuel-levels p:last-of-type {
+    flex-direction: column;
+    align-items: center;
+    max-width: 100% !important;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .fuel-levels .container img,
+  .fuel-levels p:last-of-type img {
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+}

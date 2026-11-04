@@ -1,0 +1,189 @@
+/* ==========================================================================
+   Global alert banners – matches Figma "Global alert" component
+   ========================================================================== */
+
+:root {
+  /* Status background colours — match Levels 2-4 from the response framework */
+  --clr-status-information: #ffc72c; /* Level 2 – yellow */
+  --clr-status-warning: #d6410a; /* Level 3 – orange */
+  --clr-status-critical: #fc4141; /* Level 4 – red */
+
+  /* Foreground (text) colours — chosen for WCAG AA contrast against each bg */
+  --clr-text-on-information: #212529; /* dark on yellow ≈ 11.6:1 (AAA) */
+  --clr-text-inverse: #ffffff; /* white on orange ≈ 5.0:1 (AA) / on red ≈ 6.8:1 (AAA) */
+  --clr-link-inverse: #ffffff;
+  --clr-link-on-information: #212529;
+}
+
+/* Base override for top-of-page global alerts */
+.alert.alert-warning,
+.alert.alert-info,
+.alert.alert-information,
+.alert.alert-danger,
+.alert.alert-critical {
+  --bs-alert-color: var(--clr-text-inverse);
+  --bs-alert-link-color: var(--clr-link-inverse);
+  --bs-alert-border-color: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 16px;
+  color: var(--clr-text-inverse);
+  font-family: "Lato", sans-serif;
+}
+
+.alert.alert-warning {
+  --bs-alert-bg: var(--clr-status-warning);
+  background: var(--clr-status-warning);
+}
+
+.alert.alert-info,
+.alert.alert-information {
+  --bs-alert-bg: var(--clr-status-information);
+  --bs-alert-color: var(--clr-text-on-information);
+  --bs-alert-link-color: var(--clr-link-on-information);
+  background: var(--clr-status-information);
+  color: var(--clr-text-on-information);
+}
+
+.alert.alert-danger,
+.alert.alert-critical {
+  --bs-alert-bg: var(--clr-status-critical);
+  background: var(--clr-status-critical);
+}
+
+/* Inner content row – flex column, close button handled by alert-dismissible padding */
+.alert.alert-warning > .container-xl,
+.alert.alert-info > .container-xl,
+.alert.alert-information > .container-xl,
+.alert.alert-danger > .container-xl,
+.alert.alert-critical > .container-xl {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding-right: 64px; /* room for the absolute-positioned close button */
+}
+
+/* Title */
+.alert.alert-warning .alert-title,
+.alert.alert-info .alert-title,
+.alert.alert-information .alert-title,
+.alert.alert-danger .alert-title,
+.alert.alert-critical .alert-title {
+  color: var(--clr-text-inverse);
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  line-height: 24px !important;
+  margin: 0;
+}
+
+/* Body text */
+.alert.alert-warning .alert-body,
+.alert.alert-info .alert-body,
+.alert.alert-information .alert-body,
+.alert.alert-danger .alert-body,
+.alert.alert-critical .alert-body {
+  color: var(--clr-text-inverse);
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  line-height: 24px !important;
+  margin: 0;
+}
+
+/* Inline links */
+.alert.alert-warning a,
+.alert.alert-info a,
+.alert.alert-information a,
+.alert.alert-danger a,
+.alert.alert-critical a,
+.alert.alert-warning .alert-link,
+.alert.alert-info .alert-link,
+.alert.alert-information .alert-link,
+.alert.alert-danger .alert-link,
+.alert.alert-critical .alert-link {
+  color: var(--clr-link-inverse);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.alert.alert-warning a:hover,
+.alert.alert-info a:hover,
+.alert.alert-information a:hover,
+.alert.alert-danger a:hover,
+.alert.alert-critical a:hover,
+.alert.alert-warning a:focus,
+.alert.alert-info a:focus,
+.alert.alert-information a:focus,
+.alert.alert-danger a:focus,
+.alert.alert-critical a:focus {
+  color: var(--clr-link-inverse);
+  text-decoration: none;
+}
+
+/* Close button – 24×24 white icon, anchored to top-right corner */
+.alert.alert-warning.alert-dismissible .btn-close,
+.alert.alert-info.alert-dismissible .btn-close,
+.alert.alert-information.alert-dismissible .btn-close,
+.alert.alert-danger.alert-dismissible .btn-close,
+.alert.alert-critical.alert-dismissible .btn-close {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  opacity: 1;
+  background-size: 16px 16px;
+  background-position: center;
+  filter: brightness(0) invert(1);
+}
+
+.alert.alert-warning.alert-dismissible .btn-close:hover,
+.alert.alert-info.alert-dismissible .btn-close:hover,
+.alert.alert-information.alert-dismissible .btn-close:hover,
+.alert.alert-danger.alert-dismissible .btn-close:hover,
+.alert.alert-critical.alert-dismissible .btn-close:hover {
+  opacity: 0.85;
+}
+
+.alert.alert-warning.alert-dismissible .btn-close:focus,
+.alert.alert-info.alert-dismissible .btn-close:focus,
+.alert.alert-information.alert-dismissible .btn-close:focus,
+.alert.alert-danger.alert-dismissible .btn-close:focus,
+.alert.alert-critical.alert-dismissible .btn-close:focus {
+  box-shadow: 0 0 0 2px var(--clr-text-inverse);
+  outline: none;
+}
+
+/* ==========================================================================
+   Information variant overrides — dark text on yellow background for WCAG contrast
+   ========================================================================== */
+.alert.alert-info .alert-title,
+.alert.alert-information .alert-title,
+.alert.alert-info .alert-body,
+.alert.alert-information .alert-body {
+  color: var(--clr-text-on-information);
+}
+
+.alert.alert-info a,
+.alert.alert-information a,
+.alert.alert-info .alert-link,
+.alert.alert-information .alert-link,
+.alert.alert-info a:hover,
+.alert.alert-information a:hover,
+.alert.alert-info a:focus,
+.alert.alert-information a:focus {
+  color: var(--clr-link-on-information);
+}
+
+.alert.alert-info.alert-dismissible .btn-close,
+.alert.alert-information.alert-dismissible .btn-close {
+  /* Keep Bootstrap's default dark close icon (no white invert) on the yellow bg */
+  filter: none;
+}
+
+.alert.alert-info.alert-dismissible .btn-close:focus,
+.alert.alert-information.alert-dismissible .btn-close:focus {
+  box-shadow: 0 0 0 2px var(--clr-text-on-information);
+}
