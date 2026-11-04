@@ -1,5 +1,7 @@
 import { defineConfig } from "vite";
 
+import { cloudflare } from "@cloudflare/vite-plugin";
+
 // Dev-only stand-in for the deployed proxy in src/local-conditions/worker.js.
 const localConditionsMock = {
   name: "local-conditions-mock",
@@ -21,7 +23,7 @@ const localConditionsMock = {
 
 export default defineConfig({
   root: ".",
-  plugins: [localConditionsMock],
+  plugins: [localConditionsMock, cloudflare()],
   build: {
     rollupOptions: {
       input: {
