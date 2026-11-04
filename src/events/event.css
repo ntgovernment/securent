@@ -78,3 +78,34 @@
   top: 100%;
   z-index: 1;
 }
+
+/* Scoped via the feedback component id, as the CMS markup has no unique class. */
+.container-xl:has(#component_1248686) {
+  background-color: #f4f4f7;
+}
+
+.container-xl:has(#component_1248686) > .row {
+  align-items: center;
+  font-size: 1.25rem;
+  color: #5b5b66;
+}
+
+#component_1248686 a {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #0f4a4f;
+  text-decoration: none;
+  background-color: #e8e9ec;
+  border-radius: 0.5rem;
+}
+
+#component_1248686 a:hover {
+  background-color: #dcdde1;
+}
+
+#component_1248686 a:focus-visible {
+  outline: 2px solid #0f4a4f;
+  outline-offset: 2px;
+}
