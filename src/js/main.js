@@ -1,6 +1,5 @@
 import "./homepage-news.js";
 import "./display-cards.js";
-import "../local-conditions/local-conditions.js";
 
 /* ==========================================================================
    #mainmenu – Click-to-open dropdown behaviour

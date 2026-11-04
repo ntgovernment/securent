@@ -7,17 +7,23 @@ export default defineConfig({
       input: {
         page: "./SecureNT.html",
         theme: "./src/js/main.js",
+        "local-conditions": "./src/local-conditions/local-conditions.js",
       },
       output: {
         // theme entry outputs to dist/theme.js; other chunks to Fuel security_files/
         entryFileNames: (chunk) =>
-          chunk.name === "theme" ? "theme.js" : "SecureNT_files/[name].js",
+          chunk.name === "theme" || chunk.name === "local-conditions"
+            ? "[name].js"
+            : "SecureNT_files/[name].js",
         chunkFileNames: "SecureNT_files/[name].js",
         // CSS goes to dist/ root for easy git file bridge referencing;
         // other assets keep their original subfolder.
         assetFileNames: (assetInfo) => {
           if (assetInfo.name === "print.css") {
             return "[name][extname]";
+          }
+          if (assetInfo.name === "local-conditions.css") {
+            return "local-conditions.css";
           }
           if (assetInfo.name && assetInfo.name.endsWith(".css")) {
             return "theme.css";

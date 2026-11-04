@@ -1,3 +1,5 @@
+import "./local-conditions.css";
+
 /* ==========================================================================
    #local-conditions – Location select + BOM / NT EPA condition cards
    Data comes from the proxy in worker.js (same folder).
