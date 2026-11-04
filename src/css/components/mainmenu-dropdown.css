@@ -195,6 +195,142 @@
   border-bottom: 3px solid #f4551a;
 }
 
+@media (min-width: 768px) {
+  nav.nav-masthead {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0 0 0 2rem;
+    padding: 0;
+    background-color: transparent;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  nav.nav-masthead > .row {
+    flex: 0 1 auto;
+    min-width: 0;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  nav.nav-masthead .col-md-12 {
+    flex: 0 1 auto;
+    width: auto;
+  }
+
+  nav.nav-masthead .col-md-12,
+  nav.nav-masthead .au-main-nav__content,
+  nav.nav-masthead .au-main-nav__menu,
+  nav.nav-masthead .au-main-nav__menu-inner,
+  nav.nav-masthead .au-main-nav__menu-inner-wrap {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  nav.nav-masthead .ntg-main-nav__links {
+    width: auto;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 2rem;
+    padding: 0;
+  }
+
+  nav.nav-masthead .ntg-main-nav__links > li > a {
+    display: inline-flex;
+    align-items: center;
+    padding: 0;
+    border-bottom: 0;
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.5;
+    text-decoration: none;
+  }
+
+  nav.nav-masthead .ntg-main-nav__links > li > a:hover,
+  nav.nav-masthead .ntg-main-nav__links > li > a:focus {
+    background-color: #484b55;
+    color: #ffffff;
+    border-bottom: 0;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.3em;
+  }
+
+  nav.nav-masthead .ntg-main-nav__links > li > ul {
+    background-color: #343741;
+    border-color: rgba(255, 255, 255, 0.2);
+    border-left-color: #f4551a;
+  }
+
+  nav.nav-masthead .ntg-main-nav__links > li > ul > li > a,
+  nav.nav-masthead .ntg-main-nav__links > li > ul > li > ul > li > a {
+    color: #ffffff;
+    text-decoration: none;
+  }
+
+  nav.nav-masthead .ntg-main-nav__links > li > ul > li > a:hover,
+  nav.nav-masthead .ntg-main-nav__links > li > ul > li > a:focus,
+  nav.nav-masthead .ntg-main-nav__links > li > ul > li > ul > li > a:hover,
+  nav.nav-masthead .ntg-main-nav__links > li > ul > li > ul > li > a:focus {
+    background-color: #484b55;
+    color: #ffffff;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.25em;
+  }
+
+  nav.nav-masthead .ntg-main-nav__links > li:has(> ul) > a::after,
+  nav.nav-masthead .ntg-main-nav__links > li.has-children > a::after {
+    content: "";
+    display: inline-block;
+    width: 0.6rem;
+    height: 0.6rem;
+    margin: -0.2rem 0 0 0.75rem;
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+  }
+
+  nav.nav-masthead .ntg-main-nav__links > li:not(:has(> ul)) > a::after {
+    content: none;
+  }
+
+  nav.nav-masthead .ntg-main-nav__links > li.open > a::after {
+    transform: rotate(225deg);
+  }
+
+  nav.nav-masthead .ntg-main-nav__links > li.active > a,
+  nav.nav-masthead .ntg-main-nav__links > li.current > a {
+    background-color: transparent;
+    color: #ffffff;
+    border-bottom: 0;
+  }
+
+  nav.nav-masthead .ntg-main-nav__links a:focus-visible {
+    outline-color: #ffffff;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  nav.nav-masthead {
+    margin-left: 1rem;
+    gap: 0.75rem;
+  }
+
+  nav.nav-masthead .ntg-main-nav__links {
+    gap: 1rem;
+  }
+
+  nav.nav-masthead .ntg-main-nav__links > li > a {
+    font-size: 0.875rem;
+  }
+}
+
 /* ==========================================================================
    Responsive – Collapse to vertical accordion on small screens
    ========================================================================== */

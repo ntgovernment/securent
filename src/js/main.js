@@ -1,6 +1,21 @@
 import "./homepage-news.js";
 import "./display-cards.js";
 
+/* Expand the desktop search field when the icon is activated empty. */
+(function () {
+  const form = document.querySelector("nav.nav-masthead .ntg-header-search");
+  if (!form) return;
+
+  const input = form.querySelector('input[name="query"]');
+  if (!input) return;
+
+  form.addEventListener("submit", function (event) {
+    if (input.value.trim()) return;
+    event.preventDefault();
+    input.focus();
+  });
+})();
+
 /* ==========================================================================
    #mainmenu – Click-to-open dropdown behaviour
    Toggles the .open class on <li> elements that have child <ul> menus.

@@ -9,6 +9,120 @@ header.ntg-header {
   background-color: #343741;
 }
 
+@media (min-width: 768px) {
+  header.ntg-header .navbar {
+    min-height: 72px;
+    padding: 0;
+  }
+
+  header.ntg-header .navbar > .container-xl {
+    max-width: 1200px;
+    min-height: 72px;
+    gap: 1.5rem;
+    padding: 0 16px !important;
+  }
+
+  header.ntg-header .site-logo-lockup {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+
+  header.ntg-header .site-logo-lockup > a:first-child,
+  header.ntg-header .site-logo-lockup > a:first-child span {
+    display: block;
+    flex: 0 0 3rem;
+    width: 3rem;
+    height: 3rem;
+    overflow: hidden;
+  }
+
+  header.ntg-header .site-logo-lockup img.site-logo {
+    display: block;
+    width: 3rem;
+    height: 3rem;
+    margin: 0;
+    padding: 0;
+    border: 0 !important;
+    object-fit: cover;
+    object-position: left center;
+  }
+
+  header.ntg-header .site-logo-lockup .site-name {
+    display: block !important;
+    padding: 0;
+    color: #ffffff;
+    font-size: 1.125rem;
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  nav.nav-masthead .ps-4 {
+    flex: 0 0 auto;
+    padding-left: 0 !important;
+  }
+
+  nav.nav-masthead .ntg-header-search {
+    width: 40px;
+    margin: 0;
+  }
+
+  nav.nav-masthead .ntg-header-search .input-group {
+    position: relative;
+    width: 40px;
+    height: 40px;
+  }
+
+  nav.nav-masthead .ntg-header-search .form-control {
+    position: absolute;
+    top: 0;
+    right: 40px;
+    z-index: 2;
+    width: 1px;
+    min-width: 1px;
+    height: 1px;
+    padding: 0;
+    border: 0;
+    opacity: 0;
+    transition:
+      width 0.2s ease,
+      opacity 0.2s ease;
+  }
+
+  nav.nav-masthead .ntg-header-search:hover .form-control,
+  nav.nav-masthead .ntg-header-search:focus-within .form-control {
+    width: 220px;
+    height: 40px;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #ffffff;
+    opacity: 1;
+  }
+
+  nav.nav-masthead .ntg-header-search .input-group-append {
+    display: flex;
+  }
+
+  nav.nav-masthead .ntg-header-search .input-group-append button {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent !important;
+    background-image: none !important;
+    color: #ffffff;
+  }
+
+  nav.nav-masthead .ntg-header-search .input-group-append button::before {
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: 300;
+  }
+}
+
 /* ---- Footer ---- */
 .ntg-footer,
 .ntg-footer__text {
