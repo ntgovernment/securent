@@ -9,96 +9,188 @@ header.ntg-header {
   background-color: #343741;
 }
 
-/* Overrides ntgbase's 10.5rem x 3.75rem + padding-right, which squeezes the SVG wordmark */
-header.ntg-header .site-logo-lockup img.site-logo {
+header.ntg-header .navbar {
+  display: block;
+  padding: 0;
+}
+
+header.ntg-header .header-top {
+  background-color: #343741;
+}
+
+header.ntg-header .header-top > .container-xl,
+header.ntg-header .header-navigation > .container-xl {
+  max-width: 1200px;
+  padding-right: 16px !important;
+  padding-left: 16px !important;
+}
+
+header.ntg-header .header-top > .container-xl {
+  display: flex;
+  min-height: 72px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+header.ntg-header .site-logo {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  white-space: nowrap;
+}
+
+header.ntg-header .site-logo svg {
   display: block;
   width: 150px;
   height: 46px;
   margin: 0;
   padding: 0;
-  border: 0 !important;
+}
+
+header.ntg-header .header-tools {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 32px;
+}
+
+header.ntg-header .header-tools > a {
+  color: #ffffff;
+  font-size: 16px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+header.ntg-header .header-tools > a:hover,
+header.ntg-header .header-tools > a:focus-visible {
+  text-decoration: underline;
+}
+
+header.ntg-header .header-tools .ps-4 {
+  flex: 0 0 auto;
+  padding-left: 0 !important;
+}
+
+header.ntg-header .header-tools .ntg-header-search {
+  width: 296px;
+  margin: 0;
+}
+
+header.ntg-header .header-tools .ntg-header-search .input-group {
+  display: flex;
+  width: 100%;
+  height: 48px;
+}
+
+header.ntg-header .header-tools .ntg-header-search .form-control {
+  position: static;
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+  height: 48px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 0;
+  background-color: #e9e9eb;
+  color: #343741;
+  opacity: 1;
+  transition: none;
+}
+
+header.ntg-header .header-tools .ntg-header-search .input-group-append {
+  display: flex;
+  flex: 0 0 50px;
+}
+
+header.ntg-header .header-tools .ntg-header-search .input-group-append button {
+  display: flex;
+  width: 50px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: #f4551a;
+  color: #ffffff;
+}
+
+header.ntg-header .header-tools .ntg-header-search .input-group-append button:hover,
+header.ntg-header .header-tools .ntg-header-search .input-group-append button:focus-visible {
+  background: #c33826;
+}
+
+header.ntg-header .header-tools .ntg-header-search .input-group-append button::before {
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 300;
+}
+
+header.ntg-header .header-navigation {
+  min-height: 56px;
+  background-color: #424550;
+}
+
+header.ntg-header .header-navigation > .container-xl {
+  min-height: 56px;
+}
+
+header.ntg-header .header-navigation nav.nav-masthead {
+  width: 100%;
+  min-height: 56px;
+  align-items: center;
+  justify-content: flex-start !important;
+}
+
+header.ntg-header .header-navigation nav.nav-masthead > .row {
+  width: 100%;
+  margin: 0;
+}
+
+header.ntg-header .header-navigation nav.nav-masthead > .row > .col-md-12 {
+  padding: 0;
 }
 
 @media (min-width: 768px) {
-  header.ntg-header .navbar {
+  header.ntg-header .header-navigation .ntg-main-nav__links {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+  }
+}
+
+header.ntg-header .header-navigation .ntg-main-nav__links > li > a {
+  border-bottom: 3px solid transparent;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+header.ntg-header .header-navigation .ntg-main-nav__links > li:first-child > a {
+  padding-left: 0;
+}
+
+header.ntg-header .header-navigation .ntg-main-nav__links > li > a:hover,
+header.ntg-header .header-navigation .ntg-main-nav__links > li > a:focus-visible {
+  border-bottom-color: #f4551a;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+@media (max-width: 767.98px) {
+  header.ntg-header .header-top > .container-xl {
     min-height: 72px;
-    padding: 0;
+    gap: 16px;
   }
 
-  header.ntg-header .navbar > .container-xl {
-    max-width: 1200px;
-    min-height: 72px;
-    gap: 1.5rem;
-    padding: 0 16px !important;
+  header.ntg-header .header-tools {
+    gap: 0;
   }
 
-  header.ntg-header .site-logo-lockup {
-    display: flex;
-    flex: 0 0 auto;
-    align-items: center;
-    white-space: nowrap;
-  }
-
-  nav.nav-masthead .ps-4 {
-    flex: 0 0 auto;
-    padding-left: 0 !important;
-  }
-
-  nav.nav-masthead .ntg-header-search {
-    width: 40px;
-    margin: 0;
-  }
-
-  nav.nav-masthead .ntg-header-search .input-group {
-    position: relative;
-    width: 40px;
-    height: 40px;
-  }
-
-  nav.nav-masthead .ntg-header-search .form-control {
-    position: absolute;
-    top: 0;
-    right: 40px;
-    z-index: 2;
-    width: 1px;
-    min-width: 1px;
-    height: 1px;
-    padding: 0;
-    border: 0;
-    opacity: 0;
-    transition:
-      width 0.2s ease,
-      opacity 0.2s ease;
-  }
-
-  nav.nav-masthead .ntg-header-search:hover .form-control,
-  nav.nav-masthead .ntg-header-search:focus-within .form-control {
-    width: 220px;
-    height: 40px;
-    padding: 0.375rem 0.75rem;
-    border: 1px solid #ffffff;
-    opacity: 1;
-  }
-
-  nav.nav-masthead .ntg-header-search .input-group-append {
-    display: flex;
-  }
-
-  nav.nav-masthead .ntg-header-search .input-group-append button {
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    background: transparent !important;
-    background-image: none !important;
-    color: #ffffff;
-  }
-
-  nav.nav-masthead .ntg-header-search .input-group-append button::before {
-    color: #ffffff;
-    font-size: 1.5rem;
-    font-weight: 300;
+  header.ntg-header .header-tools > a {
+    font-size: 14px;
   }
 }
 
