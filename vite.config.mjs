@@ -9,11 +9,18 @@ const eventPreview = {
   configureServer(server) {
     server.middlewares.use(async (req, res, next) => {
       const url = new URL(req.url, "http://localhost");
-      const capture = "Severe Storm \u2013 Alice Springs _ SecureNT.html";
+      const eventCapture = "Severe Storm \u2013 Alice Springs _ SecureNT.html";
+      const capture =
+        url.pathname === "/"
+          ? "SecureNT.html"
+          : url.pathname === "/" + encodeURIComponent(eventCapture)
+            ? eventCapture
+            : null;
       if (
+        capture &&
         (req.method === "GET" || req.method === "HEAD") &&
         (url.pathname === "/" ||
-          url.pathname === "/" + encodeURIComponent(capture))
+          url.pathname === "/" + encodeURIComponent(eventCapture))
       ) {
         try {
           const source = await readFile(new URL(capture, import.meta.url), "utf8");

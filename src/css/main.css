@@ -1,6 +1,6 @@
 /* ==========================================================================
-   alt.css – Main entry point
-   Compiled by Vite into Fuel security_files/alt.css
+    Main stylesheet entry point
+    Compiled by Vite into dist/theme.css
 
    To add a new component stylesheet:
      1. Create a .css file in src/css/components/
@@ -14,3 +14,4 @@
 @import "./components/buttons.css";
 @import "./components/alert.css";
 @import "./components/callout.css";
+@import "./components/homepage-latest-events.css";

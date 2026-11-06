@@ -27,7 +27,7 @@ securent/
 ├── assets/hazard-icons/              # Shared hazard alert pictograms
 ├── SecureNT.html                     # Local page capture (gitignored)
 ├── SecureNT_files/                   # Local page assets (gitignored)
-├── Severe Storm – Alice Springs _ SecureNT.html   # Default development event capture
+├── Severe Storm – Alice Springs _ SecureNT.html   # Secondary development event capture
 ├── vite.config.mjs
 └── package.json
 ```
@@ -51,9 +51,8 @@ npm install
 npm run dev
 ```
 
-Vite starts a local dev server and opens `/`, showing the captured **Severe Storm – Alice Springs** event page. The development middleware in `vite.config.mjs` serves the capture through Vite's HTML transforms and serves saved `.js.download` dependencies as JavaScript. External navigation links still point to the CMS, and externally hosted fonts and favicons require network access. The capture is a development snapshot, not a live emergency feed.  
-The optional homepage capture remains available at `/SecureNT.html` when present.  
-That homepage links `src/css/main.css` and loads `src/js/main.js` directly for in-memory CSS imports and HMR. The event capture uses the built theme at `dist/theme.css` and links its page-specific styles from `src/events/event.css`.
+Vite starts a local dev server and opens `/`, serving the captured homepage in `SecureNT.html`. The event capture remains available at `/Severe%20Storm%20%E2%80%93%20Alice%20Springs%20_%20SecureNT.html`. The development middleware in `vite.config.mjs` serves both captures through Vite's HTML transforms and serves saved `.js.download` dependencies as JavaScript. External navigation links still point to the CMS, and externally hosted fonts and favicons require network access. Both captures are development snapshots, not live emergency feeds.
+The homepage links `src/css/main.css` and loads `src/js/main.js` directly for in-memory CSS imports and HMR. The event capture uses the built theme at `dist/theme.css` and links its page-specific styles from `src/events/event.css`.
 
 ## Build
 
@@ -113,6 +112,8 @@ Overrides of the upstream `ntgbase.min.css` theme are isolated in `src/css/compo
 | `main.css`              | `.homepage-news .card`                                                                    | Border radius removed from news cards                                                                                                                                                                                                                                                                                                |
 | `main.css`              | `.homepage-news .card-header`                                                             | Bottom border removed from card header                                                                                                                                                                                                                                                                                               |
 | `main.css`              | `.homepage-news .card-tag`                                                                | Category label styled as a tag (design system default variant: white bg, `#1f1e27` text, `#d3d3d7` border)                                                                                                                                                                                                                           |
+
+The homepage Latest Events section is styled in `src/css/components/homepage-latest-events.css`, imported by `src/css/main.css`. Each card uses its `data-level` value to select the shared `--clr-status-advice`, `--clr-status-watch-act`, or `--clr-status-emergency-warning` accent and tag tint.
 
 ### Homepage news JS (`src/js/homepage-news.js`)
 
