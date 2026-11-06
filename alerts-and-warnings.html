@@ -14,7 +14,7 @@
   <meta name="dcterms.creator" content="Northern Territory Government">
   <meta name="dcterms.created" content="2026-11-03T13:22:28+09:30">
   <meta name="dcterms.issued" content="1970-01-01T09:30:00+09:30">
-  <meta name="dcterms.modified" content="2026-11-06T23:02:18+09:30">
+  <meta name="dcterms.modified" content="2026-11-07T01:19:53+09:30">
   <meta name="dcterms.identifier" content="https://cmsexternal.nt.gov.au/securent/alerts-and-warnings">
   <meta name="dcterms.subject" content="SecureNT">
   <meta name="dc.language" content="en">
@@ -25,7 +25,7 @@
   <meta property="og:description" content="">
   <meta property="og:site_name" content="SecureNT">
   <meta property="article:published_time" content="1970-01-01T09:30:00+09:30">
-  <meta property="article:modified_time" content="2026-11-06T23:02:18+09:30">
+  <meta property="article:modified_time" content="2026-11-07T01:19:53+09:30">
   <meta property="article:tag" content="">
   <script>
     var $html = document.documentElement;
@@ -42,12 +42,12 @@
   <link rel="stylesheet" href="./SecureNT_files/print.css" media="print">
   <script src="./SecureNT_files/jquery.min.js"></script>
   <link rel="stylesheet" href="./SecureNT_files/alt.css">
-  <link rel="stylesheet" href="./dist/theme.css?v=2">
   <link rel="stylesheet" href="./src/css/main.css">
-  <link rel="stylesheet" href="./dist/alerts-listing.css?v=2">
 </head>
 <body class="alerts-page">
-  <div id="component_1650208"></div>
+  <div id="component_1650208">
+    <link rel="stylesheet" href="./dist/theme.css?v=2">
+  </div>
   <div id="top"></div>
   <div class="container d-none d-print-block">
     <img src="https://nt.gov.au/_design/latest/images/logos/ntg-mono.webp" alt="">
@@ -160,7 +160,7 @@
     <div id="content_container_1189248">
       <div class="breadcrumb-container bg-ntg-background-alt pt-2">
         <div class="container-xl d-print-none ntg-breadcrumbs breadcrumb-section">
-          <nav aria-label="breadcrumb" class="mt-3">
+          <nav aria-label="breadcrumb" role="navigation" class="mt-3">
             <ol class="breadcrumb">
               <li class="breadcrumb-item"><a href="https://cmsexternal.nt.gov.au/securent">Home</a></li>
               <li class="breadcrumb-item active">Alerts and warnings</li>
@@ -172,6 +172,7 @@
 
     <main id="content" class="ntg-body mb-4">
       <section class="hero-banner position-relative overflow-hidden bg-ntg-background-alt mb-4 intro-section" data-component-status="2">
+        <!--NTG watermark-->
         <div class="container-xl py-3" style="z-index:1;">
           <div class="row">
             <div class="col-12 mt-3 pb-2">
@@ -185,6 +186,7 @@
         </div>
       </section>
 
+      <link rel="stylesheet" href="./dist/alerts-listing.css?v=2">
       <section class="alerts-listing" data-alerts-listing data-endpoint="https://cmsexternal.nt.gov.au/securent/_design/listing/alerts-listing/_nocache" aria-label="Current alerts and warnings">
         <div class="row g-4">
           <div class="col-lg-8">
@@ -196,20 +198,99 @@
               </div>
               <button class="btn btn-outline-primary" type="button" data-use-location><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Use location</button>
             </div>
-            <p class="alerts-listing__status visually-hidden" data-results-status role="status" aria-live="polite">Loading alerts...</p>
-            <div class="alerts-listing__cards" data-alert-results aria-busy="true"></div>
-            <nav class="alerts-listing__pagination" data-alert-pagination aria-label="Alert pages"></nav>
+            <p class="alerts-listing__status visually-hidden" data-results-status role="status" aria-live="polite">Showing 1-8 of 8 alerts</p>
+            <div class="alerts-listing__cards" data-alert-results aria-busy="false">
+              <article class="alerts-listing__card" data-warning-level="emergency-warning"><a class="alerts-listing__card-link" href="https://cmsexternal.nt.gov.au/securent/events/severe-storm-alice-springs"><h2 class="alerts-listing__card-title">Severe Storm &ndash; Alice Springs</h2><p class="alerts-listing__location">Central Australia</p></a></article>
+              <article class="alerts-listing__card" data-warning-level="advice"><a class="alerts-listing__card-link" href="https://cmsexternal.nt.gov.au/securent/events/severe-storm-alice-springs/additional-warnings/advice"><h2 class="alerts-listing__card-title">Severe storm Advice - Barkly</h2><p class="alerts-listing__location">Barkly</p></a></article>
+              <article class="alerts-listing__card" data-warning-level="watch-and-act"><a class="alerts-listing__card-link" href="https://cmsexternal.nt.gov.au/securent/events/severe-storm-alice-springs/additional-warnings/watch-and-act"><h2 class="alerts-listing__card-title">Severe storm Watch and act - Yulara</h2><p class="alerts-listing__location">Central Australia</p></a></article>
+              <article class="alerts-listing__card" data-warning-level="advice"><a class="alerts-listing__card-link" href="https://cmsexternal.nt.gov.au/securent/events/flooding-katherine/additional-warnings/advice-barkly"><h2 class="alerts-listing__card-title">Flooding Advice - Borroloola</h2><p class="alerts-listing__location">Big Rivers</p></a></article>
+              <article class="alerts-listing__card" data-warning-level="watch-and-act"><a class="alerts-listing__card-link" href="https://cmsexternal.nt.gov.au/securent/events/flooding-katherine"><h2 class="alerts-listing__card-title">Flooding &ndash; Katherine</h2><p class="alerts-listing__location">Big Rivers</p></a></article>
+              <article class="alerts-listing__card" data-warning-level="watch-and-act"><a class="alerts-listing__card-link" href="https://cmsexternal.nt.gov.au/securent/events/flooding-katherine/additional-warnings/watch-and-act-douglas-daly"><h2 class="alerts-listing__card-title">Flooding Watch and act - Douglas Daly</h2><p class="alerts-listing__location">Big Rivers</p></a></article>
+              <article class="alerts-listing__card" data-warning-level="advice"><a class="alerts-listing__card-link" href="https://cmsexternal.nt.gov.au/securent/events/flooding-katherine/additional-warnings/decreasing-threat-santa-teresa"><h2 class="alerts-listing__card-title">Flooding Advice - Santa Teresa</h2><p class="alerts-listing__location">Central Australia</p></a></article>
+              <article class="alerts-listing__card" data-warning-level="advice"><a class="alerts-listing__card-link" href="https://cmsexternal.nt.gov.au/securent/events/wildfires-nhulunbuy"><h2 class="alerts-listing__card-title">Wildfires &ndash; Nhulunbuy</h2><p class="alerts-listing__location">East Arnhem</p></a></article>
+            </div>
+            <nav class="alerts-listing__pagination" data-alert-pagination aria-label="Alert pages"><ul class="alerts-listing__page-list"><li><button type="button" class="alerts-listing__page-button" data-page="0" disabled>Previous</button></li><li><button type="button" class="alerts-listing__page-button" data-page="1" aria-current="page">1</button></li><li><button type="button" class="alerts-listing__page-button" data-page="2" disabled>Next</button></li></ul></nav>
           </div>
           <aside class="col-lg-4 alerts-listing__filters" aria-label="Filter alerts">
             <fieldset>
               <legend>Region</legend>
-              <div data-region-filters></div>
+              <div data-region-filters><label class="alerts-listing__filter-option"><input type="checkbox" name="region" value="Central Australia"><span>Central Australia (3)</span></label><label class="alerts-listing__filter-option"><input type="checkbox" name="region" value="Barkly"><span>Barkly (1)</span></label><label class="alerts-listing__filter-option"><input type="checkbox" name="region" value="Big Rivers"><span>Big Rivers (3)</span></label><label class="alerts-listing__filter-option"><input type="checkbox" name="region" value="East Arnhem"><span>East Arnhem (1)</span></label></div>
             </fieldset>
             <fieldset>
               <legend>Topic</legend>
-              <div data-topic-filters></div>
+              <div data-topic-filters><label class="alerts-listing__filter-option"><input type="checkbox" name="topic" value="Severe storm"><span>Severe storms (4)</span></label><label class="alerts-listing__filter-option"><input type="checkbox" name="topic" value="Flooding"><span>Flooding (3)</span></label><label class="alerts-listing__filter-option"><input type="checkbox" name="topic" value="Bushfire"><span>Bushfires (1)</span></label></div>
             </fieldset>
           </aside>
+        </div>
+      </section>
+      <script type="module" src="./dist/alerts-listing.js?v=2"></script>
+
+      <section class="ntg-display-cards bg-ntg-background-white py-4 mt-0 mb-0" data-component-status="2">
+        <div id="more_updates_1657034" class="container-xl">
+          <div>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+              <div class="col">
+                <div class="card h-100 rounded-1 card-hover--shadow position-relative">
+                  <div class="card-body p-4 d-flex flex-column">
+                    <h3 class="h5 card-title mt-0">SecureNT</h3>
+                    <a href="https://cmsexternal.nt.gov.au/securent/alerts-and-warnings/more-updates/securent2" class="stretched-link">
+                      <span class="visually-hidden">Go to SecureNT</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <div class="card h-100 rounded-1 card-hover--shadow position-relative">
+                  <div class="card-body p-4 d-flex flex-column">
+                    <h3 class="h5 card-title mt-0">Bushfire NT</h3>
+                    <a href="https://cmsexternal.nt.gov.au/securent/alerts-and-warnings/more-updates/bushfire-nt" class="stretched-link">
+                      <span class="visually-hidden">Go to Bushfire NT</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <div class="card h-100 rounded-1 card-hover--shadow position-relative">
+                  <div class="card-body p-4 d-flex flex-column">
+                    <h3 class="h5 card-title mt-0">Power and water</h3>
+                    <a href="https://cmsexternal.nt.gov.au/securent/alerts-and-warnings/more-updates/power-and-water" class="stretched-link">
+                      <span class="visually-hidden">Go to Power and water</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <div class="card h-100 rounded-1 card-hover--shadow position-relative">
+                  <div class="card-body p-4 d-flex flex-column">
+                    <h3 class="h5 card-title mt-0">Road report NT</h3>
+                    <a href="https://cmsexternal.nt.gov.au/securent/alerts-and-warnings/more-updates/road-report-nt" class="stretched-link">
+                      <span class="visually-hidden">Go to Road report NT</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <div class="card h-100 rounded-1 card-hover--shadow position-relative">
+                  <div class="card-body p-4 d-flex flex-column">
+                    <h3 class="h5 card-title mt-0">BOM</h3>
+                    <a href="https://cmsexternal.nt.gov.au/securent/alerts-and-warnings/more-updates/bom" class="stretched-link">
+                      <span class="visually-hidden">Go to BOM</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <div class="card h-100 rounded-1 card-hover--shadow position-relative">
+                  <div class="card-body p-4 d-flex flex-column">
+                    <h3 class="h5 card-title mt-0">NT Fire services</h3>
+                    <a href="https://cmsexternal.nt.gov.au/securent/alerts-and-warnings/more-updates/nt-fire-services" class="stretched-link">
+                      <span class="visually-hidden">Go to NT Fire services</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </main>
@@ -282,7 +363,7 @@
         <div class="row">
           <div class="col-12 pt-4">
             <span>&copy; <span id="currentYear">2026</span> Northern Territory Government of Australia</span>
-            <span class="date-time d-none d-print-block pt-5" id="printedDate">Printed: Nov 6, 2026, 11:04 PM</span>
+            <span class="date-time d-none d-print-block pt-5" id="printedDate">Printed: Nov 7, 2026, 1:27 AM</span>
           </div>
         </div>
       </div>
@@ -301,6 +382,10 @@
     });
     document.getElementById("printedDate").innerText = "Printed: " + currentDate;
   </script>
+  <style>
+    .ntg-footer p { color: #fff; }
+  </style>
+  <script src="./SecureNT_files/popper.min.js"></script>
   <script src="./SecureNT_files/bootstrap.bundle.min.js"></script>
   <script src="./SecureNT_files/ntgbase-components.min.js"></script>
   <script src="./SecureNT_files/ntgbase-main.min.js"></script>
@@ -328,6 +413,5 @@
     });
   </script>
   <script type="module" src="./src/js/main.js"></script>
-  <script type="module" src="./dist/alerts-listing.js?v=2"></script>
 </body>
 </html>

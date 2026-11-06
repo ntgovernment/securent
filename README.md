@@ -11,6 +11,10 @@ securent/
 │   │   ├── alerts-listing.js          # Alert rendering, search, filters, and pagination
 │   │   ├── alerts-listing.css         # Alerts page listing styles
 │   │   └── alerts-listing.local.json  # Local development fixture
+│   ├── hero-banners/
+│   │   ├── homepage-hero.css         # Purple-light homepage variant and homepage conditions overlap
+│   │   ├── landing-hero.css          # Alt landing variant, breadcrumbs and optional CTA
+│   │   └── hero-banners.js           # Landing-only breadcrumb relocation and optional CTA enhancement
 │   ├── css/
 │   │   ├── main.css                  # CSS entry point — add @imports here
 │   │   └── components/
@@ -62,7 +66,7 @@ npm run dev
 Vite starts a local dev server and opens `/`, serving the Alerts and warnings capture in `alerts-and-warnings.html`. The homepage capture remains available at `/SecureNT.html`, and the event capture remains available at `/Severe%20Storm%20%E2%80%93%20Alice%20Springs%20_%20SecureNT.html`. The development middleware in `vite.config.mjs` serves the Alerts and warnings and event captures through Vite's HTML transforms and serves saved `.js.download` dependencies as JavaScript. External navigation links still point to the CMS, and externally hosted fonts and favicons require network access. These captures are development snapshots, not live emergency feeds.
 The homepage links `src/css/main.css` and loads `src/js/main.js` directly for in-memory CSS imports and HMR. The event capture uses the built theme at `dist/theme.css` and links its page-specific styles from `src/events/event.css`.
 
-The Alerts and warnings capture loads its standalone listing scripts and styles from `dist/alerts-listing.js` and `dist/alerts-listing.css`. On localhost, the listing fetches `src/alerts-listing/alerts-listing.local.json`; on the deployed CMS page, it requests the listing endpoint configured in the page markup.
+The Alerts and warnings capture loads its standalone listing scripts and styles from `dist/alerts-listing.js` and `dist/alerts-listing.css`, alongside `dist/theme.css` and the source theme entry points `src/css/main.css` and `src/js/main.js` for local preview. On localhost, the listing fetches `src/alerts-listing/alerts-listing.local.json`; on the deployed CMS page, it requests the listing endpoint configured in the page markup. The capture keeps the supplied CMS content and navigation destinations, while shared dependencies use the local `SecureNT_files/` assets.
 
 ## Build
 
@@ -72,14 +76,16 @@ npm run build
 
 Outputs to `dist/`:
 
-- `theme.css` — compiled, minified CSS (all `src/css/` sources merged)
-- `theme.js` — compiled JS (all `src/js/` modules merged via `src/js/main.js`)
+- `theme.css` — compiled, minified CSS imported by `src/css/main.css`, including `src/hero-banners/` styles
+- `theme.js` — compiled JS imported by `src/js/main.js`, including the landing hero initializer
 - `alerts-listing.css` and `alerts-listing.js` — standalone assets for the Alerts and warnings page
 - `print.css` — print stylesheet
 
 `theme.css`, `theme.js`, `alerts-listing.css`, `alerts-listing.js`, and `print.css` are referenced in Squiz Matrix via the git file bridge.
 
 The build excludes the captured homepage's reference to the previous `dist/theme.css` so generated styles are not imported back into the next bundle. The current source styles remain the authority.
+
+Theme CSS enters the build through the optional, gitignored `SecureNT.html` capture. Keep that capture and its local dependencies available when rebuilding the complete theme; a successful build without it does not verify that `dist/theme.css` was generated. After building, confirm both theme assets exist before committing file-bridge updates.
 
 ## Adding new CSS component files
 
@@ -92,6 +98,8 @@ The build excludes the captured homepage's reference to the previous `dist/theme
 
 3. Run `npm run dev` to preview, or `npm run build` to compile.
 
+Feature-specific styles can live beside their component scripts, as in `src/hero-banners/`; import those styles through `src/css/main.css` using their relative paths rather than introducing a second theme bundle.
+
 ## Adding new JS modules
 
 1. Create a new file in `src/js/`, e.g. `src/js/my-feature.js`
@@ -103,9 +111,11 @@ The build excludes the captured homepage's reference to the previous `dist/theme
 
 3. Vite will include it in `dist/theme.js` on build. No HTML changes needed.
 
+Feature-specific scripts outside `src/js/`, such as `src/hero-banners/hero-banners.js`, are included the same way through an import in `src/js/main.js`.
+
 ## Customisations
 
-Overrides of the upstream `ntgbase.min.css` theme are isolated in `src/css/components/` and imported last so they take cascade precedence.
+Overrides of the upstream `ntgbase.min.css` theme are isolated in `src/css/components/` and feature folders such as `src/hero-banners/`, then imported through `src/css/main.css` so they take cascade precedence.
 
 | File                    | What it overrides                                                                         | Detail                                                                                                                                                                                                                                                                                                                               |
 | ----------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -150,7 +160,25 @@ Homepage featured-content cards use `src/css/components/homepage-featured-conten
 
 The local `SecureNT.html` capture is gitignored. For local preview, its feature-card image URLs can point to matching files in the also-gitignored `SecureNT_files/` directory; production CMS image URLs are unchanged. After changing featured-content styles, run `npm run build` and deploy the updated `dist/theme.css` with the source CSS.
 
-The homepage Emergencies and warnings hero and overlapping `#current-conditions` panel are styled in `src/css/components/homepage-hero.css`, imported by `src/css/main.css`. At desktop widths (992px and above), the hero uses a 42px white heading, 14px copy, and a 40px Territory-orange (`#d6410a`) Incident map action with no underline. The panel overlaps the hero by 49px on desktop, 34px at tablet widths, and 24px below 576px, with its content aligned to the hero inset and a subtle shadow. The local capture is gitignored; its markup is CMS-managed. After changing these homepage styles, run `npm run build` and deploy the updated `dist/theme.css` with the source CSS.
+### Hero banners
+
+Hero CSS and JavaScript are isolated in `src/hero-banners/`. Both stylesheets are imported by `src/css/main.css`; `hero-banners.js` is imported by `src/js/main.js`. They ship in the existing `dist/theme.css` and `dist/theme.js` bundles, with no separate CMS asset includes.
+
+`homepage-hero.css` targets `.hero-banner.intro-section.bg-ntg-background-purple-light`; retain the CMS `bg-ntg-background-home` class. It preserves the charcoal background, white 42px desktop heading, 14px copy and orange Incident map action. The overlapping `#current-conditions` panel is scoped to `main.ntg-body--homepage`: 49px desktop overlap, 34px tablet and 24px below 576px. The gitignored homepage capture now uses the supplied purple-light classes; any corresponding CMS template correction must be made separately.
+
+`landing-hero.css` targets `.hero-banner.intro-section.bg-ntg-background-alt`. It uses a pale-grey `#E7E7EA` background, dark text, 40px/44px desktop heading, 18px/20px copy and a 604px maximum content column. Below 576px the heading is 32px/36px. Content stays in document flow, wraps and grows without a fixed hero height. Breadcrumbs and an optional orange CTA receive their own scoped styles and keyboard focus outlines.
+
+The landing initializer moves the existing preceding CMS `.breadcrumb-container` into the hero, preserving its navigation and links. It also supports a breadcrumb already inside the hero, and can hide an immediately preceding title-only container only when its H1 exactly matches the hero H1. If the copy contains an `.intro-text-link`, it is moved below the copy and receives one decorative Font Awesome external-link icon. Initialization is repeat-safe; absent breadcrumbs, absent CTAs and unrelated content are left alone. No new link or copy is generated, and homepage heroes are not mutated.
+
+The Alerts and warnings capture uses the supplied PROD structure with the updated incident-map copy and Incident map CTA: one hero heading and an external breadcrumb before enhancement. Its captured alerts are replaced by the existing localhost listing fixture at runtime. Local assets and source entry points remain wired for preview. Without JavaScript, the breadcrumb stays outside the hero and the CTA remains in its original copy; all text and links remain available.
+
+After changing hero sources, run `npm run build` and deploy the updated theme CSS and JS with their source files. Check both variants at mobile, tablet and desktop widths, including breadcrumb placement, wrapping and unchanged homepage overlap.
+
+### More updates
+
+The Alerts and warnings capture uses the PROD `.ntg-display-cards` markup inside `#more_updates_1657034`. It contains six title-only cards: SecureNT, Bushfire NT, Power and water, Road report NT, BOM and NT Fire services. Each card uses an H3 title and a stretched link with a visually hidden `Go to ...` label. The supplied markup has no separate section heading or briefcase icons.
+
+Bootstrap's `row-cols-1 row-cols-md-2 row-cols-lg-3 g-3` classes produce one column on mobile, two from 768px and three from 992px. Existing display-card rules in `src/css/components/main.css` provide the charcoal titles and orange arrow; no additional stylesheet or script is required. Preserve CMS-managed link destinations when refreshing the capture, and verify all six labels, responsive columns and text wrapping in the local preview.
 
 The latest warning banner uses `.warning-banner` markup with `role="alert"`, `data-warning-level`, `data-emergency-type`, and `data-location`. Set `data-warning-level` to `advice`, `watch_act`, or `emergency_warning`; it controls the banner's accent border and subtle background tint through the shared status colour tokens. Use an icon image matching both the hazard and warning level, with a 24px height. Unknown or missing levels use a neutral accent. The local `SecureNT.html` capture is ignored by Git; production warning markup is managed in the CMS and must be updated there separately. After changing warning styles, run `npm run build` and deploy `dist/theme.css` with the source CSS.
 

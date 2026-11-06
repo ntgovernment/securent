@@ -1,0 +1,171 @@
+.hero-banner.intro-section.bg-ntg-background-alt {
+  background: var(--clr-bg-shade-alt, #e7e7ea) !important;
+  color: var(--clr-text-default, #1f1e27);
+  font-family: Lato, sans-serif;
+}
+
+.hero-banner.intro-section.bg-ntg-background-alt > .container-xl {
+  position: relative;
+  width: calc(100% - 4rem);
+  max-width: 80rem;
+  padding: 25px 2rem 32px !important;
+}
+
+.hero-banner.intro-section.bg-ntg-background-alt > .container-xl > .row {
+  margin: 0;
+}
+
+.hero-banner.intro-section.bg-ntg-background-alt .col-12 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  max-width: 604px;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.hero-banner.intro-section.bg-ntg-background-alt h1 {
+  width: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--clr-text-default, #1f1e27) !important;
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 44px;
+  overflow-wrap: anywhere;
+}
+
+.hero-banner.intro-section.bg-ntg-background-alt .col-12 > div {
+  width: 100%;
+  max-width: none;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--clr-text-default, #1f1e27) !important;
+  font-size: 18px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+}
+
+.hero-banner.intro-section.bg-ntg-background-alt .col-12 > div p {
+  margin: 0 0 16px;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.hero-banner.intro-section.bg-ntg-background-alt .col-12 > div p:last-child {
+  margin-bottom: 0;
+}
+
+.hero-banner.intro-section.bg-ntg-background-alt .intro-text-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 100%;
+  margin: 16px 0 0;
+  padding: 16px 24px;
+  background: #d6410a;
+  color: #fff !important;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 16px;
+  text-decoration: none !important;
+  overflow-wrap: anywhere;
+}
+
+.hero-banner.intro-section.bg-ntg-background-alt .intro-text-link:hover {
+  background: #b93608;
+}
+
+.hero-banner.intro-section.bg-ntg-background-alt .intro-text-link::after,
+.hero-banner.intro-section.bg-ntg-background-alt .breadcrumb a::after {
+  content: none !important;
+}
+
+.hero-banner.intro-section.bg-ntg-background-alt .intro-text-link:focus-visible {
+  outline: 2px solid #1f1e27;
+  outline-offset: 3px;
+}
+
+.hero-banner.intro-section.bg-ntg-background-alt .hero-banners__cta-icon {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  line-height: 20px;
+  text-align: center;
+}
+
+.hero-banner.intro-section.bg-ntg-background-alt .hero-banners__breadcrumbs {
+  margin: 0 0 32px !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.hero-banner.intro-section.bg-ntg-background-alt .hero-banners__breadcrumbs .container-xl {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 !important;
+}
+
+.hero-banner.intro-section.bg-ntg-background-alt .hero-banners__breadcrumbs nav {
+  margin: 0 !important;
+}
+
+.hero-banner.intro-section.bg-ntg-background-alt .breadcrumb {
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.hero-banner.intro-section.bg-ntg-background-alt .breadcrumb-item {
+  padding: 0;
+  color: var(--clr-text-default, #1f1e27);
+  overflow-wrap: anywhere;
+}
+
+.hero-banner.intro-section.bg-ntg-background-alt .breadcrumb-item + .breadcrumb-item::before {
+  content: "\f054";
+  margin-right: 8px;
+  padding: 0;
+  color: var(--clr-text-emphasis, #c33826);
+  font-family: "Font Awesome 6 Pro";
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.hero-banner.intro-section.bg-ntg-background-alt .breadcrumb a {
+  color: #174c4e !important;
+  text-decoration: underline !important;
+}
+
+.hero-banner.intro-section.bg-ntg-background-alt .breadcrumb a:focus-visible {
+  outline: 2px solid #174c4e;
+  outline-offset: 3px;
+}
+
+@media (min-width: 992px) {
+  .hero-banner.intro-section.bg-ntg-background-alt > .container-xl {
+    width: calc(100% - 6rem);
+    padding-right: 3.375rem !important;
+    padding-left: 3.375rem !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .hero-banner.intro-section.bg-ntg-background-alt > .container-xl {
+    width: 100%;
+    padding-right: 24px !important;
+    padding-left: 24px !important;
+  }
+
+  .hero-banner.intro-section.bg-ntg-background-alt h1 {
+    font-size: 32px;
+    line-height: 36px;
+  }
+}

@@ -1,5 +1,6 @@
 import "./homepage-news.js";
 import "./display-cards.js";
+import "../hero-banners/hero-banners.js";
 
 /* Expand the desktop search field when the icon is activated empty. */
 (function () {
