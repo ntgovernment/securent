@@ -93,7 +93,12 @@
   width: 1rem;
   height: 1rem;
   transform: none !important;
-  transition: none !important;
+  transition: transform 160ms ease !important;
+}
+
+#latest-events-intro a:hover .arrow,
+#latest-events-cards a:hover .arrow {
+  transform: translateX(2px) !important;
 }
 
 #latest-events-intro a:focus-visible,
@@ -168,6 +173,10 @@
 #latest-events-cards .event-card .tag {
   background: color-mix(in srgb, var(--event-accent) 14%, #fff) !important;
   color: var(--event-tag-color) !important;
+}
+
+#latest-events-cards .event-card[data-warning-level="advice"] .tag {
+  background: #fbe032 !important;
 }
 
 #latest-events-cards .location {
