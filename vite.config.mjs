@@ -1,8 +1,20 @@
 import { defineConfig } from "vite";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 
 import { cloudflare } from "@cloudflare/vite-plugin";
+
+const sourceThemeOnly = {
+  name: "source-theme-only",
+  apply: "build",
+  load(id) {
+    const stylesheet = fileURLToPath(new URL("./dist/theme.css", import.meta.url));
+    if (id.split("?")[0] === stylesheet.replaceAll("\\", "/")) {
+      return "";
+    }
+  },
+};
 
 const eventPreview = {
   name: "event-preview",
@@ -65,7 +77,7 @@ const includeLocalCapture =
 
 export default defineConfig({
   root: ".",
-  plugins: [eventPreview, localConditionsMock, cloudflare()],
+  plugins: [sourceThemeOnly, eventPreview, localConditionsMock, cloudflare()],
   build: {
     rollupOptions: {
       input: {

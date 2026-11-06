@@ -68,6 +68,8 @@ Outputs to `dist/`:
 
 `theme.css`, `theme.js`, and `print.css` are referenced in Squiz Matrix via the git file bridge.
 
+The build excludes the captured homepage's reference to the previous `dist/theme.css` so generated styles are not imported back into the next bundle. The current source styles remain the authority.
+
 ## Adding new CSS component files
 
 1. Create a new file in `src/css/components/`, e.g. `src/css/components/hero-banner.css`
@@ -113,7 +115,9 @@ Overrides of the upstream `ntgbase.min.css` theme are isolated in `src/css/compo
 | `main.css`              | `.homepage-news .card-header`                                                             | Bottom border removed from card header                                                                                                                                                                                                                                                                                               |
 | `main.css`              | `.homepage-news .card-tag`                                                                | Category label styled as a tag (design system default variant: white bg, `#1f1e27` text, `#d3d3d7` border)                                                                                                                                                                                                                           |
 
-The homepage Latest Events section is styled in `src/css/components/homepage-latest-events.css`, imported by `src/css/main.css`. Each card uses its `data-level` value to select the shared `--clr-status-advice`, `--clr-status-watch-act`, or `--clr-status-emergency-warning` accent and tag tint.
+The homepage Latest Events section is styled in `src/css/components/homepage-latest-events.css`, imported by `src/css/main.css`. Each card uses its `data-level` value to select the shared `--clr-status-advice`, `--clr-status-watch-act`, or `--clr-status-emergency-warning` accent and tag tint. When `data-level` is absent or empty, `data-emergency-type="storm"`, `"flooding"`, or `"flood"` selects the default alert orange, `--clr-status-warning` (`#d6410a`). If `data-emergency-type` is also absent or empty, the same values in `data-warning-level` provide that fallback. Unrecognised values remain neutral; `data-location` does not affect colour. Tags use a 14% tint of the selected accent even without `data-level`.
+
+Latest Events uses a pale-grey container capped at 1280px, 32px desktop container padding, and square cards with 24px padding, 240px minimum height, and 3px accent borders. The grid changes from three columns to two below 992px and one below 576px. Metadata can wrap, and cards expand for longer descriptions rather than clipping text.
 
 ### Homepage news JS (`src/js/homepage-news.js`)
 
