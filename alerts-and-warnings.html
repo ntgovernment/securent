@@ -186,18 +186,20 @@
         </div>
       </section>
 
-      <link rel="stylesheet" href="./dist/alerts-listing.css?v=2">
+      <link rel="stylesheet" href="./dist/alerts-listing.css?v=11">
+      <link rel="stylesheet" href="./dist/alerts-pagination.css?v=2">
+      <link rel="stylesheet" href="./dist/more-updates-cards.css?v=1">
       <section class="alerts-listing" data-alerts-listing data-endpoint="https://cmsexternal.nt.gov.au/securent/_design/listing/alerts-listing/_nocache" aria-label="Current alerts and warnings">
+        <div class="alerts-listing__search">
+          <label class="visually-hidden" for="alerts-search">Search for a location</label>
+          <div class="alerts-listing__search-field">
+            <input id="alerts-search" class="form-control" type="search" placeholder="Search for a location">
+            <button class="alerts-listing__search-button" type="button" aria-label="Search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></button>
+          </div>
+          <button class="btn btn-outline-primary" type="button" data-use-location><i class="fa-light fa-location-dot" aria-hidden="true"></i> Use location</button>
+        </div>
         <div class="row g-4">
           <div class="col-lg-8">
-            <div class="alerts-listing__search mb-3">
-              <label class="visually-hidden" for="alerts-search">Search for a location</label>
-              <div class="alerts-listing__search-field">
-                <input id="alerts-search" class="form-control" type="search" placeholder="Search for a location">
-                <button class="alerts-listing__search-button" type="button" aria-label="Search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></button>
-              </div>
-              <button class="btn btn-outline-primary" type="button" data-use-location><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Use location</button>
-            </div>
             <p class="alerts-listing__status visually-hidden" data-results-status role="status" aria-live="polite">Showing 1-8 of 8 alerts</p>
             <div class="alerts-listing__cards" data-alert-results aria-busy="false">
               <article class="alerts-listing__card" data-warning-level="emergency-warning"><a class="alerts-listing__card-link" href="https://cmsexternal.nt.gov.au/securent/events/severe-storm-alice-springs"><h2 class="alerts-listing__card-title">Severe Storm &ndash; Alice Springs</h2><p class="alerts-listing__location">Central Australia</p></a></article>
@@ -209,9 +211,13 @@
               <article class="alerts-listing__card" data-warning-level="advice"><a class="alerts-listing__card-link" href="https://cmsexternal.nt.gov.au/securent/events/flooding-katherine/additional-warnings/decreasing-threat-santa-teresa"><h2 class="alerts-listing__card-title">Flooding Advice - Santa Teresa</h2><p class="alerts-listing__location">Central Australia</p></a></article>
               <article class="alerts-listing__card" data-warning-level="advice"><a class="alerts-listing__card-link" href="https://cmsexternal.nt.gov.au/securent/events/wildfires-nhulunbuy"><h2 class="alerts-listing__card-title">Wildfires &ndash; Nhulunbuy</h2><p class="alerts-listing__location">East Arnhem</p></a></article>
             </div>
-            <nav class="alerts-listing__pagination" data-alert-pagination aria-label="Alert pages"><ul class="alerts-listing__page-list"><li><button type="button" class="alerts-listing__page-button" data-page="0" disabled>Previous</button></li><li><button type="button" class="alerts-listing__page-button" data-page="1" aria-current="page">1</button></li><li><button type="button" class="alerts-listing__page-button" data-page="2" disabled>Next</button></li></ul></nav>
+            <nav class="alerts-listing__pagination" data-alert-pagination aria-label="Alert pages"><ul class="alerts-listing__page-list"><li><button type="button" class="alerts-listing__page-button" data-page="0" disabled><i class="fa-light fa-chevron-left alerts-listing__page-icon" aria-hidden="true"></i>Previous</button></li><li><button type="button" class="alerts-listing__page-button" data-page="1" aria-current="page">1</button></li><li><button type="button" class="alerts-listing__page-button" data-page="2" disabled>Next<i class="fa-light fa-chevron-right alerts-listing__page-icon" aria-hidden="true"></i></button></li></ul></nav>
           </div>
           <aside class="col-lg-4 alerts-listing__filters" aria-label="Filter alerts">
+            <fieldset>
+              <legend>Levels</legend>
+              <div data-level-filters><label class="alerts-listing__filter-option"><input type="checkbox" name="level" value="Emergency warning"><span>Emergency warning (1)</span></label><label class="alerts-listing__filter-option"><input type="checkbox" name="level" value="Advice"><span>Advice (4)</span></label><label class="alerts-listing__filter-option"><input type="checkbox" name="level" value="Watch and act"><span>Watch and act (3)</span></label></div>
+            </fieldset>
             <fieldset>
               <legend>Region</legend>
               <div data-region-filters><label class="alerts-listing__filter-option"><input type="checkbox" name="region" value="Central Australia"><span>Central Australia (3)</span></label><label class="alerts-listing__filter-option"><input type="checkbox" name="region" value="Barkly"><span>Barkly (1)</span></label><label class="alerts-listing__filter-option"><input type="checkbox" name="region" value="Big Rivers"><span>Big Rivers (3)</span></label><label class="alerts-listing__filter-option"><input type="checkbox" name="region" value="East Arnhem"><span>East Arnhem (1)</span></label></div>
@@ -223,7 +229,7 @@
           </aside>
         </div>
       </section>
-      <script type="module" src="./dist/alerts-listing.js?v=2"></script>
+      <script type="module" src="./dist/alerts-listing.js?v=5"></script>
 
       <section class="ntg-display-cards bg-ntg-background-white py-4 mt-0 mb-0" data-component-status="2">
         <div id="more_updates_1657034" class="container-xl">

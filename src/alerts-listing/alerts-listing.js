@@ -8,6 +8,7 @@ if (listing) {
   const results = listing.querySelector("[data-alert-results]");
   const status = listing.querySelector("[data-results-status]");
   const pagination = listing.querySelector("[data-alert-pagination]");
+  const levelFilters = listing.querySelector("[data-level-filters]");
   const regionFilters = listing.querySelector("[data-region-filters]");
   const topicFilters = listing.querySelector("[data-topic-filters]");
   const locationButton = listing.querySelector("[data-use-location]");
@@ -55,8 +56,15 @@ if (listing) {
   }
 
   function renderFilters() {
+    levelFilters.replaceChildren();
     regionFilters.replaceChildren();
     topicFilters.replaceChildren();
+
+    const levels = data.facets?.levels || [...new Set(data.items.map((item) => item.warningLevel).filter(Boolean))];
+    levels.forEach((level) => {
+      const count = data.items.filter((item) => item.warningLevel === level).length;
+      makeFilter(levelFilters, "level", level, level, count);
+    });
 
     const regions = data.facets?.regions || [...new Set(data.items.map((item) => item.region).filter(Boolean))];
     regions.forEach((region) => {
@@ -77,6 +85,7 @@ if (listing) {
 
   function filteredItems() {
     const query = search.value.trim().toLocaleLowerCase();
+    const levels = selectedValues(levelFilters, "level");
     const regions = selectedValues(regionFilters, "region");
     const topics = selectedValues(topicFilters, "topic");
 
@@ -86,6 +95,7 @@ if (listing) {
         .join(" ")
         .toLocaleLowerCase();
       return (!query || searchable.includes(query)) &&
+        (!levels.length || levels.includes(item.warningLevel)) &&
         (!regions.length || regions.includes(item.region)) &&
         (!topics.length || topics.includes(item.emergencyType));
     });
@@ -139,7 +149,18 @@ if (listing) {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "alerts-listing__page-button";
-      button.textContent = label;
+      if (label === "Previous" || label === "Next") {
+        const icon = document.createElement("i");
+        icon.className = `fa-light fa-chevron-${label === "Previous" ? "left" : "right"} alerts-listing__page-icon`;
+        icon.setAttribute("aria-hidden", "true");
+        if (label === "Previous") {
+          button.append(icon, document.createTextNode(label));
+        } else {
+          button.append(document.createTextNode(label), icon);
+        }
+      } else {
+        button.textContent = label;
+      }
       button.dataset.page = String(page);
       button.disabled = disabled;
       if (current) button.setAttribute("aria-current", "page");
@@ -199,7 +220,7 @@ if (listing) {
   });
 
   listing.addEventListener("change", (event) => {
-    if (event.target.matches('input[name="region"], input[name="topic"]')) {
+    if (event.target.matches('input[name="level"], input[name="region"], input[name="topic"]')) {
       currentPage = 1;
       render();
     }

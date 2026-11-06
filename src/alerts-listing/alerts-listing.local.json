@@ -101,6 +101,11 @@
   "pageSize": 8,
   "total": 8,
   "facets": {
+    "levels": [
+      "Emergency warning",
+      "Advice",
+      "Watch and act"
+    ],
     "regions": [
       "Central Australia",
       "Barkly",

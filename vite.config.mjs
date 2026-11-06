@@ -83,6 +83,8 @@ export default defineConfig({
       input: {
         ...(includeLocalCapture ? { page: "./SecureNT.html" } : {}),
         "alerts-listing": "./src/alerts-listing/alerts-listing.js",
+        "alerts-pagination": "./src/alerts-listing/alerts-pagination.css",
+        "more-updates-cards": "./src/alerts-listing/more-updates-cards.css",
         theme: "./src/js/main.js",
         "local-conditions": "./src/local-conditions/local-conditions.js",
       },
@@ -103,6 +105,12 @@ export default defineConfig({
           }
           if (assetInfo.name === "local-conditions.css") {
             return "local-conditions.css";
+          }
+          if (assetInfo.name === "alerts-pagination.css") {
+            return "alerts-pagination.css";
+          }
+          if (assetInfo.name === "more-updates-cards.css") {
+            return "more-updates-cards.css";
           }
           if (assetInfo.name === "alerts-listing.css") {
             return "alerts-listing.css";
