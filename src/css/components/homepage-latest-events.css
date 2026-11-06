@@ -81,6 +81,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  padding: 0 0 1px !important;
   color: #174c4e;
   font-size: 0.875rem;
   font-weight: 700;
@@ -91,12 +92,8 @@
 #latest-events-cards .arrow {
   width: 1rem;
   height: 1rem;
-  transition: transform 160ms ease;
-}
-
-#latest-events-intro a:hover .arrow,
-#latest-events-cards a:hover .arrow {
-  transform: translateX(4px);
+  transform: none !important;
+  transition: none !important;
 }
 
 #latest-events-intro a:focus-visible,
@@ -113,6 +110,7 @@
 
 #latest-events-cards .event-card {
   --event-accent: var(--clr-status-neutral);
+  --event-tag-color: var(--event-accent);
 
   display: flex;
   min-width: 0;
@@ -132,6 +130,7 @@
 
 #latest-events-cards .event-card[data-warning-level="advice"] {
   --event-accent: var(--clr-status-advice);
+  --event-tag-color: #716309;
   border-top-color: var(--clr-status-advice);
 }
 
@@ -168,7 +167,7 @@
 
 #latest-events-cards .event-card .tag {
   background: color-mix(in srgb, var(--event-accent) 14%, #fff) !important;
-  color: var(--clr-text-on-information) !important;
+  color: var(--event-tag-color) !important;
 }
 
 #latest-events-cards .location {

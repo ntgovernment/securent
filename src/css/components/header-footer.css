@@ -21,9 +21,28 @@ header.ntg-header .header-top {
 
 header.ntg-header .header-top > .container-xl,
 header.ntg-header .header-navigation > .container-xl {
-  max-width: 1200px;
+  max-width: 80rem;
   padding-right: 16px !important;
   padding-left: 16px !important;
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  header.ntg-header .header-top > .container-xl,
+  header.ntg-header .header-navigation > .container-xl {
+    width: calc(100% - 3rem);
+    padding-right: 2.5rem !important;
+    padding-left: 2.5rem !important;
+  }
+}
+
+@media (min-width: 992px) {
+  header.ntg-header .header-top > .container-xl,
+  header.ntg-header .header-navigation > .container-xl {
+    width: calc(100% - 6rem);
+    max-width: 80rem;
+    padding-right: 3.375rem !important;
+    padding-left: 3.375rem !important;
+  }
 }
 
 header.ntg-header .header-top > .container-xl {
