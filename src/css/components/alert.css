@@ -203,6 +203,7 @@
   gap: 24px;
   margin: 0;
   border: 2px solid var(--ntg-alert-accent);
+  border-color: var(--ntg-alert-accent) !important;
   border-radius: 0;
   background: color-mix(in srgb, var(--ntg-alert-accent) 12%, #fff);
   color: var(--clr-text-on-information);
@@ -218,7 +219,7 @@
 }
 
 .ntg-alert[data-level="emergency_warning"] {
-  --ntg-alert-accent: var(--clr-status-warning);
+  --ntg-alert-accent: var(--clr-status-emergency-warning);
 }
 
 .ntg-alert__icon {

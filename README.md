@@ -24,13 +24,15 @@ securent/
 │   ├── print.css
 │   ├── theme.css
 │   └── theme.js
+├── assets/hazard-icons/              # Shared hazard alert pictograms
 ├── SecureNT.html                     # Local page capture (gitignored)
 ├── SecureNT_files/                   # Local page assets (gitignored)
+├── Severe Storm – Alice Springs _ SecureNT.html   # Default development event capture
 ├── vite.config.mjs
 └── package.json
 ```
 
-The local page capture and its assets are excluded from Git. `vite.config.mjs` includes `SecureNT.html` as the local HTML entry when the capture exists. The `dist/` files are tracked because they are consumed by the Squiz Matrix file bridge.
+The homepage capture (`SecureNT.html`) and shared `SecureNT_files/` assets are excluded from Git. The event capture uses those shared local assets, hazard icons from `assets/hazard-icons/`, the built theme in `dist/theme.css`, and event-specific styles from `src/events/event.css`; it no longer has a separate asset folder. `vite.config.mjs` includes `SecureNT.html` as the build HTML entry when that optional capture exists; the event preview does not change production build inputs. The `dist/` files are tracked because they are consumed by the Squiz Matrix file bridge.
 
 ## Prerequisites
 
@@ -49,9 +51,9 @@ npm install
 npm run dev
 ```
 
-Vite starts a local dev server and opens the HTML entry configured in `vite.config.js`. The page snapshot and its assets are not included in a fresh clone.  
-`src/css/main.css` is linked directly in the HTML so all `@import` chains are resolved in-memory with HMR — no build step needed during development.  
-`src/js/main.js` is loaded as a `<script type="module">` and is also served with HMR.
+Vite starts a local dev server and opens `/`, showing the captured **Severe Storm – Alice Springs** event page. The development middleware in `vite.config.mjs` serves the capture through Vite's HTML transforms and serves saved `.js.download` dependencies as JavaScript. External navigation links still point to the CMS, and externally hosted fonts and favicons require network access. The capture is a development snapshot, not a live emergency feed.  
+The optional homepage capture remains available at `/SecureNT.html` when present.  
+That homepage links `src/css/main.css` and loads `src/js/main.js` directly for in-memory CSS imports and HMR. The event capture uses the built theme at `dist/theme.css` and links its page-specific styles from `src/events/event.css`.
 
 ## Build
 

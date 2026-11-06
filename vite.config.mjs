@@ -1,7 +1,37 @@
 import { defineConfig } from "vite";
 import { existsSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 
 import { cloudflare } from "@cloudflare/vite-plugin";
+
+const eventPreview = {
+  name: "event-preview",
+  configureServer(server) {
+    server.middlewares.use(async (req, res, next) => {
+      const url = new URL(req.url, "http://localhost");
+      const capture = "Severe Storm \u2013 Alice Springs _ SecureNT.html";
+      if (
+        (req.method === "GET" || req.method === "HEAD") &&
+        (url.pathname === "/" ||
+          url.pathname === "/" + encodeURIComponent(capture))
+      ) {
+        try {
+          const source = await readFile(new URL(capture, import.meta.url), "utf8");
+          const html = await server.transformIndexHtml(url.pathname, source);
+          res.setHeader("Content-Type", "text/html; charset=utf-8");
+          res.end(req.method === "HEAD" ? undefined : html);
+        } catch (error) {
+          next(error);
+        }
+        return;
+      }
+      if (url.pathname.endsWith(".js.download")) {
+        res.setHeader("Content-Type", "text/javascript");
+      }
+      next();
+    });
+  },
+};
 
 // Dev-only stand-in for the deployed proxy in src/local-conditions/worker.js.
 const localConditionsMock = {
@@ -28,7 +58,7 @@ const includeLocalCapture =
 
 export default defineConfig({
   root: ".",
-  plugins: [localConditionsMock, cloudflare()],
+  plugins: [eventPreview, localConditionsMock, cloudflare()],
   build: {
     rollupOptions: {
       input: {
@@ -61,6 +91,6 @@ export default defineConfig({
     },
   },
   server: {
-    open: "./SecureNT.html",
+    open: "/",
   },
 });
