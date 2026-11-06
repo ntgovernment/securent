@@ -61,7 +61,9 @@ import "./local-conditions.css";
   }
 
   function unavailable(c) {
-    c.appendChild(el("p", "lc-card__none", "Currently unavailable"));
+    c.appendChild(
+      el("p", "lc-card__none", "Data is currently unavailable. Try again later."),
+    );
     return c;
   }
 
@@ -155,10 +157,7 @@ import "./local-conditions.css";
       })
       .catch(function () {
         if (id !== requestId) return;
-        cards.replaceChildren();
-        cards.removeAttribute("aria-busy");
-        status.textContent =
-          "Local conditions are currently unavailable. Please try again later.";
+        render({});
       });
   }
 

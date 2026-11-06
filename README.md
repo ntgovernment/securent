@@ -144,6 +144,10 @@ The homepage Emergencies and warnings hero and overlapping `#current-conditions`
 
 The latest warning banner uses `.warning-banner` markup with `role="alert"`, `data-warning-level`, `data-emergency-type`, and `data-location`. Set `data-warning-level` to `advice`, `watch_act`, or `emergency_warning`; it controls the banner's accent border and subtle background tint through the shared status colour tokens. Use an icon image matching both the hazard and warning level, with a 24px height. Unknown or missing levels use a neutral accent. The local `SecureNT.html` capture is ignored by Git; production warning markup is managed in the CMS and must be updated there separately. After changing warning styles, run `npm run build` and deploy `dist/theme.css` with the source CSS.
 
+### Local conditions
+
+The local-conditions widget renders three cards for fire danger, air quality, and temperature. If a request fails or an individual value is unavailable, the cards remain visible and show `Data is currently unavailable. Try again later.` in place of the unavailable data. The page-level status remains available for loading and location messages.
+
 ### Homepage news JS (`src/js/homepage-news.js`)
 
 Runs at page load to transform the CMS-rendered category label markup into tag elements:
