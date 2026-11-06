@@ -14,6 +14,7 @@ securent/
 │   │       ├── buttons.css           # Button overrides: primary bg Charcoal (#343741), secondary outline Charcoal + white bg, hover Territory orange (#D6410A)
 │   │       ├── mainmenu-dropdown.css # Navigation dropdown styles; charcoal hover/active states, responsive link padding, zero desktop link gap
 │   │       ├── header-footer.css     # Header/footer brand colour overrides; background: Charcoal (#343741)
+│   │       ├── homepage-featured-content.css # CMS homepage feature cards: responsive image/text layout and CTA styling
 │   │       ├── statistics.css        # Statistics section styles
 │   │       └── main.css              # General page overrides: display-card icon colours, card-title colour + animated arrow; homepage-news section styles
 │   └── js/
@@ -132,6 +133,12 @@ After changing header styles, run `npm run build` and commit `dist/theme.css` al
 The homepage Latest Events section is styled in `src/css/components/homepage-latest-events.css`, imported by `src/css/main.css`. Each card uses `data-warning-level="advice"`, `"watch_act"`, or `"emergency_warning"` to select the shared `--clr-status-advice`, `--clr-status-watch-act`, or `--clr-status-emergency-warning` accent and tag tint. When `data-warning-level` is absent or empty, `data-emergency-type="storm"`, `"flooding"`, or `"flood"` selects the default alert orange, `--clr-status-warning` (`#d6410a`). Unrecognised status or hazard values remain neutral; `data-location` does not affect colour. Tags use a 14% tint of the selected accent, except Advice tags which use solid `#FBE032`.
 
 Latest Events uses a pale-grey container capped at 1280px, 32px desktop container padding, and square cards with 24px padding, 240px minimum height, and 3px accent borders. The grid changes from three columns to two below 992px and one below 576px. Metadata can wrap, and cards expand for longer descriptions rather than clipping text. Tag text follows its warning accent, with Advice using dark yellow `#716309` for legibility. The “View all warnings” and “Find out more” links keep fixed padding while their arrows shift 2px right on hover without vertical layout movement.
+
+### Homepage featured content
+
+Homepage featured-content cards use `src/css/components/homepage-featured-content.css`, imported by `src/css/main.css`. The stylesheet targets the CMS `.ntg-featured-content-small` markup and styles its visible `.card-link` as the orange CTA; card copy, destinations, and photos remain CMS-managed. Desktop cards use a pale-teal surface with a text/image split, while narrow layouts stack the image below the text. The `ntg-featured-content-small--image-left` modifier retains image-first ordering on desktop.
+
+The local `SecureNT.html` capture is gitignored. For local preview, its feature-card image URLs can point to matching files in the also-gitignored `SecureNT_files/` directory; production CMS image URLs are unchanged. After changing featured-content styles, run `npm run build` and deploy the updated `dist/theme.css` with the source CSS.
 
 The homepage Emergencies and warnings hero and overlapping `#current-conditions` panel are styled in `src/css/components/homepage-hero.css`, imported by `src/css/main.css`. At desktop widths (992px and above), the hero uses a 42px white heading, 14px copy, and a 40px Territory-orange (`#d6410a`) Incident map action with no underline. The panel overlaps the hero by 49px on desktop, 34px at tablet widths, and 24px below 576px, with its content aligned to the hero inset and a subtle shadow. The local capture is gitignored; its markup is CMS-managed. After changing these homepage styles, run `npm run build` and deploy the updated `dist/theme.css` with the source CSS.
 
