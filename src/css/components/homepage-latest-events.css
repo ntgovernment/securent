@@ -73,23 +73,22 @@
   background: #fff;
 }
 
-#latest-events-cards .event-card:is(:not([data-level]), [data-level=""]):is([data-emergency-type="storm"], [data-emergency-type="flooding"], [data-emergency-type="flood"]),
-#latest-events-cards .event-card:is(:not([data-level]), [data-level=""]):is(:not([data-emergency-type]), [data-emergency-type=""]):is([data-warning-level="storm"], [data-warning-level="flooding"], [data-warning-level="flood"]) {
+#latest-events-cards .event-card:is(:not([data-warning-level]), [data-warning-level=""]):is([data-emergency-type="storm"], [data-emergency-type="flooding"], [data-emergency-type="flood"]) {
   --event-accent: var(--clr-status-warning);
   border-top-color: var(--clr-status-warning);
 }
 
-#latest-events-cards .event-card[data-level="advice"] {
+#latest-events-cards .event-card[data-warning-level="advice"] {
   --event-accent: var(--clr-status-advice);
   border-top-color: var(--clr-status-advice);
 }
 
-#latest-events-cards .event-card[data-level="watch_act"] {
+#latest-events-cards .event-card[data-warning-level="watch_act"] {
   --event-accent: var(--clr-status-watch-act);
   border-top-color: var(--clr-status-watch-act);
 }
 
-#latest-events-cards .event-card[data-level="emergency_warning"] {
+#latest-events-cards .event-card[data-warning-level="emergency_warning"] {
   --event-accent: var(--clr-status-emergency-warning);
   border-top-color: var(--clr-status-emergency-warning);
 }
