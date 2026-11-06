@@ -114,6 +114,18 @@ section[class*="ntg-featured-content-small--"] {
   order: 1;
 }
 
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .ntg-featured-content-small__card {
+    margin-inline: 52px;
+  }
+}
+
+@media (min-width: 992px) {
+  .ntg-featured-content-small__card {
+    margin-inline: 56px;
+  }
+}
+
 @media (max-width: 767.98px) {
   .ntg-featured-content-small__text,
   .ntg-featured-content-small__image {
