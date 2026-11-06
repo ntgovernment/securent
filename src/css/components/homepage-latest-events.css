@@ -1,8 +1,61 @@
 #current-conditions.container-xl {
   width: calc(100% - 4rem);
   max-width: 80rem;
+  margin-top: -2.125rem;
+  position: relative;
+  z-index: 1;
   padding: 2rem;
   background: #f4f4f6;
+  box-shadow: 0 0.25rem 0.75rem rgb(52 55 65 / 14%);
+}
+
+.hero-banner.intro-section {
+  margin-bottom: 0 !important;
+  background-color: #343741 !important;
+  color: #fff;
+}
+
+.hero-banner.intro-section > .container-xl {
+  position: relative;
+  z-index: 1;
+  width: calc(100% - 4rem);
+  max-width: 80rem;
+  padding: 0.75rem 2rem 4.25rem;
+}
+
+.hero-banner.intro-section h1 {
+  margin-bottom: 0.5rem;
+  color: #fff;
+  font-size: 2rem;
+  line-height: 1.15;
+}
+
+.hero-banner.intro-section .col-12 > div {
+  max-width: 40rem;
+  color: #fff;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.hero-banner.intro-section .intro-text-link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.875rem;
+  background: #d6410a;
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.hero-banner.intro-section .intro-text-link:hover {
+  background: #b93608;
+  color: #fff;
+}
+
+.hero-banner.intro-section .intro-text-link:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
 }
 
 #latest-warnings .warning-banner {
@@ -231,7 +284,17 @@
 @media (max-width: 575.98px) {
   #current-conditions.container-xl {
     width: calc(100% - 1.5rem);
+    margin-top: -1.5rem;
     padding: 1.25rem;
+  }
+
+  .hero-banner.intro-section > .container-xl {
+    width: calc(100% - 1.5rem);
+    padding: 0.5rem 1.25rem 3.5rem;
+  }
+
+  .hero-banner.intro-section h1 {
+    font-size: 1.75rem;
   }
 
   #latest-events-intro {
