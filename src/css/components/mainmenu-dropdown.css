@@ -243,7 +243,7 @@
     align-items: center;
     padding: 0;
     border-bottom: 0;
-    color: #ffffff;
+    color: #ffffff !important;
     font-size: 1rem;
     font-weight: 700;
     line-height: 1.5;
@@ -253,7 +253,7 @@
   nav.nav-masthead .ntg-main-nav__links > li > a:hover,
   nav.nav-masthead .ntg-main-nav__links > li > a:focus {
     background-color: #343741;
-    color: #ffffff;
+    color: #ffffff !important;
     border-bottom: 0;
     text-decoration: underline;
     text-decoration-thickness: 2px;
@@ -268,7 +268,7 @@
 
   nav.nav-masthead .ntg-main-nav__links > li > ul > li > a,
   nav.nav-masthead .ntg-main-nav__links > li > ul > li > ul > li > a {
-    color: #ffffff;
+    color: #ffffff !important;
     text-decoration: none;
   }
 
@@ -277,7 +277,7 @@
   nav.nav-masthead .ntg-main-nav__links > li > ul > li > ul > li > a:hover,
   nav.nav-masthead .ntg-main-nav__links > li > ul > li > ul > li > a:focus {
     background-color: #343741;
-    color: #ffffff;
+    color: #ffffff !important;
     text-decoration: underline;
     text-decoration-thickness: 2px;
     text-underline-offset: 0.25em;
