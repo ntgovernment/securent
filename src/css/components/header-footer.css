@@ -176,8 +176,15 @@ header.ntg-header .header-navigation > .container-xl {
 header.ntg-header .header-navigation nav.nav-masthead {
   width: 100%;
   min-height: 56px;
+  margin-left: -0.5rem;
   align-items: center;
   justify-content: flex-start !important;
+}
+
+@media (min-width: 1200px) {
+  header.ntg-header .header-navigation nav.nav-masthead {
+    margin-left: -1rem;
+  }
 }
 
 header.ntg-header .header-navigation nav.nav-masthead > .row {

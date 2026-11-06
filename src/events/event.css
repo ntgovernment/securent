@@ -14,6 +14,36 @@
 .event-page__header-accent.warning-level-emergency_warning {
   background-color: var(--clr-status-emergency-warning);
 }
+
+body:has(.event-page__header-accent) .breadcrumb-container > .container-xl,
+body:has(.event-page__header-accent) main#content > .container-xl,
+body:has(.event-page__header-accent) > .container-xl:has(#component_1248686) {
+  max-width: 80rem;
+  padding-right: 16px !important;
+  padding-left: 16px !important;
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  body:has(.event-page__header-accent) .breadcrumb-container > .container-xl,
+  body:has(.event-page__header-accent) main#content > .container-xl,
+  body:has(.event-page__header-accent) > .container-xl:has(#component_1248686) {
+    width: calc(100% - 3rem);
+    padding-right: 2.5rem !important;
+    padding-left: 2.5rem !important;
+  }
+}
+
+@media (min-width: 992px) {
+  body:has(.event-page__header-accent) .breadcrumb-container > .container-xl,
+  body:has(.event-page__header-accent) main#content > .container-xl,
+  body:has(.event-page__header-accent) > .container-xl:has(#component_1248686) {
+    width: calc(100% - 6rem);
+    max-width: 80rem;
+    padding-right: 3.375rem !important;
+    padding-left: 3.375rem !important;
+  }
+}
+
 .ntg-social-share {
   position: relative;
   background-color: #f4f4f7;

@@ -144,7 +144,7 @@ Overrides of the upstream `ntgbase.min.css` theme are isolated in `src/css/compo
 
 ### Header navigation
 
-Desktop navigation wrappers and top-level links stretch through the full 56px minimum-height bar. The link list has zero flex gap: each link, including the first, has `1rem` horizontal padding per side at widths of 1200px and above, or `0.5rem` from 768px to below 1200px. The `--menu-item-padding` property on `nav.nav-masthead` controls both link padding and an equal negative nav left margin, keeping the first label aligned with the header content edge.
+Desktop navigation wrappers and top-level links stretch through the full 56px minimum-height bar. The link list has zero flex gap: each link, including the first, has `1rem` horizontal padding per side at widths of 1200px and above, or `0.5rem` from 768px to below 1200px. The nav's responsive negative left margin matches the first link's padding, keeping its label aligned with the header content edge despite the upstream theme's default nav margin.
 
 Both header rows use the hero's 1280px maximum content width. At 768–991px their 64px content inset matches the hero; from 992px up their 102px inset matches the desktop hero heading. The mobile header keeps its compact 16px gutter.
 
