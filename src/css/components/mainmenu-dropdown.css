@@ -201,9 +201,10 @@
 
 @media (min-width: 768px) {
   nav.nav-masthead {
+    --menu-item-padding: 1rem;
     flex: 1 1 auto;
     min-width: 0;
-    margin: 0 0 0 2rem;
+    margin: 0 0 0 calc(-1 * var(--menu-item-padding));
     padding: 0;
     background-color: transparent;
     flex-wrap: nowrap;
@@ -238,14 +239,14 @@
     flex-wrap: nowrap;
     align-items: center;
     justify-content: flex-start;
-    gap: 2rem;
+    gap: 0;
     padding: 0;
   }
 
   nav.nav-masthead .ntg-main-nav__links > li > a {
     display: inline-flex;
     align-items: center;
-    padding: 0;
+    padding: 0 var(--menu-item-padding);
     border-bottom: 0;
     color: #ffffff !important;
     font-size: 1rem;
@@ -256,7 +257,7 @@
 
   nav.nav-masthead .ntg-main-nav__links > li > a:hover,
   nav.nav-masthead .ntg-main-nav__links > li > a:focus {
-    background-color: #000000 !important;
+    background-color: #343741 !important;
     color: #ffffff !important;
     border-bottom: 0 !important;
   }
@@ -281,7 +282,7 @@
   nav.nav-masthead .ntg-main-nav__links > li > ul > li.current > a,
   nav.nav-masthead .ntg-main-nav__links > li > ul > li > ul > li.active > a,
   nav.nav-masthead .ntg-main-nav__links > li > ul > li > ul > li.current > a {
-    background-color: #000000 !important;
+    background-color: #343741 !important;
     color: #ffffff !important;
   }
 
@@ -309,7 +310,7 @@
   nav.nav-masthead .ntg-main-nav__links > li.active > a,
   nav.nav-masthead .ntg-main-nav__links > li.current > a,
   nav.nav-masthead .ntg-main-nav__links > li.open > a {
-    background-color: #000000 !important;
+    background-color: #343741 !important;
     color: #ffffff !important;
     border-bottom: 0 !important;
   }
@@ -321,12 +322,8 @@
 
 @media (min-width: 768px) and (max-width: 1199.98px) {
   nav.nav-masthead {
-    margin-left: 1rem;
+    --menu-item-padding: 0.5rem;
     gap: 0.75rem;
-  }
-
-  nav.nav-masthead .ntg-main-nav__links {
-    gap: 1rem;
   }
 
   nav.nav-masthead .ntg-main-nav__links > li > a {
@@ -404,7 +401,7 @@
   .ntg-main-nav__links > li > ul > li > ul > li > a:focus,
   .ntg-main-nav__links > li > ul > li > ul > li.active > a,
   .ntg-main-nav__links > li > ul > li > ul > li.current > a {
-    background-color: #000000 !important;
+    background-color: #343741 !important;
     color: #ffffff !important;
     text-decoration: none !important;
   }
