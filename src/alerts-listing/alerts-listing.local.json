@@ -1,0 +1,116 @@
+{
+  "items": [
+    {
+      "id": "alert-1655500",
+      "title": "Severe Storm – Alice Springs",
+      "summary": "",
+      "url": "https://cmsexternal.nt.gov.au/securent/events/severe-storm-alice-springs",
+      "region": "Central Australia",
+      "location": "Alice Springs",
+      "emergencyType": "Severe storm",
+      "warningLevel": "Emergency warning",
+      "icon": "https://cmsexternal.nt.gov.au/__data/assets/git_bridge/0007/1650175/assets/hazard-icons/storm-emergency_warning.webp",
+      "updatedAt": "2026-10-27 00:00:00"
+    },
+    {
+      "id": "alert-1656711",
+      "title": "",
+      "summary": "",
+      "url": "https://cmsexternal.nt.gov.au/securent/events/severe-storm-alice-springs/additional-warnings/advice",
+      "region": "Barkly",
+      "location": "Barkly",
+      "emergencyType": "Severe storm",
+      "warningLevel": "Advice",
+      "icon": "https://cmsexternal.nt.gov.au/__data/assets/git_bridge/0007/1650175/assets/hazard-icons/storm-advice.webp",
+      "updatedAt": ""
+    },
+    {
+      "id": "alert-1656712",
+      "title": "",
+      "summary": "",
+      "url": "https://cmsexternal.nt.gov.au/securent/events/severe-storm-alice-springs/additional-warnings/watch-and-act",
+      "region": "Central Australia",
+      "location": "Yulara",
+      "emergencyType": "Severe storm",
+      "warningLevel": "Watch and act",
+      "icon": "https://cmsexternal.nt.gov.au/__data/assets/git_bridge/0007/1650175/assets/hazard-icons/storm-watch_act.webp",
+      "updatedAt": ""
+    },
+    {
+      "id": "alert-1656845",
+      "title": "",
+      "summary": "",
+      "url": "https://cmsexternal.nt.gov.au/securent/events/flooding-katherine/additional-warnings/advice-barkly",
+      "region": "Big Rivers",
+      "location": "Borroloola",
+      "emergencyType": "Flooding",
+      "warningLevel": "Advice",
+      "icon": "https://cmsexternal.nt.gov.au/__data/assets/git_bridge/0007/1650175/assets/hazard-icons/flood-advice.webp",
+      "updatedAt": ""
+    },
+    {
+      "id": "alert-1656846",
+      "title": "Flooding – Katherine",
+      "summary": "",
+      "url": "https://cmsexternal.nt.gov.au/securent/events/flooding-katherine",
+      "region": "Big Rivers",
+      "location": "Katherine",
+      "emergencyType": "Flooding",
+      "warningLevel": "Watch and act",
+      "icon": "https://cmsexternal.nt.gov.au/__data/assets/git_bridge/0007/1650175/assets/hazard-icons/flood-watch_act.webp",
+      "updatedAt": "2026-10-27 00:00:00"
+    },
+    {
+      "id": "alert-1656859",
+      "title": "",
+      "summary": "",
+      "url": "https://cmsexternal.nt.gov.au/securent/events/flooding-katherine/additional-warnings/watch-and-act-douglas-daly",
+      "region": "Big Rivers",
+      "location": "Douglas Daly",
+      "emergencyType": "Flooding",
+      "warningLevel": "Watch and act",
+      "icon": "https://cmsexternal.nt.gov.au/__data/assets/git_bridge/0007/1650175/assets/hazard-icons/flood-watch_act.webp",
+      "updatedAt": ""
+    },
+    {
+      "id": "alert-1656860",
+      "title": "",
+      "summary": "",
+      "url": "https://cmsexternal.nt.gov.au/securent/events/severe-storm-alice-springs/additional-warnings/decreasing-threat-santa-teresa",
+      "region": "Central Australia",
+      "location": "Santa Teresa",
+      "emergencyType": "Severe storm",
+      "warningLevel": "Advice",
+      "icon": "https://cmsexternal.nt.gov.au/__data/assets/git_bridge/0007/1650175/assets/hazard-icons/storm-advice.webp",
+      "updatedAt": ""
+    },
+    {
+      "id": "alert-1656996",
+      "title": "Wildfires – Nhulunbuy",
+      "summary": "",
+      "url": "https://cmsexternal.nt.gov.au/securent/events/wildfires-nhulunbuy",
+      "region": "East Arnhem",
+      "location": "Nhulunbuy",
+      "emergencyType": "Bushfire",
+      "warningLevel": "Advice",
+      "icon": "https://cmsexternal.nt.gov.au/__data/assets/git_bridge/0007/1650175/assets/hazard-icons/fire-advice.webp",
+      "updatedAt": "2026-10-27 00:00:00"
+    }
+  ],
+  "page": 1,
+  "pageSize": 8,
+  "total": 8,
+  "facets": {
+    "regions": [
+      "Central Australia",
+      "Barkly",
+      "Big Rivers",
+      "East Arnhem"
+    ],
+    "types": [
+      "Severe storm",
+      "Flooding",
+      "Bushfire"
+    ]
+  }
+}

@@ -24,7 +24,7 @@ const eventPreview = {
       const eventCapture = "Severe Storm \u2013 Alice Springs _ SecureNT.html";
       const capture =
         url.pathname === "/"
-          ? "SecureNT.html"
+            ? "alerts-and-warnings.html"
           : url.pathname === "/" + encodeURIComponent(eventCapture)
             ? eventCapture
             : null;
@@ -82,13 +82,16 @@ export default defineConfig({
     rollupOptions: {
       input: {
         ...(includeLocalCapture ? { page: "./SecureNT.html" } : {}),
+        "alerts-listing": "./src/alerts-listing/alerts-listing.js",
         theme: "./src/js/main.js",
         "local-conditions": "./src/local-conditions/local-conditions.js",
       },
       output: {
         // theme entry outputs to dist/theme.js; other chunks to Fuel security_files/
         entryFileNames: (chunk) =>
-          chunk.name === "theme" || chunk.name === "local-conditions"
+          chunk.name === "theme" ||
+          chunk.name === "alerts-listing" ||
+          chunk.name === "local-conditions"
             ? "[name].js"
             : "SecureNT_files/[name].js",
         chunkFileNames: "SecureNT_files/[name].js",
@@ -100,6 +103,9 @@ export default defineConfig({
           }
           if (assetInfo.name === "local-conditions.css") {
             return "local-conditions.css";
+          }
+          if (assetInfo.name === "alerts-listing.css") {
+            return "alerts-listing.css";
           }
           if (assetInfo.name && assetInfo.name.endsWith(".css")) {
             return "theme.css";

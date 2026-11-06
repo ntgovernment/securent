@@ -7,6 +7,10 @@ Source and build tooling for the **SecureNT** NT Government site (`https://cmsex
 ```
 securent/
 ├── src/
+│   ├── alerts-listing/
+│   │   ├── alerts-listing.js          # Alert rendering, search, filters, and pagination
+│   │   ├── alerts-listing.css         # Alerts page listing styles
+│   │   └── alerts-listing.local.json  # Local development fixture
 │   ├── css/
 │   │   ├── main.css                  # CSS entry point — add @imports here
 │   │   └── components/
@@ -22,12 +26,15 @@ securent/
 │       ├── homepage-news.js          # Runtime JS for homepage news cards (tag transformation)
 │       └── display-cards.js          # Runtime JS — swaps FA 5 `fal` icons to FA 6 `fa-solid` in display cards
 ├── dist/                             # Committed build output for the Squiz Matrix file bridge
+│   ├── alerts-listing.css
+│   ├── alerts-listing.js
 │   ├── print.css
 │   ├── theme.css
 │   └── theme.js
 ├── assets/hazard-icons/              # Shared hazard alert pictograms
 ├── SecureNT.html                     # Local page capture (gitignored)
 ├── SecureNT_files/                   # Local page assets (gitignored)
+├── alerts-and-warnings.html          # Alerts and warnings page capture
 ├── Severe Storm – Alice Springs _ SecureNT.html   # Secondary development event capture
 ├── vite.config.mjs
 └── package.json
@@ -52,8 +59,10 @@ npm install
 npm run dev
 ```
 
-Vite starts a local dev server and opens `/`, serving the captured homepage in `SecureNT.html`. The event capture remains available at `/Severe%20Storm%20%E2%80%93%20Alice%20Springs%20_%20SecureNT.html`. The development middleware in `vite.config.mjs` serves both captures through Vite's HTML transforms and serves saved `.js.download` dependencies as JavaScript. External navigation links still point to the CMS, and externally hosted fonts and favicons require network access. Both captures are development snapshots, not live emergency feeds.
+Vite starts a local dev server and opens `/`, serving the Alerts and warnings capture in `alerts-and-warnings.html`. The homepage capture remains available at `/SecureNT.html`, and the event capture remains available at `/Severe%20Storm%20%E2%80%93%20Alice%20Springs%20_%20SecureNT.html`. The development middleware in `vite.config.mjs` serves the Alerts and warnings and event captures through Vite's HTML transforms and serves saved `.js.download` dependencies as JavaScript. External navigation links still point to the CMS, and externally hosted fonts and favicons require network access. These captures are development snapshots, not live emergency feeds.
 The homepage links `src/css/main.css` and loads `src/js/main.js` directly for in-memory CSS imports and HMR. The event capture uses the built theme at `dist/theme.css` and links its page-specific styles from `src/events/event.css`.
+
+The Alerts and warnings capture loads its standalone listing scripts and styles from `dist/alerts-listing.js` and `dist/alerts-listing.css`. On localhost, the listing fetches `src/alerts-listing/alerts-listing.local.json`; on the deployed CMS page, it requests the listing endpoint configured in the page markup.
 
 ## Build
 
@@ -65,9 +74,10 @@ Outputs to `dist/`:
 
 - `theme.css` — compiled, minified CSS (all `src/css/` sources merged)
 - `theme.js` — compiled JS (all `src/js/` modules merged via `src/js/main.js`)
+- `alerts-listing.css` and `alerts-listing.js` — standalone assets for the Alerts and warnings page
 - `print.css` — print stylesheet
 
-`theme.css`, `theme.js`, and `print.css` are referenced in Squiz Matrix via the git file bridge.
+`theme.css`, `theme.js`, `alerts-listing.css`, `alerts-listing.js`, and `print.css` are referenced in Squiz Matrix via the git file bridge.
 
 The build excludes the captured homepage's reference to the previous `dist/theme.css` so generated styles are not imported back into the next bundle. The current source styles remain the authority.
 
