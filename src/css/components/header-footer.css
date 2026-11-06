@@ -6,6 +6,7 @@
 
 /* ---- Header ---- */
 header.ntg-header {
+  padding-bottom: 0 !important;
   background-color: #343741;
 }
 

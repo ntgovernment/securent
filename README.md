@@ -121,6 +121,8 @@ Desktop navigation wrappers and top-level links stretch through the full 56px mi
 
 Emergency contacts uses white text and no underline with `!important` to withstand the production cascade. Its hover, keyboard-focus, and active states use `#424550`, and its desktop/tablet horizontal padding matches the menu. Main navigation states use `#343741`. Menu links retain the same bottom-border width between normal and hovered states so vertically centred text does not jump; keyboard focus outlines remain available.
 
+The header overrides upstream bottom padding with `padding-bottom: 0 !important`, removing the extra 30px grey strip between navigation and the page accent bar. Desktop dropdown panels retain a thin neutral border instead of an orange left accent. Dropdown links fill the entire item width and height, including their padding; hover, focus, and active/current states use `#444855` with white text. These dropdown state colours are separate from the top-level navigation colours.
+
 After changing header styles, run `npm run build` and commit `dist/theme.css` alongside the source CSS so the Squiz Matrix file bridge receives the updates. Check desktop and tablet padding, first-label alignment, full-height highlights, and unchanged text bounds on hover in the local preview. The captured page's external links can navigate to the CMS rather than demonstrate dropdown toggling; test `.open` styling separately when that happens.
 
 ### Homepage Latest Events
