@@ -490,7 +490,7 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-emergency-
   }
 
   .ntg-main-nav__links li > a {
-    display: flex;
+    display: flex !important;
     min-height: 40px;
     align-items: center;
     justify-content: space-between;
@@ -504,7 +504,18 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-emergency-
     font-size: 14px;
     font-weight: 700;
     line-height: 20px;
-    white-space: normal;
+    white-space: normal !important;
+  }
+
+  .ntg-main-nav__label {
+    display: block;
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    white-space: normal !important;
+  }
+
+  .ntg-main-nav__links li > a.is-multiline {
+    align-items: flex-start;
   }
 
   .ntg-main-nav__links > li:not(.has-children) > a,
@@ -551,22 +562,27 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-emergency-
     padding-left: 48px;
   }
 
-  .ntg-main-nav__links > li.has-children > a::after,
-  .ntg-main-nav__submenu li.has-children > a::after {
-    content: "";
-    width: 9px;
-    height: 9px;
-    flex: 0 0 9px;
-    margin: 0 3px 4px 12px;
-    border: solid #ffffff;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
+  header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links li.has-children > a::after {
+    content: "" !important;
+    display: block !important;
+    width: 9px !important;
+    height: 9px !important;
+    flex: 0 0 9px !important;
+    margin: 0 3px 0 12px !important;
+    border: solid #ffffff !important;
+    border-width: 0 2px 2px 0 !important;
+    font-size: 0 !important;
+    transform: rotate(-45deg) !important;
     transition: transform 0.18s ease;
   }
 
-  .ntg-main-nav__links li.has-children.open > a::after {
-    margin-bottom: -4px;
-    transform: rotate(225deg);
+  header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links li.has-children.open > a::after {
+    margin-bottom: 4px !important;
+    transform: rotate(45deg) !important;
+  }
+
+  header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links li > a.is-multiline::after {
+    margin-top: 5px !important;
   }
 
   .mobile-emergency-link a {

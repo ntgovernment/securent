@@ -39,8 +39,11 @@ import { primaryNavigation } from "../data/navigation.js";
     items.forEach(function (item) {
       const listItem = document.createElement("li");
       const link = document.createElement("a");
+      const label = document.createElement("span");
       link.href = item.href;
-      link.textContent = item.label;
+      label.className = "ntg-main-nav__label";
+      label.textContent = item.label;
+      link.append(label);
       listItem.append(link);
 
       if (item.children) {
@@ -112,12 +115,33 @@ import { primaryNavigation } from "../data/navigation.js";
     link.setAttribute("aria-expanded", "false");
   });
 
+  let wrappedLabelFrame = 0;
+
+  function updateWrappedLabels() {
+    cancelAnimationFrame(wrappedLabelFrame);
+    wrappedLabelFrame = requestAnimationFrame(function () {
+      renderedMenu.querySelectorAll(".ntg-main-nav__label").forEach(function (label) {
+        if (label.closest("ul[hidden]")) return;
+
+        const lineHeight = parseFloat(getComputedStyle(label).lineHeight);
+        label.parentElement.classList.toggle(
+          "is-multiline",
+          label.getBoundingClientRect().height > lineHeight + 1,
+        );
+      });
+    });
+  }
+
+  updateWrappedLabels();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(updateWrappedLabels);
+
   function setExpanded(item, expanded) {
     const childList = item.querySelector(":scope > ul");
     const link = item.querySelector(":scope > a");
     item.classList.toggle("open", expanded);
     childList.hidden = !expanded;
     link.setAttribute("aria-expanded", expanded ? "true" : "false");
+    updateWrappedLabels();
   }
 
   function closeNested(item) {
@@ -141,6 +165,7 @@ import { primaryNavigation } from "../data/navigation.js";
     backdrop.hidden = !open;
     document.body.classList.toggle("mobile-menu-open", open);
     document.body.style.overflow = open ? "hidden" : previousBodyOverflow;
+    if (open) updateWrappedLabels();
     if (open) closeButton.focus();
     else if (returnFocus) menuButton.focus();
   }
@@ -223,6 +248,7 @@ import { primaryNavigation } from "../data/navigation.js";
   });
 
   window.addEventListener("resize", function () {
+    updateWrappedLabels();
     if (window.innerWidth >= 768 && header.classList.contains("menu-open")) {
       setMenuOpen(false, false);
     }
