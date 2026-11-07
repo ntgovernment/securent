@@ -258,9 +258,12 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li > a:focus-visible
 }
 
 /* ---- Footer ---- */
-.ntg-footer,
-.ntg-footer__text {
+.ntg-footer {
   background-color: #343741;
+}
+
+.ntg-footer__text {
+  background-color: #3F4352;
 }
 
 /* ---- Mobile search banner ---- */
