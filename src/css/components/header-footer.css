@@ -266,6 +266,12 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li > a:focus-visible
   background-color: #3F4352;
 }
 
+@media (min-width: 992px) {
+  .ntg-footer {
+    padding-top: 48px !important;
+  }
+}
+
 /* ---- Mobile search banner ---- */
 .mobile-banner {
   background-color: #343741;
