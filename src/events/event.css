@@ -44,69 +44,10 @@ body:has(.event-page__header-accent) > .container-xl:has(#component_1248686) {
   }
 }
 
-.ntg-social-share {
-  position: relative;
-  background-color: #f4f4f7;
-}
-
-.ntg-social-share > p {
-  margin: 0 !important;
-  padding: 1.25rem 1.5rem;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1b1b1f;
-  border-bottom: 2px solid #d4d4d8;
-}
-
-.ntg-social-share .list-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-}
-
-.ntg-social-share .list-group-item {
-  padding: 0 !important;
-  background: transparent;
-}
-
-.ntg-social-share__link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  font-size: 1.5rem;
-  color: #1b1b1f;
-  text-decoration: none;
-  background: transparent;
-}
-
-.ntg-social-share__link:hover,
-.ntg-social-share__link:focus-visible {
-  background-color: #e8e8ea;
-  color: #1b1b1f;
-}
-
-.ntg-social-share__link:focus-visible {
-  outline: 2px solid #1b1b1f;
-  outline-offset: 2px;
-}
-
-.ntg-social-share__link svg {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-.ntg-social-share__link svg path {
-  fill: currentColor;
-}
-
-.ntg-social-share #fade-text {
-  position: absolute;
-  left: 1.5rem;
-  top: 100%;
-  z-index: 1;
+@media (min-width: 992px) {
+  body:has(.event-page__header-accent) .ntg-social-share {
+    margin-top: 49px;
+  }
 }
 
 /* Scoped via the feedback component id, as the CMS markup has no unique class. */

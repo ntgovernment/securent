@@ -16,6 +16,20 @@ const sourceThemeOnly = {
   },
 };
 
+const excludeLocalCapturePhotos = {
+  name: "exclude-local-capture-photos",
+  apply: "build",
+  transformIndexHtml: {
+    order: "pre",
+    handler(html) {
+      return html.replace(
+        / style="background: url\('\.\/SecureNT_files\/(?:bushfires-nt|bush-curlews)\.webp'\) no-repeat center \/ cover;"/g,
+        "",
+      );
+    },
+  },
+};
+
 const eventPreview = {
   name: "event-preview",
   configureServer(server) {
@@ -77,7 +91,13 @@ const includeLocalCapture =
 
 export default defineConfig({
   root: ".",
-  plugins: [sourceThemeOnly, eventPreview, localConditionsMock, cloudflare()],
+  plugins: [
+    sourceThemeOnly,
+    excludeLocalCapturePhotos,
+    eventPreview,
+    localConditionsMock,
+    cloudflare(),
+  ],
   build: {
     rollupOptions: {
       input: {
@@ -85,14 +105,16 @@ export default defineConfig({
         "alerts-listing": "./src/alerts-listing/alerts-listing.js",
         "alerts-pagination": "./src/alerts-listing/alerts-pagination.css",
         "more-updates-cards": "./src/alerts-listing/more-updates-cards.css",
+        "social-share": "./src/social-share/social-share.js",
         theme: "./src/js/main.js",
         "local-conditions": "./src/local-conditions/local-conditions.js",
       },
       output: {
-        // theme entry outputs to dist/theme.js; other chunks to Fuel security_files/
+        // Standalone feature entries go to dist/; shared chunks go to SecureNT_files/.
         entryFileNames: (chunk) =>
           chunk.name === "theme" ||
           chunk.name === "alerts-listing" ||
+          chunk.name === "social-share" ||
           chunk.name === "local-conditions"
             ? "[name].js"
             : "SecureNT_files/[name].js",

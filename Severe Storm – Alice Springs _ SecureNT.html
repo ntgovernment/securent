@@ -199,6 +199,7 @@
         
         <div class="ntg-body">
             <link rel="stylesheet" href="./src/events/event.css">
+            <link rel="stylesheet" href="./src/social-share/social-share.css">
 <div class="event-page__header-accent warning-level-emergency_warning" aria-hidden="true"></div>
 
 
@@ -401,72 +402,47 @@
             
             <div class="col-md-4 mt-5 ps-md-5 pt-3 d-print-none">
                                 <!-- Social share -->
-                
-
-<script>
-
-    (function () {
-
-        var shareButtons = document.querySelectorAll(".ntg-social-share--enabled .ntg-social-share__link");
-
-        if (shareButtons) {
-            [].forEach.call(shareButtons, function (button) {
-                button.addEventListener("click", function (event) {
-                    var width = 650,
-                        height = 450;
-
-                    event.preventDefault();
-
-                    window.open(this.href, 'Share Dialog',
-                        'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,width=' + width +
-                        ',height=' + height + ',top=' + (screen.height / 2 - height / 2) +
-                        ',left=' + (screen.width / 2 - width / 2));
-                });
-            });
-        }
-
-    })();
-    
-    // copy current URL function
-    document.querySelector(".ntg-social-share--copy").addEventListener("click", function() {
-        
-        var text = window.location.href.split('#void')[0];
-        
-        // Detect IE 11 and call execCommand since clipboard.writeText function not support in IE
-        if (!!navigator.userAgent.match(/Trident.*rv\:11\./))  {
-            var inputc = document.body.appendChild(document.createElement("input"));
-            inputc.value =  window.location.href.split('#void')[0];
-            inputc.focus();
-            inputc.select();
-            document.execCommand('copy');
-            inputc.parentNode.removeChild(inputc);
-            urlCopiedAlert();
-        }
-        
-        // Call clipboard.writeText function for other browsers 
-        else {
-            navigator.clipboard.writeText(text);
-            urlCopiedAlert();
-        }
-
-    });
-    
-    // user alert after URL copied to clipboard
-    function urlCopiedAlert () {
-        var text = document.getElementById("fade-text");
-        
-        text.classList.remove("d-none");
-        text.setAttribute("class", "fadeIn");
-        
-        setTimeout(function(){ 
-            text.setAttribute("class", "d-none");
-        }, 500);
-    }
-    
-    // remove external class from copy link button
-    document.querySelector('a[href="#void"]').classList.remove('external');
-    
-</script> 
+                <section class="ntg-social-share">
+                                    <p class="mt-2 mb-0">Share this page</p>
+                    <ul class="list-group list-group-horizontal">
+                        <li class="list-group-item border-0 px-0 ntg-social-share--enabled" title="Share this page on Facebook">
+                            <a class="ntg-social-share__link ntg-social-share--facebook" href="https://facebook.com/sharer/sharer.php?u=%frontend_asset_url%">
+                                <i class="fab fa-facebook"></i>
+                                <span class="sr-only">Facebook</span>
+                            </a>
+                        </li>
+                                        <li class="list-group-item border-0 px-0 ntg-social-share--enabled" title="Share this page on LinkedIn">
+                                            <a class="ntg-social-share__link ntg-social-share--linkedin" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=%frontend_asset_url%">
+                                                <i class="fab fa-linkedin-in"></i>
+                                                <span class="sr-only">LinkedIn</span>
+                                            </a>
+                                        </li>
+                                        <li class="list-group-item border-0 px-0 ntg-social-share--enabled svg" title="Share this page on X">
+                                            <a class="ntg-social-share__link ntg-social-share--x" href="https://twitter.com/intent/tweet/?url=%frontend_asset_url%">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true">
+                                                    <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" />
+                                </svg>
+                                                <span class="sr-only">X</span>
+                            </a>
+                        </li>
+                                        <li class="list-group-item border-0 px-0" title="Visit Instagram">
+                                            <a class="ntg-social-share__link ntg-social-share--instagram" href="https://www.instagram.com/">
+                                                <i class="fab fa-instagram"></i>
+                                                <span class="sr-only">Instagram</span>
+                            </a>
+                        </li>
+                        <li class="list-group-item border-0 px-0" title="Copy URL of this page">
+                            <a class="ntg-social-share__link ntg-social-share--copy" href="#void" role="button">
+                                <i class="fal fa-copy"></i>
+                                <span class="sr-only">Copy link</span>
+                            </a>
+                            <div id="fade-text" class="d-none">
+                                <span class="d-inline-block p-2 bg-success text-white mt-3">URL copied!</span>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+                <script src="./dist/social-share.js"></script>
                 </div>
                 
                 

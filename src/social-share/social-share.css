@@ -1,0 +1,111 @@
+.ntg-social-share {
+  position: relative;
+  container-type: inline-size;
+  background-color: var(--clr-bg-shade, #f5f5f7);
+}
+
+.ntg-social-share > p {
+  margin: 0 !important;
+  padding: 16px 24px;
+  color: var(--clr-text-default, #1f1e27);
+  font-family: Lato, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 20px;
+  border-bottom: 2px solid var(--clr-border-subtle, #d3d3d7);
+}
+
+.ntg-social-share .list-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px 24px;
+  background-color: var(--clr-bg-shade, #f5f5f7);
+}
+
+.ntg-social-share .list-group-item {
+  padding: 0 !important;
+  background: transparent;
+}
+
+.ntg-social-share__link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 32px;
+  box-sizing: border-box !important;
+  width: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  padding: 4px;
+  border-radius: 0;
+  color: var(--clr-text-default, #1f1e27) !important;
+  font-size: 20px;
+  text-decoration: none;
+  background-color: transparent !important;
+}
+
+.ntg-social-share__link i,
+.ntg-social-share__link i::before,
+.ntg-social-share__link svg {
+  color: var(--clr-text-default, #1f1e27) !important;
+  background-color: transparent !important;
+}
+
+.ntg-social-share__link:hover,
+.ntg-social-share__link:focus-visible {
+  color: var(--clr-text-default, #1f1e27);
+  background-color: var(--clr-bg-shade-alt, #e7e7ea) !important;
+}
+
+.ntg-social-share__link:focus-visible {
+  outline: 2px solid var(--clr-text-default, #1f1e27);
+  outline-offset: 2px;
+}
+
+.ntg-social-share__link svg {
+  display: block;
+  flex: 0 0 20px;
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.ntg-social-share__link svg path {
+  fill: currentColor !important;
+}
+
+.ntg-social-share #fade-text {
+  position: absolute;
+  left: 1.5rem;
+  top: 100%;
+  z-index: 1;
+}
+
+@container (min-width: 500px) {
+  .ntg-social-share .list-group {
+    gap: 16px;
+    padding: 32px 48px;
+  }
+
+  .ntg-social-share__link {
+    flex-basis: 64px;
+    width: 64px !important;
+    min-width: 64px !important;
+    max-width: 64px !important;
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    padding: 12px;
+    font-size: 40px;
+  }
+
+  .ntg-social-share__link svg {
+    flex-basis: 40px;
+    width: 40px !important;
+    height: 40px !important;
+  }
+}
