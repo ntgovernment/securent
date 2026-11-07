@@ -244,12 +244,18 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li > a:focus-visible
 
 @media (max-width: 767.98px) {
   header.ntg-header .header-top > .container-xl {
-    min-height: 72px;
+    min-height: 56px !important;
     gap: 16px;
   }
 
+  header.ntg-header .navbar .header-navigation,
+  header.ntg-header .navbar .header-navigation > .container-xl {
+    height: 0 !important;
+    min-height: 0 !important;
+  }
+
   header.ntg-header .header-tools {
-    gap: 0;
+    gap: 8px;
   }
 
   header.ntg-header .header-tools > a {

@@ -80,7 +80,7 @@
 }
 
 /* Arrow indicator for items with children */
-.ntg-main-nav__links > li.has-children > a::after {
+.ntg-main-nav__links li.has-children > a::after {
   content: "\f078"; /* fa-chevron-down */
   font-family: "Font Awesome 6 Pro";
   font-weight: 900;
@@ -91,7 +91,7 @@
   transition: transform 0.3s ease;
 }
 
-.ntg-main-nav__links > li.has-children.open > a::after {
+.ntg-main-nav__links li.has-children.open > a::after {
   content: "\f078";
   transform: rotate(-180deg) translateX(-4px);
 }
@@ -148,30 +148,40 @@
   color: #000000;
 }
 
-/* Arrow for third-level parents – hidden */
-.ntg-main-nav__links > li > ul > li.has-children > a::after {
-  display: none;
-}
-
-/* ---- Third-level dropdown (fly-out) – hidden ---- */
-.ntg-main-nav__links > li > ul > li > ul {
-  display: none;
-}
-
-/* Show third-level when .open is toggled via JS */
-.ntg-main-nav__links > li > ul > li.open > ul {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(0);
-}
-
-/* Third-level items need relative positioning for fly-out */
-.ntg-main-nav__links > li > ul > li.has-children {
+.ntg-main-nav__links li.has-children {
   position: relative;
 }
 
-/* ---- Third-level links ---- */
-.ntg-main-nav__links > li > ul > li > ul > li > a {
+.ntg-main-nav__submenu {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 240px;
+  background-color: #ffffff;
+  border: 1px solid #d6d6d6;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1010;
+}
+
+.ntg-main-nav__submenu .ntg-main-nav__submenu {
+  top: 0;
+  left: 100%;
+}
+
+.ntg-main-nav__submenu[hidden] {
+  display: none !important;
+}
+
+.ntg-main-nav__submenu:not([hidden]) {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+.ntg-main-nav__submenu a {
   display: block;
   padding: 0.5rem 1.25rem;
   color: #000000;
@@ -184,8 +194,8 @@
     color 0.15s ease;
 }
 
-.ntg-main-nav__links > li > ul > li > ul > li > a:hover,
-.ntg-main-nav__links > li > ul > li > ul > li > a:focus {
+.ntg-main-nav__submenu a:hover,
+.ntg-main-nav__submenu a:focus {
   background-color: #fcccbb;
   color: #000000;
 }
@@ -335,166 +345,262 @@
   }
 }
 
-/* ==========================================================================
-   Responsive – Collapse to vertical accordion on small screens
+/* ===========================================================================
+   Responsive – Mobile navigation drawer
    ========================================================================== */
-
-/* ---- Hamburger toggle button ---- */
-.ntg-menu-toggle {
+.mobile-menu-toggle,
+.mobile-search-toggle,
+.mobile-nav-close,
+.mobile-menu-backdrop {
   display: none;
 }
 
+header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-emergency-link {
+  display: none !important;
+}
+
 @media (max-width: 767.98px) {
-  .ntg-menu-toggle {
-    display: flex;
+  header.ntg-header {
+    position: relative;
+    z-index: 1100;
+  }
+
+  header.ntg-header .header-top > .container-xl {
+    min-height: 56px;
+    gap: 12px;
+  }
+
+  header.ntg-header .site-logo img,
+  header.ntg-header .site-logo svg {
+    width: 100px;
+    height: 31px;
+  }
+
+  header.ntg-header .header-tools {
+    gap: 8px;
+  }
+
+  header.ntg-header .header-tools > a,
+  header.ntg-header .header-tools > .ps-4 {
+    display: none !important;
+  }
+
+  .mobile-menu-toggle,
+  .mobile-search-toggle,
+  .mobile-nav-close {
+    display: inline-flex;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
     align-items: center;
-    gap: 0.5rem;
-    width: 100%;
-    padding: 0.75rem 1rem;
-    background-color: #ffffff;
-    color: #000000;
-    font-size: 0.9375rem;
-    font-weight: bold;
-    border: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #ffffff;
     cursor: pointer;
-    transition: background-color 0.2s ease;
   }
 
-  .ntg-menu-toggle:hover,
-  .ntg-menu-toggle:focus {
-    background-color: #fcccbb;
+  .mobile-menu-toggle {
+    flex-direction: column;
+    gap: 6px;
   }
 
-  .ntg-menu-toggle[aria-expanded="true"] .fas::before {
-    content: "\f00d"; /* fa-xmark / fa-times */
-  }
-
-  /* Hide the nav links by default on mobile */
-  #mainmenu .row {
-    display: none;
-  }
-
-  #mainmenu.menu-open .row {
+  .mobile-menu-toggle span {
     display: block;
+    width: 24px;
+    height: 2px;
+    background: currentColor;
+  }
+
+  .mobile-search-toggle span,
+  .mobile-nav-close span {
+    font-size: 24px;
+  }
+
+  .mobile-menu-toggle:focus-visible,
+  .mobile-search-toggle:focus-visible,
+  .mobile-nav-close:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: -3px;
+  }
+
+  header.ntg-header .header-navigation .container-xl nav.nav-masthead {
+    position: fixed;
+    top: 56px;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    display: block !important;
+    width: min(270px, calc(100vw - 64px));
+    height: calc(100dvh - 56px);
+    min-height: 0;
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 8px 0 24px;
+    background: #343741;
+    box-shadow: -8px 4px 20px rgba(15, 15, 47, 0.2);
+    transform: translateX(102%);
+    visibility: hidden;
+    pointer-events: none;
+    transition: transform 0.24s ease, visibility 0s linear 0.24s;
+  }
+
+  header.ntg-header.menu-open .header-navigation .container-xl nav.nav-masthead {
+    transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
+    transition: transform 0.24s ease, visibility 0s linear;
+  }
+
+  .mobile-nav-close {
+    display: flex;
+    width: 100%;
+    height: 52px;
+    justify-content: flex-end;
+    padding: 0 16px;
+  }
+
+  header.ntg-header .header-navigation nav.nav-masthead > .row,
+  header.ntg-header .header-navigation nav.nav-masthead > .row > .col-md-12,
+  header.ntg-header .header-navigation .au-main-nav__content,
+  header.ntg-header .header-navigation .au-main-nav__menu,
+  header.ntg-header .header-navigation .au-main-nav__menu-inner,
+  header.ntg-header .header-navigation .au-main-nav__menu-inner-wrap {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 0;
   }
 
   .ntg-main-nav__links {
-    flex-direction: column;
-  }
-
-  .ntg-main-nav__links > li > a {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .ntg-main-nav__links > li,
+  .ntg-main-nav__submenu > li {
+    display: block;
+    width: 100%;
+  }
+
+  .ntg-main-nav__links li > a {
+    display: flex;
+    min-height: 40px;
     align-items: center;
-    color: #000000;
-    font-weight: bold;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  }
-
-  .ntg-main-nav__links > li > a:hover,
-  .ntg-main-nav__links > li > a:focus,
-  .ntg-main-nav__links > li.active > a,
-  .ntg-main-nav__links > li.current > a,
-  .ntg-main-nav__links > li.open > a,
-  .ntg-main-nav__links > li > ul > li > a:hover,
-  .ntg-main-nav__links > li > ul > li > a:focus,
-  .ntg-main-nav__links > li > ul > li.active > a,
-  .ntg-main-nav__links > li > ul > li.current > a,
-  .ntg-main-nav__links > li > ul > li > ul > li > a:hover,
-  .ntg-main-nav__links > li > ul > li > ul > li > a:focus,
-  .ntg-main-nav__links > li > ul > li > ul > li.active > a,
-  .ntg-main-nav__links > li > ul > li > ul > li.current > a {
-    background-color: #343741 !important;
+    justify-content: space-between;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 8px 16px;
+    border: 0;
+    border-bottom: 1px solid #1f1e27;
+    background: transparent;
     color: #ffffff !important;
-    text-decoration: none !important;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 20px;
+    white-space: normal;
   }
 
-  .ntg-main-nav__links > li > a:hover,
-  .ntg-main-nav__links > li > a:focus {
-    border-bottom-color: rgba(0, 0, 0, 0.1);
+  .ntg-main-nav__links > li:not(.has-children) > a,
+  .ntg-main-nav__links > li.has-children > a {
+    min-height: 40px;
   }
 
-  .ntg-main-nav__links > li.active > a,
-  .ntg-main-nav__links > li.current > a {
-    border-left: 3px solid #f4551a;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  .ntg-main-nav__links li > a:hover,
+  .ntg-main-nav__links li > a:focus-visible,
+  .ntg-main-nav__links li.open > a {
+    background: #444855 !important;
+    color: #ffffff !important;
   }
 
-  /* Left accent border on expanded level 1 item */
-  .ntg-main-nav__links > li.open > a {
-    border-left: 3px solid #f4551a;
+  header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links li.open > a,
+  header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links li.open > .ntg-main-nav__submenu {
+    border-left: 0 !important;
   }
 
-  /* Stack dropdowns vertically instead of absolute positioning */
-  .ntg-main-nav__links > li > ul,
-  .ntg-main-nav__links > li > ul > li > ul {
+  .ntg-main-nav__links .ntg-main-nav__submenu {
     position: static;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
     opacity: 1;
     visibility: visible;
     transform: none;
+    background: #343741;
     box-shadow: none;
-    border: none;
-    border-top: none;
-    border-radius: 0;
-    background-color: #ffffff;
-    display: none;
   }
 
-  /* Left accent border on expanded level 2 dropdown */
-  .ntg-main-nav__links > li.open > ul {
-    border-left: 3px solid #f4551a;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  .ntg-main-nav__submenu a {
+    min-height: 40px;
+    padding: 8px 16px 8px 32px;
+    border-bottom: 1px solid #1f1e27;
+    color: #ffffff !important;
+    font-size: 14px;
+    font-weight: 400;
+    white-space: normal;
   }
 
-  /* Show nested lists when .open is toggled via JS */
-  .ntg-main-nav__links > li.open > ul,
-  .ntg-main-nav__links > li > ul > li.open > ul {
+  .ntg-main-nav__submenu .ntg-main-nav__submenu a {
+    padding-left: 48px;
+  }
+
+  .ntg-main-nav__links > li.has-children > a::after,
+  .ntg-main-nav__submenu li.has-children > a::after {
+    content: "";
+    width: 9px;
+    height: 9px;
+    flex: 0 0 9px;
+    margin: 0 3px 4px 12px;
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    transition: transform 0.18s ease;
+  }
+
+  .ntg-main-nav__links li.has-children.open > a::after {
+    margin-bottom: -4px;
+    transform: rotate(225deg);
+  }
+
+  .mobile-emergency-link a {
+    font-weight: 700 !important;
+  }
+
+  header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-emergency-link {
+    display: block !important;
+  }
+
+  .mobile-menu-backdrop:not([hidden]) {
+    position: fixed;
+    inset: 56px 0 0;
+    z-index: 1;
     display: block;
+    width: 100%;
+    border: 0;
+    background: rgba(59, 64, 73, 0.8);
   }
 
-  .ntg-main-nav__links > li > ul > li > a,
-  .ntg-main-nav__links > li > ul > li > ul > li > a {
-    color: #000000;
-    font-weight: bold;
-    padding-left: 2rem;
+  .mobile-menu-backdrop[hidden] {
+    display: none !important;
   }
 
-  .ntg-main-nav__links > li > ul > li > ul > li > a {
-    padding-left: 3rem;
+  .mobile-banner {
+    display: none !important;
   }
 
-  /* Reset border-left on third-level mobile */
-  .ntg-main-nav__links > li > ul > li > ul {
-    border-left: none;
+  body.mobile-search-open .mobile-banner {
+    display: block !important;
   }
 
-  /* Remove bottom border accent on hover for mobile */
-  .ntg-main-nav__links > li > a:hover,
-  .ntg-main-nav__links > li > a:focus {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  }
-
-  /* Carets for mobile – FA chevrons matching desktop */
-  .ntg-main-nav__links > li.has-children > a::after {
-    content: "\f078"; /* fa-chevron-down */
-    font-family: "Font Awesome 6 Pro";
-    font-weight: 900;
-    width: auto;
-    height: auto;
-    border: none;
-    font-size: 0.65em;
-    transform: none;
-    transition: transform 0.3s ease;
-  }
-
-  .ntg-main-nav__links > li.has-children.open > a::after {
-    content: "\f078";
-    transform: rotate(-180deg) translateX(-4px);
-  }
-
-  .ntg-main-nav__links > li > ul > li.has-children > a::after {
-    display: none;
+  body.mobile-menu-open {
+    overflow: hidden;
   }
 }
 

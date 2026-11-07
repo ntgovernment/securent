@@ -1,0 +1,130 @@
+export const primaryNavigation = [
+  {
+    label: "Alerts and warnings",
+    href: "https://cmsexternal.nt.gov.au/securent/alerts-and-warnings",
+  },
+  {
+    label: "Prepare",
+    href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency",
+    children: [
+      {
+        label: "Emergency planning",
+        href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/emergency-planning",
+        children: [
+          { label: "Emergency plans", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/emergency-planning/emergency-plans" },
+          { label: "Emergency kits", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/emergency-planning/emergency-kits" },
+          { label: "Emergency shelters", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/emergency-planning/emergency-shelters" },
+          { label: "Caring for pets", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/emergency-planning/caring-for-pets" },
+          { label: "Caring for infants", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/emergency-planning/caring-for-infants" },
+          { label: "Prepare your business for an emergency", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/emergency-planning/prepare-your-business-for-an-emergency" },
+          { label: "Emergency sign language videos", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/emergency-planning/emergency-sign-language-videos" },
+          { label: "Get insurance", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/emergency-planning/get-insurance" },
+        ],
+      },
+      {
+        label: "Weather events",
+        href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/weather-events",
+        children: [
+          { label: "Cyclones", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/weather-events/cyclone" },
+          { label: "Flooding", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/weather-events/flooding" },
+          { label: "Heatwave", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/weather-events/heatwave" },
+          { label: "Earthquakes", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/weather-events/earthquakes" },
+          { label: "Droughts", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/weather-events/droughts" },
+          { label: "Severe storms", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/weather-events/severe-storms" },
+          { label: "Tsunamis", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/weather-events/tsunamis" },
+        ],
+      },
+      {
+        label: "Fires",
+        href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/fires",
+        children: [
+          { label: "House fires", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/fires/house-fires" },
+          { label: "Bushfires", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/fires/bushfires" },
+        ],
+      },
+      { label: "Health emergencies", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/health-emergencies" },
+      {
+        label: "Terrorism and foreign interference",
+        href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/terrorism-and-foreign-interference",
+        children: [
+          { label: "What you can do", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/terrorism-and-foreign-interference/what-you-can-do" },
+          { label: "What happens if there is a terrorist incident", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/terrorism-and-foreign-interference/what-happens-if-there-is-a-terrorist-incident" },
+          { label: "Countering violent extremism", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/terrorism-and-foreign-interference/countering-violent-extremism" },
+          { label: "Crowded places", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/terrorism-and-foreign-interference/crowded-places" },
+          { label: "Cyber security", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/terrorism-and-foreign-interference/cyber-security" },
+          { label: "Counter-terrorism", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/terrorism-and-foreign-interference/counter-terrorism" },
+          { label: "Espionage and foreign interference", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/terrorism-and-foreign-interference/espionage-and-foreign-interference" },
+        ],
+      },
+      { label: "Biosecurity", href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency/biosecurity" },
+    ],
+  },
+  {
+    label: "Respond",
+    href: "https://cmsexternal.nt.gov.au/securent/respond",
+    children: [
+      { label: "Listen to radio updates", href: "https://cmsexternal.nt.gov.au/securent/respond/listen-to-radio-updates" },
+      { label: "Emergency contact numbers", href: "https://cmsexternal.nt.gov.au/securent/respond/emergency-contact-numbers" },
+      { label: "Find a hospital", href: "https://cmsexternal.nt.gov.au/securent/respond/find-a-hospital" },
+      { label: "Get weather updates", href: "https://cmsexternal.nt.gov.au/securent/respond/get-weather-updates" },
+      { label: "Emergency Alert", href: "https://cmsexternal.nt.gov.au/securent/respond/emergency-alert" },
+      {
+        label: "Active events",
+        href: "https://cmsexternal.nt.gov.au/securent/respond/current-events",
+        children: [
+          { label: "Alice Springs severe weather update", href: "https://cmsexternal.nt.gov.au/securent/respond/current-events/alice-springs-severe-weather-update" },
+        ],
+      },
+    ],
+  },
+  {
+    label: "Recover",
+    href: "https://cmsexternal.nt.gov.au/securent/recover",
+    children: [
+      {
+        label: "Staying safe",
+        href: "https://cmsexternal.nt.gov.au/securent/recover/staying-safe",
+        children: [
+          { label: "Food safety and power outages", href: "https://cmsexternal.nt.gov.au/securent/recover/staying-safe/food-safety-and-power-outages" },
+          { label: "Swimming pools", href: "https://cmsexternal.nt.gov.au/securent/recover/staying-safe/swimming-pools" },
+          { label: "Water", href: "https://cmsexternal.nt.gov.au/securent/recover/staying-safe/water" },
+          { label: "Food", href: "https://cmsexternal.nt.gov.au/securent/recover/staying-safe/food" },
+          { label: "Fishing", href: "https://cmsexternal.nt.gov.au/securent/recover/staying-safe/fishing" },
+          { label: "Sporting activities", href: "https://cmsexternal.nt.gov.au/securent/recover/staying-safe/sporting-activities" },
+          { label: "Staying safe around flood waters", href: "https://cmsexternal.nt.gov.au/securent/recover/staying-safe/staying-safe-around-flood-waters" },
+          { label: "Infectious diseases", href: "https://cmsexternal.nt.gov.au/securent/recover/staying-safe/infectious-diseases" },
+          { label: "Hazards after an emergency or disaster event", href: "https://cmsexternal.nt.gov.au/securent/recover/staying-safe/hazards-after-an-emergency-or-disaster-event" },
+        ],
+      },
+      {
+        label: "Getting help",
+        href: "https://cmsexternal.nt.gov.au/securent/recover/getting-help",
+        children: [
+          { label: "Who to contact after a fire or disaster", href: "https://cmsexternal.nt.gov.au/securent/recover/getting-help/who-to-contact-after-a-fire-or-disaster" },
+          { label: "Emotional and psychological support", href: "https://cmsexternal.nt.gov.au/securent/recover/getting-help/emotional-and-psychological-support" },
+          { label: "Financial help", href: "https://cmsexternal.nt.gov.au/securent/recover/getting-help/financial-help" },
+          { label: "Northern Territory disaster impact survey", href: "https://cmsexternal.nt.gov.au/securent/recover/getting-help/northern-territory-disaster-impact-survey" },
+        ],
+      },
+      { label: "After cyclones", href: "https://cmsexternal.nt.gov.au/securent/recover/after-cyclones" },
+      {
+        label: "After floods",
+        href: "https://cmsexternal.nt.gov.au/securent/recover/after-floods",
+        children: [
+          { label: "Returning home", href: "https://cmsexternal.nt.gov.au/securent/recover/after-floods/returning-home" },
+          { label: "Private water supplies after a flood", href: "https://cmsexternal.nt.gov.au/securent/recover/after-floods/private-water-supplies-after-a-flood" },
+          { label: "Swimming pools", href: "https://cmsexternal.nt.gov.au/securent/recover/after-floods/swimming-pools" },
+          { label: "Your garden", href: "https://cmsexternal.nt.gov.au/securent/recover/after-floods/your-garden" },
+          { label: "On-site wastewater systems", href: "https://cmsexternal.nt.gov.au/securent/recover/after-floods/on-site-wastewater-systems" },
+          { label: "Cleaning up", href: "https://cmsexternal.nt.gov.au/securent/recover/after-floods/cleaning-up" },
+          { label: "Repairs", href: "https://cmsexternal.nt.gov.au/securent/recover/after-floods/repairs" },
+        ],
+      },
+      { label: "Recovering pets and animals", href: "https://cmsexternal.nt.gov.au/securent/recover/recovering-pets-and-animals" },
+      { label: "Food businesses", href: "https://cmsexternal.nt.gov.au/securent/recover/food-businesses" },
+      { label: "Active recoveries and past events", href: "https://cmsexternal.nt.gov.au/securent/recover/active-recoveries-and-past-events" },
+      { label: "Donating goods for emergencies", href: "https://cmsexternal.nt.gov.au/securent/recover/donating-goods-for-emergencies" },
+      { label: "Active recoveries", href: "https://cmsexternal.nt.gov.au/securent/recover/active-recoveries" },
+    ],
+  },
+];
