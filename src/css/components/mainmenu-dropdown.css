@@ -345,6 +345,195 @@
   }
 }
 
+.desktop-main-nav {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  header.ntg-header .header-navigation > .container-xl {
+    position: relative;
+  }
+
+  header.ntg-header .header-navigation nav.nav-masthead {
+    position: static;
+  }
+
+  header.ntg-header .header-navigation .mobile-main-nav {
+    display: none;
+  }
+
+  header.ntg-header .header-navigation .desktop-main-nav {
+    display: flex;
+    align-items: stretch;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .desktop-main-nav > li {
+    display: flex;
+    align-items: stretch;
+  }
+
+  .desktop-main-nav > li > a,
+  .desktop-main-nav > li > button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 var(--menu-item-padding);
+    border: 0;
+    background: transparent;
+    color: #ffffff !important;
+    font: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5;
+    text-decoration: none !important;
+    cursor: pointer;
+  }
+
+  .desktop-main-nav > li > button::after {
+    content: "";
+    width: 0.6rem;
+    height: 0.6rem;
+    margin: -0.2rem 0 0 0.75rem;
+    border: solid currentColor;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  .desktop-main-nav > li > button[aria-expanded="true"]::after {
+    transform: rotate(225deg);
+  }
+
+  .desktop-main-nav > li > a:hover,
+  .desktop-main-nav > li > a:focus-visible,
+  .desktop-main-nav > li > button:hover,
+  .desktop-main-nav > li > button:focus-visible,
+  .desktop-main-nav > li > button[aria-expanded="true"] {
+    background: #343741;
+    color: #ffffff !important;
+  }
+
+  .desktop-main-nav > li > a:focus-visible,
+  .desktop-main-nav > li > button:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: -3px;
+  }
+
+  .desktop-main-nav__panel {
+    position: absolute;
+    top: 100%;
+    right: 3.375rem;
+    left: 3.375rem;
+    z-index: 1010;
+    display: grid;
+    grid-template-columns: minmax(12rem, 1fr) minmax(0, 3fr);
+    gap: 2rem;
+    max-height: min(70vh, 42rem, max(0px, 100dvh - 128px));
+    overflow-y: auto;
+    padding: 2rem;
+    background: #ffffff;
+    color: #343741;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .desktop-main-nav__panel[hidden] {
+    display: none;
+  }
+
+  .desktop-main-nav__overview {
+    padding-right: 1.5rem;
+    border-right: 1px solid #d3d3d7;
+  }
+
+  .desktop-main-nav__overview h2 {
+    margin: 0 0 1rem;
+    font-size: 1.5rem;
+    line-height: 1.25;
+  }
+
+  .desktop-main-nav__overview p {
+    margin: 0 0 1rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .desktop-main-nav__panel a {
+    color: #343741 !important;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+
+  .desktop-main-nav__panel a:hover,
+  .desktop-main-nav__panel a:focus-visible {
+    color: #c33826 !important;
+    text-decoration: underline;
+  }
+
+  .desktop-main-nav__panel a:focus-visible {
+    outline: 2px solid #343741;
+    outline-offset: 2px;
+  }
+
+  .desktop-main-nav__overview > a {
+    font-weight: 700;
+    text-decoration: underline;
+  }
+
+  .desktop-main-nav__columns {
+    column-count: 3;
+    column-gap: 1.75rem;
+  }
+
+  .desktop-main-nav__columns > section {
+    break-inside: avoid;
+    margin-bottom: 1.75rem;
+  }
+
+  .desktop-main-nav__columns h3 {
+    margin: 0 0 0.75rem;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .desktop-main-nav__columns ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .desktop-main-nav__columns li + li {
+    margin-top: 0.5rem;
+  }
+
+  .desktop-main-nav__columns li a {
+    font-size: 0.9375rem;
+    line-height: 1.4;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .desktop-main-nav__panel {
+    right: 2.5rem;
+    left: 2.5rem;
+    grid-template-columns: minmax(10rem, 1fr) minmax(0, 2fr);
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  .desktop-main-nav__columns {
+    column-count: 2;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  .desktop-main-nav > li > a,
+  .desktop-main-nav > li > button {
+    font-size: 0.875rem;
+  }
+}
+
 /* ===========================================================================
    Responsive – Mobile navigation drawer
    ========================================================================== */

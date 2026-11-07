@@ -25,13 +25,15 @@ securent/
 │   │   └── components/
 │   │       ├── alert.css             # Global alert banner styles: information (#FFC72C yellow, dark text AAA), warning (#D6410A orange, white AA), critical (#FC4141 red, white AA large text only); 24×24 close button anchored top-right
 │   │       ├── buttons.css           # Button overrides: primary bg Charcoal (#343741), secondary outline Charcoal + white bg, hover Territory orange (#D6410A)
-│   │       ├── mainmenu-dropdown.css # Navigation dropdown styles; charcoal hover/active states, responsive link padding, zero desktop link gap
+│   │       ├── mainmenu-dropdown.css # Content-width desktop mega-menu and mobile drawer styles
 │   │       ├── header-footer.css     # Header/footer brand colour overrides; background: Charcoal (#343741)
 │   │       ├── homepage-featured-content.css # CMS homepage feature cards: responsive image/text layout and CTA styling
 │   │       ├── statistics.css        # Statistics section styles
 │   │       └── main.css              # General page overrides: display-card icon colours, card-title colour + animated arrow; homepage-news section styles
+│   ├── data/
+│   │   └── navigation.js             # Shared navigation labels, destinations, and optional descriptions
 │   └── js/
-│       ├── main.js                   # JS entry point — click-to-open dropdowns, hamburger toggle
+│       ├── main.js                   # JS entry point — desktop mega-menu and mobile drawer
 │       ├── homepage-news.js          # Runtime JS for homepage news cards (tag transformation)
 │       └── display-cards.js          # Runtime JS — swaps FA 5 `fal` icons to FA 6 `fa-solid` in display cards
 ├── dist/                             # Committed build output for the Squiz Matrix file bridge
@@ -140,7 +142,7 @@ Overrides of the upstream `ntgbase.min.css` theme are isolated in `src/css/compo
 | `buttons.css`           | `.homepage-news .btn.ntg-btn`                                                             | Border radius removed from the "View all" button                                                                                                                                                                                                                                                                                     |
 | `header-footer.css`     | Two-row header, footer, and mobile search banner                                          | `.header-top` uses charcoal `#343741`; `.header-navigation` uses `#424550`; the desktop search is expanded in the top row; the mobile search banner uses charcoal `#343741`                                                                                                                                                             |
 | `header-footer.css`     | Mobile search banner background                                                           | `.mobile-banner` overridden from navy `#1f1f5f` to Charcoal `#343741`                                                                                                                                                                                                                                                                |
-| `mainmenu-dropdown.css` | Main nav background & behaviour                                                           | Desktop nav uses `#424550` with white links; mobile nav uses white with black text; hover, focus, active, current, and open top-level items use charcoal `#343741` with white text and no underline; link colours use `!important` to override PROD's global anchor rule; level-3 menus hidden |
+| `mainmenu-dropdown.css` | Main navigation styles                                                                    | Desktop navigation has content-width mega-menu panels with grouped links; mobile navigation uses a charcoal nested drawer. |
 | `statistics.css`        | Statistics section                                                                        | Sand `#D9DED4` background; black text and icons                                                                                                                                                                                                                                                                                      |
 | `main.css`              | Display card icons                                                                        | Icons use `fa-solid` (FA 6); default colour `#f4551a` (orange), hover colour `#c84c01` (darker orange)                                                                                                                                                                                                                               |
 | `main.css`              | Display card titles                                                                       | Title colour `#343741` (Charcoal); orange long-arrow-right (`→`) appended via `::after`, slides 4 px right on hover; title uses flexbox row layout                                                                                                                                                                                   |
@@ -158,9 +160,9 @@ Both header rows use the hero's 1280px maximum content width. At 768–991px the
 
 Emergency contacts uses white text and no underline with `!important` to withstand the production cascade. Its hover, keyboard-focus, and active states use `#424550`, and its desktop/tablet horizontal padding matches the menu. Main navigation states use `#343741`. Menu links retain the same bottom-border width between normal and hovered states so vertically centred text does not jump; keyboard focus outlines remain available.
 
-The header overrides upstream bottom padding with `padding-bottom: 0 !important`, removing the extra 30px grey strip between navigation and the page accent bar. Desktop dropdown panels retain a thin neutral border instead of an orange left accent. Dropdown links fill the entire item width and height, including their padding; hover, focus, and active/current states use `#444855` with white text. These dropdown state colours are separate from the top-level navigation colours.
+The header overrides upstream bottom padding with `padding-bottom: 0 !important`, removing the extra 30px grey strip between navigation and the page accent bar. Desktop navigation uses content-width mega-menu panels with section overview links and grouped child links from `src/data/navigation.js`. Groups are packed into three columns on desktop and two at 768–991px, with headings and child links kept together where possible. Overview descriptions use the navigation data when provided, otherwise optional `data-description` attributes on the original top-level menu item or its link. Panels scroll when needed and close on Escape, focus leaving the menu, or an outside click. The mobile drawer retains its nested accordion.
 
-After changing header styles, run `npm run build` and commit `dist/theme.css` alongside the source CSS so the Squiz Matrix file bridge receives the updates. Check desktop and tablet padding, first-label alignment, full-height highlights, and unchanged text bounds on hover in the local preview. The captured page's external links can navigate to the CMS rather than demonstrate dropdown toggling; test `.open` styling separately when that happens.
+After changing navigation styles or scripts, run `npm run build` so the Squiz Matrix file bridge receives the updated `dist/theme.css` and `dist/theme.js`. Check panel alignment, keyboard interaction, and the mobile drawer in the local preview.
 
 ### Homepage Latest Events
 
