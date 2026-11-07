@@ -23,6 +23,7 @@ securent/
 │   ├── css/
 │   │   ├── main.css                  # CSS entry point — add @imports here
 │   │   └── components/
+│   │       ├── accordion.css         # CMS accordion styling, states and content-width alignment
 │   │       ├── alert.css             # Global alert banner styles: information (#FFC72C yellow, dark text AAA), warning (#D6410A orange, white AA), critical (#FC4141 red, white AA large text only); 24×24 close button anchored top-right
 │   │       ├── buttons.css           # Button overrides: primary bg Charcoal (#343741), secondary outline Charcoal + white bg, hover Territory orange (#D6410A)
 │   │       ├── mainmenu-dropdown.css # Content-width desktop mega-menu and mobile drawer styles
@@ -78,7 +79,7 @@ npm run dev
 Vite starts a local dev server and opens `/`, serving the Alerts and warnings capture in `alerts-and-warnings.html`. The homepage capture remains available at `/SecureNT.html`, and the event capture remains available at `/Severe%20Storm%20%E2%80%93%20Alice%20Springs%20_%20SecureNT.html`. The development middleware in `vite.config.mjs` serves the Alerts and warnings and event captures through Vite's HTML transforms and serves saved `.js.download` dependencies as JavaScript. External navigation links still point to the CMS, and externally hosted fonts and favicons require network access. These captures are development snapshots, not live emergency feeds.
 The HTML captures link stylesheets and scripts from `dist/`. Run `npm run build` after source changes so the updated assets are available for local preview.
 
-Existing Vite servers and browser tabs can cache built assets even after rebuilding. When changing the theme, increment the `?v=` values on the `dist/theme.css` and `dist/theme.js` references in all three local captures, including the gitignored homepage, then verify a normal reload without temporary test URLs. The current versions are CSS `30` and JavaScript `25`. Update equivalent CMS asset references separately when deploying.
+Existing Vite servers and browser tabs can cache built assets even after rebuilding. When changing the theme, increment the `?v=` values on the `dist/theme.css` and `dist/theme.js` references in all three local captures, including the gitignored homepage, then verify a normal reload without temporary test URLs. The current versions are CSS `32` and JavaScript `25`. Update equivalent CMS asset references separately when deploying.
 
 To select a different port on Windows without npm dropping the forwarded flags, launch Vite directly:
 
@@ -159,6 +160,12 @@ Overrides of the upstream `ntgbase.min.css` theme are isolated in `src/css/compo
 | `main.css`              | `.homepage-news .card`                                                                    | Border radius removed from news cards                                                                                                                                                                                                                                                                                                |
 | `main.css`              | `.homepage-news .card-header`                                                             | Bottom border removed from card header                                                                                                                                                                                                                                                                                               |
 | `main.css`              | `.homepage-news .card-tag`                                                                | Category label styled as a tag (design system default variant: white bg, `#1f1e27` text, `#d3d3d7` border)                                                                                                                                                                                                                           |
+
+### CMS accordions
+
+Shared CMS accordion styles live in `src/css/components/accordion.css` and are imported through `src/css/main.css` into `dist/theme.css`. Styles are scoped to `.ntg-accordion` and `.ntg-accordion-toggler`, leaving unrelated Bootstrap accordions unchanged. Headers use grey collapsed and expanded states with teal labels and chevrons; expanded content uses a white panel. Accordion surfaces and controls have square corners. The `.ntg-accordion-container.container-xl` wrapper fills its containing column without the default max-width or horizontal gutters, keeping the rows, panel and open/close-all controls aligned with the content.
+
+Keep the CMS Bootstrap collapse markup and controls intact. After changing accordion styles, run `npm run build`, increment the theme CSS query version in all local captures, and verify collapsed and expanded states, keyboard and open/close-all behavior, and content-column alignment at mobile, tablet and desktop widths.
 
 ### Header navigation
 

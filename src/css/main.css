@@ -15,6 +15,7 @@
 @import "./components/buttons.css";
 @import "./components/alert.css";
 @import "./components/callout.css";
+@import "./components/accordion.css";
 @import "./components/homepage-latest-events.css";
 @import "../hero-banners/homepage-hero.css";
 @import "../hero-banners/landing-hero.css";
