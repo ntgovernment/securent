@@ -39,7 +39,9 @@ securent/
 │   ├── alerts-listing.js
 │   ├── alerts-pagination.css
 │   ├── more-updates-cards.css
+│   ├── event.css
 │   ├── print.css
+│   ├── social-share.css
 │   ├── social-share.js
 │   ├── theme.css
 │   └── theme.js
@@ -52,7 +54,7 @@ securent/
 └── package.json
 ```
 
-The homepage capture (`SecureNT.html`) and shared `SecureNT_files/` assets are excluded from Git. The event capture uses those shared local assets, hazard icons from `assets/hazard-icons/`, the built theme in `dist/theme.css`, event-specific styles from `src/events/event.css`, and the standalone share nester assets from `src/social-share/`; it no longer has a separate asset folder. On desktop, the share panel aligns with the first content section after the event H1. Both captures use the same two-row header: `.header-top` holds the logo, emergency contacts, and desktop search, while `.header-navigation` holds the primary navigation. The separate mobile search banner remains below the header. `vite.config.mjs` includes `SecureNT.html` as the build HTML entry when that optional capture exists; its production HTML transform removes references to the two local WEBP photos so they are not emitted in `dist/`, while development preview retains them. The event preview does not change production build inputs. The `dist/` files are tracked because they are consumed by the Squiz Matrix file bridge.
+The homepage capture (`SecureNT.html`) and shared `SecureNT_files/` assets are excluded from Git. All local HTML captures reference built assets from `dist/`, not source files from `src/`. The event capture uses the shared local assets, hazard icons from `assets/hazard-icons/`, and the standalone `dist/event.css`, `dist/social-share.css`, and `dist/social-share.js` assets; it no longer has a separate asset folder. On desktop, the share panel aligns with the first content section after the event H1. Both captures use the same two-row header: `.header-top` holds the logo, emergency contacts, and desktop search, while `.header-navigation` holds the primary navigation. The separate mobile search banner remains below the header. `vite.config.mjs` includes `SecureNT.html` as the build HTML entry when that optional capture exists; its production HTML transform removes references to the two local WEBP photos so they are not emitted in `dist/`, while development preview retains them. The event preview does not change production build inputs. The `dist/` files are tracked because they are consumed by the Squiz Matrix file bridge.
 
 ## Prerequisites
 
@@ -72,9 +74,9 @@ npm run dev
 ```
 
 Vite starts a local dev server and opens `/`, serving the Alerts and warnings capture in `alerts-and-warnings.html`. The homepage capture remains available at `/SecureNT.html`, and the event capture remains available at `/Severe%20Storm%20%E2%80%93%20Alice%20Springs%20_%20SecureNT.html`. The development middleware in `vite.config.mjs` serves the Alerts and warnings and event captures through Vite's HTML transforms and serves saved `.js.download` dependencies as JavaScript. External navigation links still point to the CMS, and externally hosted fonts and favicons require network access. These captures are development snapshots, not live emergency feeds.
-The homepage links `src/css/main.css` and loads `src/js/main.js` directly for in-memory CSS imports and HMR. The event capture uses the built theme at `dist/theme.css`, links page styles from `src/events/event.css` and `src/social-share/social-share.css`, and loads `dist/social-share.js` for share interactions.
+The HTML captures link stylesheets and scripts from `dist/`. Run `npm run build` after source changes so the updated assets are available for local preview.
 
-The Alerts and warnings capture loads its listing script and standalone listing, pagination, and bottom-card styles from `dist/alerts-listing.js`, `dist/alerts-listing.css`, `dist/alerts-pagination.css`, and `dist/more-updates-cards.css`, alongside `dist/theme.css` and the source theme entry points `src/css/main.css` and `src/js/main.js` for local preview. On localhost, the listing fetches `src/alerts-listing/alerts-listing.local.json`; level, region, and topic facets are rendered as combined filters. On the deployed CMS page, it requests the listing endpoint configured in the page markup. The capture keeps the supplied CMS content and navigation destinations, while shared dependencies use the local `SecureNT_files/` assets.
+The Alerts and warnings capture loads its listing script and standalone listing, pagination, and bottom-card styles from `dist/alerts-listing.js`, `dist/alerts-listing.css`, `dist/alerts-pagination.css`, and `dist/more-updates-cards.css`, alongside `dist/theme.css` and `dist/theme.js`. On localhost, the listing fetches `src/alerts-listing/alerts-listing.local.json`; level, region, and topic facets are rendered as combined filters. On the deployed CMS page, it requests the listing endpoint configured in the page markup. The capture keeps the supplied CMS content and navigation destinations, while shared dependencies use the local `SecureNT_files/` assets.
 
 ## Build
 
@@ -89,10 +91,11 @@ Outputs to `dist/`:
 - `alerts-listing.css` and `alerts-listing.js` — standalone assets for the Alerts and warnings page
 - `alerts-pagination.css` — standalone pagination styling and list-marker overrides
 - `more-updates-cards.css` — styles for the bottom update cards on the Alerts and warnings page
+- `event.css` and `social-share.css` — standalone event page and share nester styles
 - `social-share.js` — standalone event share popup and copy-link behavior
 - `print.css` — print stylesheet
 
-`theme.css`, `theme.js`, `alerts-listing.css`, `alerts-listing.js`, `alerts-pagination.css`, `more-updates-cards.css`, `social-share.js`, and `print.css` are referenced in Squiz Matrix via the git file bridge. Reference `src/social-share/social-share.css` from the Squiz share nester after the global theme; it remains a standalone asset rather than part of `dist/theme.css`.
+`theme.css`, `theme.js`, `alerts-listing.css`, `alerts-listing.js`, `alerts-pagination.css`, `more-updates-cards.css`, `event.css`, `social-share.css`, `social-share.js`, and `print.css` are referenced in Squiz Matrix via the git file bridge. Reference `dist/social-share.css` from the Squiz share nester after the global theme; it remains a standalone asset rather than part of `dist/theme.css`.
 
 The build excludes the captured homepage's reference to the previous `dist/theme.css` so generated styles are not imported back into the next bundle. The current source styles remain the authority.
 

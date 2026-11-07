@@ -105,6 +105,9 @@ export default defineConfig({
         "alerts-listing": "./src/alerts-listing/alerts-listing.js",
         "alerts-pagination": "./src/alerts-listing/alerts-pagination.css",
         "more-updates-cards": "./src/alerts-listing/more-updates-cards.css",
+        "theme-styles": "./src/css/main.css",
+        "event-styles": "./src/events/event.css",
+        "social-share-styles": "./src/social-share/social-share.css",
         "social-share": "./src/social-share/social-share.js",
         theme: "./src/js/main.js",
         "local-conditions": "./src/local-conditions/local-conditions.js",
@@ -127,6 +130,12 @@ export default defineConfig({
           }
           if (assetInfo.name === "local-conditions.css") {
             return "local-conditions.css";
+          }
+          if (assetInfo.name === "event-styles.css") {
+            return "event.css";
+          }
+          if (assetInfo.name === "social-share-styles.css") {
+            return "social-share.css";
           }
           if (assetInfo.name === "alerts-pagination.css") {
             return "alerts-pagination.css";
