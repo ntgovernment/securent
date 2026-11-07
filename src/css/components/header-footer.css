@@ -272,6 +272,18 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li > a:focus-visible
   background-color: #3F4352;
 }
 
+@media (max-width: 767.98px) {
+  .ntg-footer__links {
+    row-gap: 2.5rem;
+  }
+
+  .ntg-footer__links ul.d-flex {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+  }
+}
+
 @media (min-width: 992px) {
   .ntg-footer {
     padding-top: 48px !important;

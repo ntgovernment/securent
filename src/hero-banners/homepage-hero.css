@@ -93,8 +93,8 @@ main.ntg-body--homepage #current-conditions.container-xl {
 
 @media (max-width: 575.98px) {
   main.ntg-body--homepage #current-conditions.container-xl {
-    width: calc(100% - 1.5rem);
-    margin-top: -1.5rem;
+    width: 100%;
+    margin-top: 0;
     padding: 1.25rem;
   }
 
@@ -104,6 +104,18 @@ main.ntg-body--homepage #current-conditions.container-xl {
   }
 
   .hero-banner.intro-section.bg-ntg-background-purple-light h1 {
-    font-size: 1.75rem;
+    font-size: 2rem;
+  }
+
+  .hero-banner.intro-section.bg-ntg-background-purple-light .col-12 > div {
+    font-size: 1.125rem;
+    line-height: 1.5;
+  }
+
+  .hero-banner.intro-section.bg-ntg-background-purple-light .intro-text-link {
+    min-height: 3.25rem;
+    margin-top: 1.5rem;
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
   }
 }

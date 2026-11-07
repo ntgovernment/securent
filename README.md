@@ -14,7 +14,7 @@ securent/
 │   │   ├── more-updates-cards.css     # Alerts page bottom-card styles
 │   │   └── alerts-listing.local.json  # Local development fixture
 │   ├── hero-banners/
-│   │   ├── homepage-hero.css         # Purple-light homepage variant and homepage conditions overlap
+│   │   ├── homepage-hero.css         # Purple-light homepage hero and responsive conditions alignment
 │   │   ├── landing-hero.css          # Alt landing variant, breadcrumbs and optional CTA
 │   │   └── hero-banners.js           # Landing-only breadcrumb relocation and optional CTA enhancement
 │   ├── social-share/
@@ -78,7 +78,7 @@ npm run dev
 Vite starts a local dev server and opens `/`, serving the Alerts and warnings capture in `alerts-and-warnings.html`. The homepage capture remains available at `/SecureNT.html`, and the event capture remains available at `/Severe%20Storm%20%E2%80%93%20Alice%20Springs%20_%20SecureNT.html`. The development middleware in `vite.config.mjs` serves the Alerts and warnings and event captures through Vite's HTML transforms and serves saved `.js.download` dependencies as JavaScript. External navigation links still point to the CMS, and externally hosted fonts and favicons require network access. These captures are development snapshots, not live emergency feeds.
 The HTML captures link stylesheets and scripts from `dist/`. Run `npm run build` after source changes so the updated assets are available for local preview.
 
-Existing Vite servers and browser tabs can cache built assets even after rebuilding. When changing the theme, increment the `?v=` values on the `dist/theme.css` and `dist/theme.js` references in all three local captures, including the gitignored homepage, then verify a normal reload without temporary test URLs. The current versions are CSS `26` and JavaScript `25`. Update equivalent CMS asset references separately when deploying.
+Existing Vite servers and browser tabs can cache built assets even after rebuilding. When changing the theme, increment the `?v=` values on the `dist/theme.css` and `dist/theme.js` references in all three local captures, including the gitignored homepage, then verify a normal reload without temporary test URLs. The current versions are CSS `30` and JavaScript `25`. Update equivalent CMS asset references separately when deploying.
 
 To select a different port on Windows without npm dropping the forwarded flags, launch Vite directly:
 
@@ -188,7 +188,7 @@ After rebuilding and updating asset versions, verify normal reloads on the alert
 
 The homepage Latest Events section is styled in `src/css/components/homepage-latest-events.css`, imported by `src/css/main.css`. Each card uses `data-warning-level="advice"`, `"watch_act"`, or `"emergency_warning"` to select the shared `--clr-status-advice`, `--clr-status-watch-act`, or `--clr-status-emergency-warning` accent and tag tint. When `data-warning-level` is absent or empty, `data-emergency-type="storm"`, `"flooding"`, or `"flood"` selects the default alert orange, `--clr-status-warning` (`#d6410a`). Unrecognised status or hazard values remain neutral; `data-location` does not affect colour. Tags use a 14% tint of the selected accent, except Advice tags which use solid `#FBE032`.
 
-Latest Events uses a pale-grey container capped at 1280px, 32px desktop container padding, and square cards with 24px padding, 240px minimum height, and 3px accent borders. The grid changes from three columns to two below 992px and one below 576px. Metadata can wrap, and cards expand for longer descriptions rather than clipping text. Tag text follows its warning accent, with Advice using dark yellow `#716309` for legibility. The “View all warnings” and “Find out more” links keep fixed padding while their arrows shift 2px right on hover without vertical layout movement.
+Latest Events uses a pale-grey container capped at 1280px, 32px desktop container padding, and square cards with 24px padding, 240px minimum height, and 3px accent borders. The grid changes from three columns to two below 992px and one below 576px. Metadata can wrap, and cards expand for longer descriptions rather than clipping text. Tag text follows its warning accent, with Advice using dark yellow `#716309` for legibility. On mobile, the heading and card copy use the larger homepage type scale, event cards are separated by 32px, and “View all warnings” is hidden. The “Find out more” link keeps fixed padding while its arrow shifts 2px right on hover without vertical layout movement.
 
 ### Homepage featured content
 
@@ -196,11 +196,15 @@ Homepage featured-content cards use `src/css/components/homepage-featured-conten
 
 The local `SecureNT.html` capture is gitignored. For local preview, its feature-card image URLs can point to matching files in the also-gitignored `SecureNT_files/` directory; production CMS image URLs are unchanged. After changing featured-content styles, run `npm run build` and deploy the updated `dist/theme.css` with the source CSS.
 
+### Footer
+
+The shared mobile footer styles live in `src/css/components/header-footer.css`. Below 768px, footer columns have 40px of vertical separation, and social links remain on one horizontal row with wrapping disabled. Keep the footer labels, links, and social destinations in the CMS markup.
+
 ### Hero banners
 
 Hero CSS and JavaScript are isolated in `src/hero-banners/`. Both stylesheets are imported by `src/css/main.css`; `hero-banners.js` is imported by `src/js/main.js`. They ship in the existing `dist/theme.css` and `dist/theme.js` bundles, with no separate CMS asset includes.
 
-`homepage-hero.css` targets `.hero-banner.intro-section.bg-ntg-background-purple-light`; retain the CMS `bg-ntg-background-home` class. It preserves the charcoal background, white 42px desktop heading, 14px copy and orange Incident map action. The overlapping `#current-conditions` panel is scoped to `main.ntg-body--homepage`: 49px desktop overlap, 34px tablet and 24px below 576px. The gitignored homepage capture now uses the supplied purple-light classes; any corresponding CMS template correction must be made separately.
+`homepage-hero.css` targets `.hero-banner.intro-section.bg-ntg-background-purple-light`; retain the CMS `bg-ntg-background-home` class. It preserves the charcoal background, white 42px desktop heading, 14px copy and orange Incident map action. The `#current-conditions` panel is scoped to `main.ntg-body--homepage`: 49px desktop overlap and 34px tablet overlap; below 576px it has no overlap and fills the available width. Mobile hero text uses a 32px heading and 18px copy. The gitignored homepage capture now uses the supplied purple-light classes; any corresponding CMS template correction must be made separately.
 
 `landing-hero.css` targets `.hero-banner.intro-section.bg-ntg-background-alt`. It uses a pale-grey `#E7E7EA` background, dark text, 40px/44px desktop heading, 18px/20px copy and a 604px maximum content column. Below 576px the heading is 32px/36px. Content stays in document flow, wraps and grows without a fixed hero height. Breadcrumbs and an optional orange CTA receive their own scoped styles and keyboard focus outlines.
 
@@ -220,7 +224,7 @@ The latest warning banner uses `.warning-banner` markup with `role="alert"`, `da
 
 ### Local conditions
 
-The local-conditions widget renders three cards for fire danger, air quality, and temperature. If a request fails or an individual value is unavailable, the cards remain visible and show `Data is currently unavailable. Try again later.` in place of the unavailable data. The page-level status remains available for loading and location messages.
+The local-conditions widget renders three cards for fire danger, air quality, and temperature. Its styles live in `src/local-conditions/local-conditions.css`, imported by `src/css/main.css` into the shared `dist/theme.css` bundle. Below 576px, location controls stack at full width and condition cards use outlined panels with 32px separation. If a request fails or an individual value is unavailable, the cards remain visible and show `Data is currently unavailable. Try again later.` in place of the unavailable data. The page-level status remains available for loading and location messages.
 
 ### Homepage news JS (`src/js/homepage-news.js`)
 

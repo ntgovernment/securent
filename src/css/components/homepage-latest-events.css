@@ -230,22 +230,45 @@
 }
 
 @media (max-width: 575.98px) {
+  #latest-warnings .warning-banner {
+    gap: 1rem;
+    padding: 1.25rem 1rem;
+  }
+
+  #latest-warnings .warning-banner h3 {
+    font-size: 1.375rem;
+  }
+
+  #latest-warnings .warning-banner p {
+    font-size: 1.125rem;
+  }
+
   #latest-events-intro {
     align-items: flex-start;
     flex-direction: column;
-    margin: 1.5rem 0;
+    margin: 2rem 0 1.75rem;
   }
 
   #latest-events-intro h2 {
-    font-size: 1.75rem;
+    font-size: 2rem;
+    text-transform: capitalize;
+  }
+
+  #latest-events-intro p {
+    display: none;
   }
 
   #latest-events-cards .event-grid {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 2rem;
   }
 
   #latest-events-cards .event-card {
-    padding: 1.25rem;
+    min-height: 16.25rem;
+    padding: 1.5rem;
+  }
+
+  #latest-events-cards .event-card p {
+    font-size: 1.125rem;
   }
 }
