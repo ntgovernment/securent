@@ -78,6 +78,14 @@ npm run dev
 Vite starts a local dev server and opens `/`, serving the Alerts and warnings capture in `alerts-and-warnings.html`. The homepage capture remains available at `/SecureNT.html`, and the event capture remains available at `/Severe%20Storm%20%E2%80%93%20Alice%20Springs%20_%20SecureNT.html`. The development middleware in `vite.config.mjs` serves the Alerts and warnings and event captures through Vite's HTML transforms and serves saved `.js.download` dependencies as JavaScript. External navigation links still point to the CMS, and externally hosted fonts and favicons require network access. These captures are development snapshots, not live emergency feeds.
 The HTML captures link stylesheets and scripts from `dist/`. Run `npm run build` after source changes so the updated assets are available for local preview.
 
+Existing Vite servers and browser tabs can cache built assets even after rebuilding. When changing the theme, increment the `?v=` values on the `dist/theme.css` and `dist/theme.js` references in all three local captures, including the gitignored homepage, then verify a normal reload without temporary test URLs. The current versions are CSS `26` and JavaScript `25`. Update equivalent CMS asset references separately when deploying.
+
+To select a different port on Windows without npm dropping the forwarded flags, launch Vite directly:
+
+```powershell
+node node_modules/vite/bin/vite.js --port 5175 --strictPort
+```
+
 The Alerts and warnings capture loads its listing script and standalone listing, pagination, and bottom-card styles from `dist/alerts-listing.js`, `dist/alerts-listing.css`, `dist/alerts-pagination.css`, and `dist/more-updates-cards.css`, alongside `dist/theme.css` and `dist/theme.js`. On localhost, the listing fetches `src/alerts-listing/alerts-listing.local.json`; level, region, and topic facets are rendered as combined filters. On the deployed CMS page, it requests the listing endpoint configured in the page markup. The capture keeps the supplied CMS content and navigation destinations, while shared dependencies use the local `SecureNT_files/` assets.
 
 ## Build
@@ -101,7 +109,7 @@ Outputs to `dist/`:
 
 The build excludes the captured homepage's reference to the previous `dist/theme.css` so generated styles are not imported back into the next bundle. The current source styles remain the authority.
 
-Theme CSS enters the build through the optional, gitignored `SecureNT.html` capture. Keep that capture and its local dependencies available when rebuilding the complete theme; a successful build without it does not verify that `dist/theme.css` was generated. After building, confirm both theme assets exist before committing file-bridge updates.
+Theme CSS has an explicit `theme-styles` entry pointing to `src/css/main.css` in `vite.config.mjs`; the optional, gitignored homepage capture is not required to generate the theme bundle. Keep that capture and its local dependencies available when building or previewing the captured homepage. After building, confirm both theme assets exist before committing file-bridge updates.
 
 ## Adding new CSS component files
 
@@ -158,11 +166,23 @@ Desktop navigation wrappers and top-level links stretch through the full 56px mi
 
 Both header rows use the hero's 1280px maximum content width. At 768–991px their 64px content inset matches the hero; from 992px up their 102px inset matches the desktop hero heading. The mobile header keeps its compact 16px gutter.
 
-Emergency contacts uses white text and no underline with `!important` to withstand the production cascade. Its hover, keyboard-focus, and active states use `#424550`, and its desktop/tablet horizontal padding matches the menu. Main navigation states use `#343741`. Menu links retain the same bottom-border width between normal and hovered states so vertically centred text does not jump; keyboard focus outlines remain available.
+Emergency contacts uses white text and no underline with `!important` to withstand the production cascade. Its hover, keyboard-focus, and active states use `#424550`, and its desktop/tablet horizontal padding matches the menu. Desktop main navigation states use `#343741`. Desktop menu links retain the same bottom-border width between normal and hovered states so vertically centred text does not jump; keyboard focus outlines remain available.
 
 The header overrides upstream bottom padding with `padding-bottom: 0 !important`, removing the extra 30px grey strip between navigation and the page accent bar. Desktop navigation uses content-width mega-menu panels with section overview links and grouped child links from `src/data/navigation.js`. Groups are packed into three columns on desktop and two at 768–991px, with headings and child links kept together where possible. Overview descriptions use the navigation data when provided, otherwise optional `data-description` attributes on the original top-level menu item or its link. Panels scroll when needed and close on Escape, focus leaving the menu, or an outside click. The mobile drawer retains its nested accordion.
 
 After changing navigation styles or scripts, run `npm run build` so the Squiz Matrix file bridge receives the updated `dist/theme.css` and `dist/theme.js`. Check panel alignment, keyboard interaction, and the mobile drawer in the local preview.
+
+### Mobile navigation
+
+Below 768px, every menu item with children has a destination link on the left and a separate 40 by 40px chevron button on the right. The left link navigates to the unchanged CMS destination and closes the drawer; it does not expand the submenu. The button expands or collapses children without navigating, exposes `aria-controls` and `aria-expanded`, and updates its accessible label and tooltip. This applies at every nesting level; leaf items remain ordinary links.
+
+The drawer preserves its accordion behavior: opening a sibling closes the previous sibling and its descendants, and collapsing a parent resets its descendants. Menu links and chevron buttons have no separator borders, including in hover and expanded states. The charcoal `#343741` background and white text remain; hover, keyboard focus, and expanded states use `#444855`. Hover effects apply independently to each control. Focus outlines are retained for keyboard accessibility.
+
+Top-level links use 16px left padding, level 2 links use 36px, and level 3 links use 48px. Parent rows use a flexible link column and a fixed 40px button column; long labels wrap without moving or resizing the button, and child lists span both columns. Mobile submenu selectors override inherited link padding and borders, and expanded lists explicitly override the captured `alt.css` rule that otherwise hides them.
+
+Tab reaches the link before its chevron button; Enter and Space toggle focused buttons. The menu's Escape keydown handler closes the drawer and returns focus to the menu trigger. The captured upstream `ntgbase-components.min.js` also binds Escape keyup to Quick Exit, which opens `nt.gov.au` and redirects to Google. Preserve that safety behavior; test the menu keydown handler separately when checking focus return.
+
+After rebuilding and updating asset versions, verify normal reloads on the alerts, homepage, and event captures. Check all four border widths on links, buttons, list items, and child lists in closed, expanded, and hover states; check 320px and 375px layouts for wrapped labels, and the 767px/768px transition for drawer cleanup and unchanged desktop mega-menus.
 
 ### Homepage Latest Events
 

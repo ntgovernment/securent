@@ -10,6 +10,8 @@ The local Severe Storm - Alice Springs capture loads `dist/event.css`, `dist/soc
 
 Event breadcrumb and main content (including accordions) share the header and menu's 80rem maximum width and responsive horizontal gutters. The feedback band is styled site-wide by `src/css/components/feedback.css` in `dist/theme.css`; it extends across the viewport while its content uses the same responsive alignment. The footer retains its existing layout. Main navigation labels align with the header content edge using matching responsive offsets in `src/css/components/header-footer.css`.
 
+The event capture uses the same border-free mobile menu as the alerts and homepage captures: parent links navigate, while separate square chevron buttons toggle children. See [Mobile navigation](../../README.md#mobile-navigation) for spacing, keyboard behavior, and verification. When rebuilding shared theme assets, update their `?v=` references in every local capture and verify a normal reload; changing only the event stylesheet will not refresh cached theme styles or scripts.
+
 The header accent uses the global status color tokens from the site theme. Its CMS markup appends the event warning-level metadata to the `warning-level-` class. Neutral is the default; the metadata value may be:
 
 - `neutral`

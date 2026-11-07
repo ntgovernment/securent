@@ -212,11 +212,18 @@ import { primaryNavigation } from "../data/navigation.js";
   parents.forEach(function (item, index) {
     const childList = item.querySelector(":scope > ul");
     const link = item.querySelector(":scope > a");
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "mobile-submenu-toggle";
+    toggle.innerHTML = '<span class="fa-regular fa-chevron-right" aria-hidden="true"></span>';
     item.classList.add("has-children");
     childList.id = "navigation-submenu-" + index;
     childList.hidden = true;
-    link.setAttribute("aria-controls", childList.id);
-    link.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-controls", childList.id);
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-label", "Expand " + link.textContent.trim() + " submenu");
+    toggle.title = toggle.getAttribute("aria-label");
+    link.after(toggle);
   });
 
   let wrappedLabelFrame = 0;
@@ -242,9 +249,12 @@ import { primaryNavigation } from "../data/navigation.js";
   function setExpanded(item, expanded) {
     const childList = item.querySelector(":scope > ul");
     const link = item.querySelector(":scope > a");
+    const toggle = item.querySelector(":scope > .mobile-submenu-toggle");
     item.classList.toggle("open", expanded);
     childList.hidden = !expanded;
-    link.setAttribute("aria-expanded", expanded ? "true" : "false");
+    toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
+    toggle.setAttribute("aria-label", (expanded ? "Collapse " : "Expand ") + link.textContent.trim() + " submenu");
+    toggle.title = toggle.getAttribute("aria-label");
     updateWrappedLabels();
   }
 
@@ -298,13 +308,12 @@ import { primaryNavigation } from "../data/navigation.js";
   });
 
   renderedMenu.addEventListener("click", function (event) {
-    const link = event.target.closest("a");
-    const item = link && link.parentElement;
+    const control = event.target.closest("a, .mobile-submenu-toggle");
+    const item = control && control.parentElement;
     if (!item || !renderedMenu.contains(item)) return;
 
-    if (item.classList.contains("has-children")) {
-      event.preventDefault();
-      const expanded = link.getAttribute("aria-expanded") === "true";
+    if (control.classList.contains("mobile-submenu-toggle")) {
+      const expanded = control.getAttribute("aria-expanded") === "true";
       const siblings = Array.from(item.parentElement.children).filter(function (sibling) {
         return sibling !== item && sibling.classList.contains("has-children");
       });
