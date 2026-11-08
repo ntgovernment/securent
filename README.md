@@ -8,10 +8,12 @@ Source and build tooling for the **SecureNT** NT Government site (`https://cmsex
 securent/
 ├── src/
 │   ├── alerts-listing/
-│   │   ├── alerts-listing.js          # Alert rendering, search, filters, and pagination
+│   │   ├── alerts-listing.js          # Alert rendering, responsive filters, sorting, and pagination
 │   │   ├── alerts-listing.css         # Alerts page listing styles
 │   │   ├── alerts-pagination.css      # Standalone pagination styles and list marker reset
 │   │   ├── more-updates-cards.css     # Alerts page bottom-card styles
+│   │   ├── sorting.mjs               # Stable alert sorting and CMS timestamp parsing
+│   │   ├── sorting.test.mjs          # Built-in Node sorting regression tests
 │   │   └── alerts-listing.local.json  # Local development fixture
 │   ├── hero-banners/
 │   │   ├── homepage-hero.css         # Purple-light homepage hero and responsive conditions alignment
@@ -88,6 +90,14 @@ node node_modules/vite/bin/vite.js --port 5175 --strictPort
 ```
 
 The Alerts and warnings capture loads its listing script and standalone listing, pagination, and bottom-card styles from `dist/alerts-listing.js`, `dist/alerts-listing.css`, `dist/alerts-pagination.css`, and `dist/more-updates-cards.css`, alongside `dist/theme.css` and `dist/theme.js`. On localhost, the listing fetches `src/alerts-listing/alerts-listing.local.json`; level, region, and topic facets are rendered as combined filters. On the deployed CMS page, it requests the listing endpoint configured in the page markup. The capture keeps the supplied CMS content and navigation destinations, while shared dependencies use the local `SecureNT_files/` assets.
+
+Below 768px, an initially collapsed **Filter and sort** disclosure appears between search and results. It expands the existing controls inline; desktop keeps the sidebar expanded. Checkbox selections, sort choice, and mobile expansion preference survive breakpoint changes. The native button exposes its expanded state and hides collapsed controls from keyboard navigation. Without JavaScript, the captured filters remain visible.
+
+The Level filter uses severity order: Emergency warning, Watch and act, Advice, then Decreasing threat, with unknown levels last. This order applies whether levels come from feed facets or are derived from alert items; counts and selected values are unchanged. The local capture uses the same order without JavaScript. CMS wrappers matching `section.alerts-page` receive `margin-top: -1.5em`; this rule does not target the capture's `body.alerts-page`.
+
+The shared **Sort by** dropdown offers Current order (the default feed order), Warning level, Newest updated, Location A-Z, and Title A-Z. Sorting applies to combined search/filter matches before pagination; changing sort resets to page 1. Equal values retain feed order. Warning levels sort Emergency warning, Watch and act, Advice, then Decreasing threat, with unknown levels last. Empty locations and invalid or missing update dates sort last. Timezone-less CMS `updatedAt` timestamps are interpreted as Northern Territory time (UTC+09:30); ISO timestamps with explicit offsets retain their offsets. Confirm this timezone assumption against the production endpoint before rollout.
+
+The controls enhance existing `.alerts-listing__filters` markup automatically, so no extra CMS control markup is needed. Rebuild and refresh the listing CSS/JS asset versions in both the local capture and CMS references after changes. The local listing references currently use CSS version `13` and JavaScript version `7`. Run focused sorting regressions with `node --test src/alerts-listing/sorting.test.mjs`.
 
 ## Build
 

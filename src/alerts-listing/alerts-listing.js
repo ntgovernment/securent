@@ -1,4 +1,5 @@
 import "./alerts-listing.css";
+import { sortAlerts } from "./sorting.mjs";
 
 const endpoint = "https://cmsexternal.nt.gov.au/securent/_design/listing/alerts-listing/_nocache";
 const listing = document.querySelector("[data-alerts-listing]");
@@ -12,8 +13,72 @@ if (listing) {
   const regionFilters = listing.querySelector("[data-region-filters]");
   const topicFilters = listing.querySelector("[data-topic-filters]");
   const locationButton = listing.querySelector("[data-use-location]");
+  const filters = listing.querySelector(".alerts-listing__filters");
+  const resultsColumn = results.parentElement;
+  const row = filters.parentElement;
+  const mobile = window.matchMedia("(max-width: 767.98px)");
+  const panel = document.createElement("div");
+  panel.id = "alerts-filter-panel";
+  panel.className = "alerts-listing__filter-panel";
+  panel.append(...filters.childNodes);
+
+  const sortField = document.createElement("div");
+  sortField.className = "alerts-listing__sort";
+  const sortLabel = document.createElement("label");
+  sortLabel.htmlFor = "alerts-sort";
+  sortLabel.textContent = "Sort by";
+  const sort = document.createElement("select");
+  sort.id = "alerts-sort";
+  sort.name = "sort";
+  for (const [value, label] of [["current", "Current order"], ["level", "Warning level"],
+    ["updated", "Newest updated"], ["location", "Location A-Z"], ["title", "Title A-Z"]]) {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = label;
+    sort.append(option);
+  }
+  sortField.append(sortLabel, sort);
+  panel.prepend(sortField);
+
+  const filterToggle = document.createElement("button");
+  filterToggle.type = "button";
+  filterToggle.className = "alerts-listing__filter-toggle";
+  filterToggle.setAttribute("aria-controls", panel.id);
+  const toggleLabel = document.createElement("span");
+  toggleLabel.className = "alerts-listing__filter-toggle-label";
+  const sliders = document.createElement("i");
+  sliders.className = "fa-light fa-sliders";
+  sliders.setAttribute("aria-hidden", "true");
+  toggleLabel.append(sliders, document.createTextNode("Filter and sort"));
+  const chevron = document.createElement("i");
+  chevron.className = "fa-light fa-chevron-right alerts-listing__filter-chevron";
+  chevron.setAttribute("aria-hidden", "true");
+  filterToggle.append(toggleLabel, chevron);
+  filters.append(filterToggle, panel);
+  let mobileExpanded = false;
   let data;
   let currentPage = 1;
+
+  function syncFilters() {
+    const focused = document.activeElement;
+    const expanded = !mobile.matches || mobileExpanded;
+    filterToggle.hidden = !mobile.matches;
+    filterToggle.setAttribute("aria-expanded", String(expanded));
+    if (mobile.matches) row.insertBefore(filters, resultsColumn);
+    else row.append(filters);
+    panel.hidden = !expanded;
+    if (!expanded && panel.contains(focused)) filterToggle.focus();
+    else if (focused === filterToggle && filterToggle.hidden) {
+      panel.querySelector("input, select")?.focus();
+    } else if (filters.contains(focused)) focused.focus();
+  }
+
+  filterToggle.addEventListener("click", () => {
+    mobileExpanded = !mobileExpanded;
+    syncFilters();
+  });
+  mobile.addEventListener("change", syncFilters);
+  syncFilters();
 
   function isLocalPreview() {
     return ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
@@ -61,7 +126,7 @@ if (listing) {
     topicFilters.replaceChildren();
 
     const levels = data.facets?.levels || [...new Set(data.items.map((item) => item.warningLevel).filter(Boolean))];
-    levels.forEach((level) => {
+    sortAlerts(levels.map((warningLevel) => ({ warningLevel })), "level", titleFor).forEach(({ warningLevel: level }) => {
       const count = data.items.filter((item) => item.warningLevel === level).length;
       makeFilter(levelFilters, "level", level, level, count);
     });
@@ -177,7 +242,8 @@ if (listing) {
   }
 
   function render() {
-    const items = filteredItems();
+    if (!data) return;
+    const items = sortAlerts(filteredItems(), sort.value, titleFor);
     const pageSize = Math.max(1, Number(data.pageSize) || 8);
     const pageCount = Math.max(1, Math.ceil(items.length / pageSize));
     currentPage = Math.min(currentPage, pageCount);
@@ -202,9 +268,9 @@ if (listing) {
         credentials: "same-origin",
       });
       if (!response.ok) throw new Error(`Alert request failed: ${response.status}`);
-      data = await response.json();
-
-      if (!Array.isArray(data.items)) throw new Error("Alert response has no items array");
+      const payload = await response.json();
+      if (!Array.isArray(payload.items)) throw new Error("Alert response has no items array");
+      data = payload;
       renderFilters();
       render();
     } catch (error) {
@@ -220,7 +286,7 @@ if (listing) {
   });
 
   listing.addEventListener("change", (event) => {
-    if (event.target.matches('input[name="level"], input[name="region"], input[name="topic"]')) {
+    if (event.target.matches('input[name="level"], input[name="region"], input[name="topic"], select[name="sort"]')) {
       currentPage = 1;
       render();
     }
