@@ -35,6 +35,10 @@
   var cards = root.querySelector(".lc-cards");
   var status = root.querySelector(".lc-status");
   var requestId = 0;
+  var activeLocation = null;
+  var activeData = null;
+  var activePending = 0;
+  var userSelected = false;
 
   var oldAttribution = root.querySelector(".lc-attribution");
   if (oldAttribution && !cards.contains(oldAttribution)) oldAttribution.remove();
@@ -179,12 +183,16 @@
     var id = ++requestId;
     var data = { temperature: location.temperature };
     var pending = Number(Boolean(location.workerKey)) + Number(Boolean(location.epaStation));
+    activeLocation = location;
+    activeData = data;
+    activePending = pending;
     render(data, pending);
 
     function complete(field, value) {
       if (id !== requestId) return;
       data[field] = value;
-      render(data, --pending);
+      activePending = --pending;
+      render(data, pending);
     }
 
     if (location.workerKey) {
@@ -257,6 +265,7 @@
   }
 
   select.addEventListener("change", function () {
+    userSelected = true;
     setLocation(select.value);
   });
 
@@ -268,7 +277,10 @@
       navigator.geolocation.getCurrentPosition(
         function (pos) {
           var location = nearest(pos.coords.latitude, pos.coords.longitude);
-          if (location) setLocation(location.key);
+          if (location) {
+            userSelected = true;
+            setLocation(location.key);
+          }
           else status.textContent = "No locations with coordinates are available.";
         },
         function () {
@@ -374,7 +386,7 @@
       timer = setTimeout(function () {
         reject(new Error("Local conditions catalog timed out"));
         controller.abort();
-      }, 10000);
+      }, 30000);
     });
     var request = Promise.resolve().then(function () {
       return fetch(url, { signal: controller.signal });
@@ -387,19 +399,38 @@
     });
   }
 
-  status.textContent = "Loading local conditions…";
-  cards.setAttribute("aria-busy", "true");
-  Promise.allSettled([
-    fetchCatalog(observationsUrl, "text", readLocations),
-    fetchCatalog(airQualityUrl, "json", function (data) {
-      readAirStations(data);
-      return data;
-    }),
-  ])
-    .then(function (results) {
-      locations = results[0].status === "fulfilled" ? results[0].value : [];
-      if (results[1].status === "fulfilled") addAirLocations(results[1].value);
-      if (!locations.length) throw new Error("No local conditions locations");
+  var bomLocations = [];
+  var airCatalog = null;
+  var catalogsPending = 2;
+  var saved = null;
+  try {
+    saved = localStorage.getItem(STORAGE_KEY);
+  } catch (e) {
+    /* ignore */
+  }
+
+  function updateCatalog() {
+      locations = bomLocations.slice();
+      if (airCatalog) addAirLocations(airCatalog);
+      if (!locations.length) {
+        if (!catalogsPending) {
+          render({});
+          status.textContent = "Local conditions locations are currently unavailable.";
+        }
+        return;
+      }
+      var previous = activeLocation && (locations.find(function (location) {
+        return location.key === activeLocation.key;
+      }) || locations.find(function (location) {
+        return location.name.toLowerCase() === activeLocation.name.toLowerCase();
+      }));
+      var restored = !userSelected && (locations.find(function (location) { return location.key === saved; }) ||
+        (saved && locations.find(function (location) { return location.workerKey === saved; })));
+      var initial = restored || previous ||
+        locations.find(function (location) { return location.name === "Darwin Airport"; }) ||
+        locations.find(function (location) { return !location.key.startsWith("epa-"); }) ||
+        locations[0];
+      select.replaceChildren();
       locations.forEach(function (location) {
         var option = document.createElement("option");
         option.value = location.key;
@@ -412,21 +443,38 @@
       select.disabled = false;
       useBtn.disabled = !locations.some(hasCoordinates);
 
-      var saved = null;
-      try {
-        saved = localStorage.getItem(STORAGE_KEY);
-      } catch (e) {
-        /* ignore */
+      if (previous === initial && activeLocation.workerKey === initial.workerKey &&
+          activeLocation.epaStation === initial.epaStation) {
+        activeLocation = initial;
+        activeData.temperature = initial.temperature;
+        select.value = initial.key;
+        try {
+          localStorage.setItem(STORAGE_KEY, initial.key);
+        } catch (e) {
+          /* ignore */
+        }
+        render(activeData, activePending);
+      } else {
+        setLocation(initial.key);
       }
-      var initial = locations.find(function (location) { return location.key === saved; }) ||
-        (saved && locations.find(function (location) { return location.workerKey === saved; })) ||
-        locations.find(function (location) { return location.name === "Darwin Airport"; }) ||
-        locations.find(function (location) { return !location.key.startsWith("epa-"); }) ||
-        locations[0];
-      setLocation(initial.key);
+  }
+
+  function catalogComplete() {
+    --catalogsPending;
+    updateCatalog();
+  }
+
+  status.textContent = "Loading local conditions…";
+  cards.setAttribute("aria-busy", "true");
+  fetchCatalog(observationsUrl, "text", readLocations)
+    .then(function (result) { bomLocations = result; })
+    .catch(function () {})
+    .finally(catalogComplete);
+  fetchCatalog(airQualityUrl, "json", function (data) {
+      readAirStations(data);
+      return data;
     })
-    .catch(function () {
-      render({});
-      status.textContent = "Local conditions locations are currently unavailable.";
-    });
+    .then(function (result) { airCatalog = result; })
+    .catch(function () {})
+    .finally(catalogComplete);
 })();

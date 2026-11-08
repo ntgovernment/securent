@@ -506,7 +506,7 @@ test("catalog timeouts preserve the other feed and ignore late results", async (
     const pendingTimers = new Map();
     const timers = {
       setTimeout(callback, delay) {
-        assert.equal(delay, 10000);
+        assert.equal(delay, 30000);
         const key = {};
         pendingTimers.set(key, callback);
         return key;
@@ -522,8 +522,8 @@ test("catalog timeouts preserve the other feed and ignore late results", async (
       },
       air: () => Promise.resolve(response({ index: 51 })),
     });
-    assert.deepEqual(context.requests, ["/IDD60920.xml", "/api/air-quality"]);
-    assert.equal(context.select.disabled, true);
+    assert.deepEqual(context.requests.slice(0, 2), ["/IDD60920.xml", "/api/air-quality"]);
+    assert.equal(context.select.disabled, false);
     assert.equal(pendingTimers.size, 1);
     Array.from(pendingTimers.values())[0]();
     await settle();
@@ -560,6 +560,7 @@ test("catalog timeout includes response body reading", async () => {
       }),
     });
     assert.equal(pendingTimers.size, 1);
+    assert.equal(context.select.disabled, false);
     Array.from(pendingTimers.values())[0]();
     await settle();
     assert.equal(pendingTimers.size, 0);
@@ -587,4 +588,75 @@ test("no usable catalogs leave controls disabled and end loading", async () => {
       assert.match(context.window.document.querySelector(".lc-status").textContent, /locations are currently unavailable/);
     }
   }
+});
+
+test("either catalog populates immediately and late arrivals preserve user selection", async () => {
+  for (const local of [true, false]) {
+    for (const delayed of ["observations", "catalog"]) {
+      let resolveCatalog;
+      const context = await widget({ url: local ? "http://localhost/" : "https://example.com/conditions",
+        [delayed]: () => new Promise((resolve) => { resolveCatalog = resolve; }),
+        air: () => Promise.resolve(response(local ? { index: 90, station: "Katherine" } : epaFixture)),
+      });
+      assert.equal(context.select.disabled, false);
+      assert.equal(context.select.options.length, delayed === "observations" ? 4 : 6);
+      const selected = delayed === "observations" ? "epa-4" : "014272";
+      selectLocation(context, selected);
+      await settle();
+      const requests = context.requests.length;
+      resolveCatalog(response(delayed === "observations" ? fixture
+        : local ? { stations: parseAirQualityStations(epaFixture) } : epaFixture));
+      await settle();
+      assert.equal(context.select.options.length, 10);
+      assert.equal(context.select.value, selected);
+      assert.equal(context.requests.length, requests);
+      assert.equal(context.window.localStorage.getItem("securent.localConditions.location"), selected);
+      assert.equal(context.window.document.querySelector(".lc-use-location").disabled, false);
+      if (delayed === "observations") {
+        assert.match(context.window.document.querySelectorAll(".lc-card")[1].textContent, /90 Index/);
+      } else {
+        assert.match(context.window.document.querySelectorAll(".lc-card")[2].textContent, /36 °C/);
+      }
+    }
+  }
+});
+
+test("saved locations arriving later restore only until the user chooses a location", async () => {
+  for (const userChoice of [false, true]) {
+    for (const delayed of ["observations", "catalog"]) {
+      let resolveCatalog;
+      const saved = delayed === "observations" ? "015590" : "epa-4";
+      const context = await widget({ saved,
+        [delayed]: () => new Promise((resolve) => { resolveCatalog = resolve; }),
+      });
+      const chosen = context.select.value;
+      if (userChoice) selectLocation(context, chosen);
+      resolveCatalog(response(delayed === "observations" ? fixture : { stations: parseAirQualityStations(epaFixture) }));
+      await settle();
+      assert.equal(context.select.value, userChoice ? chosen : saved);
+    }
+  }
+});
+
+test("late BOM matches enrich the selected EPA location without losing its readings", async () => {
+  let resolveBom;
+  const station = { id: 2, name: "Darwin Airport", index: 51 };
+  const context = await widget({
+    observations: () => new Promise((resolve) => { resolveBom = resolve; }),
+    catalog: () => Promise.resolve(response({ stations: [station] })),
+    air: () => Promise.resolve(response({ index: 51, station: station.name })),
+    worker: () => Promise.resolve(response({ fireDanger: { label: "Moderate", level: 1 } })),
+  });
+  assert.equal(context.select.value, "epa-2");
+  selectLocation(context, "epa-2");
+  await settle();
+  const requests = context.requests.length;
+  resolveBom(response(fixture));
+  await settle();
+  assert.equal(context.select.value, "014015");
+  assert.equal(context.select.querySelector('[value="epa-2"]'), null);
+  assert.equal(context.requests.length, requests);
+  assert.match(context.window.document.querySelectorAll(".lc-card")[1].textContent, /51 Index/);
+  assert.match(context.window.document.querySelectorAll(".lc-card")[2].textContent, /36 °C/);
+  assert.match(context.window.document.querySelectorAll(".lc-card")[0].textContent, /Moderate/);
 });
