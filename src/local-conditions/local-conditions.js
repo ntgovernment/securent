@@ -1,6 +1,6 @@
 /* ==========================================================================
    #local-conditions – Location select + BOM / NT EPA condition cards
-    Temperature observations come from BOM; other data comes from worker.js.
+    Temperature observations come from BOM; air quality comes from NT EPA.
    ========================================================================== */
 (function () {
   var root = document.getElementById("local-conditions");
@@ -10,9 +10,11 @@
   var STORAGE_KEY = "securent.localConditions.location";
 
   var LOCAL_HOSTS = ["localhost", "127.0.0.1", "::1", "[::1]"];
-  var observationsUrl = LOCAL_HOSTS.includes(window.location.hostname)
+  var isLocal = LOCAL_HOSTS.includes(window.location.hostname);
+  var observationsUrl = isLocal
     ? "/IDD60920.xml"
     : "./?a=1657184";
+  var airQualityUrl = isLocal ? "/api/air-quality" : "./?a=1657186";
   var workerKeys = {
     "Darwin Airport": "darwin",
     "Darwin Harbour": "darwin",
@@ -20,16 +22,13 @@
     "Tennant Creek": "tennant-creek",
     Yulara: "yulara",
   };
+  var epaStations = {
+    "Darwin Airport": 2,
+    "Darwin Harbour": 3,
+  };
   var locations = [];
 
   var FIRE_COLOURS = ["#5fb830", "#f4d63a", "#f28100", "#a80a0a"];
-  var AIR_COLOURS = {
-    good: "#5fb830",
-    fair: "#f4d63a",
-    poor: "#f28100",
-    "very poor": "#a80a0a",
-    "extremely poor": "#6b0000",
-  };
 
   var select = root.querySelector(".lc-select");
   var useBtn = root.querySelector(".lc-use-location");
@@ -91,22 +90,22 @@
 
   function airCard(data) {
     var c = card("Air quality monitor", "fa-fan");
-    if (!data) return unavailable(c);
+    if (!data || !Number.isFinite(data.index)) return unavailable(c);
 
     var row = el("div", "lc-card__row");
-    var value = el("span", "lc-card__value");
-    if (data.pm25 != null) {
-      value.textContent = data.pm25;
-      value.appendChild(el("span", "lc-card__unit", " PM2.5 µg/m³"));
-    }
+    var value = el("span", "lc-card__value", String(data.index));
+    value.appendChild(el("span", "lc-card__unit", " Index"));
     row.appendChild(value);
-
-    var badge = el("span", "lc-air");
-    var dot = el("span", "lc-air__dot");
-    dot.style.background = AIR_COLOURS[data.category.toLowerCase()] || "#999";
-    badge.appendChild(dot);
-    badge.appendChild(document.createTextNode(data.category));
-    row.appendChild(badge);
+    if (typeof data.category === "string" && data.category.trim()) {
+      var badge = el("span", "lc-air");
+      var dot = el("span", "lc-air__dot");
+      dot.setAttribute("aria-hidden", "true");
+      dot.style.backgroundColor = typeof data.colour === "string" && /^#[0-9a-f]{6}$/i.test(data.colour)
+        ? data.colour : "#999999";
+      badge.appendChild(dot);
+      badge.appendChild(document.createTextNode(data.category.trim()));
+      row.appendChild(badge);
+    }
     c.appendChild(row);
     return c;
   }
@@ -149,40 +148,61 @@
     return group;
   }
 
-  function render(data) {
+  function render(data, pending) {
     cards.replaceChildren(
       cardWithSource(fireCard(data.fireDanger), "Bushfires NT", "https://www.pfes.nt.gov.au/incidentmap"),
       cardWithSource(airCard(data.airQuality), "NTEPA", "https://ntepa.nt.gov.au/"),
       cardWithSource(tempCard(data.temperature), "Bureau of Meteorology",
         "https://www.bom.gov.au/location/australia/northern-territory#observations"),
     );
-    cards.removeAttribute("aria-busy");
-    status.textContent = "";
+    if (pending) cards.setAttribute("aria-busy", "true");
+    else cards.removeAttribute("aria-busy");
+    status.textContent = pending ? "Loading local conditions…" : "";
   }
 
   function load(location) {
     var id = ++requestId;
-    render({ temperature: location.temperature });
-    if (!location.workerKey) return;
-    cards.setAttribute("aria-busy", "true");
-    status.textContent = "Loading local conditions…";
-    var url = new URL(endpoint, window.location.href);
-    url.searchParams.set("location", location.workerKey);
-    fetch(url.href)
-      .then(function (r) {
-        if (!r.ok) throw new Error(r.status);
-        return r.json();
-      })
-      .then(function (data) {
-        if (id === requestId) {
-          data.temperature = location.temperature;
-          render(data);
-        }
-      })
-      .catch(function () {
-        if (id !== requestId) return;
-        render({ temperature: location.temperature });
-      });
+    var data = { temperature: location.temperature };
+    var pending = Number(Boolean(location.workerKey)) + Number(Boolean(location.epaStation));
+    render(data, pending);
+
+    function complete(field, value) {
+      if (id !== requestId) return;
+      data[field] = value;
+      render(data, --pending);
+    }
+
+    if (location.workerKey) {
+      var url = new URL(endpoint, window.location.href);
+      url.searchParams.set("location", location.workerKey);
+      fetch(url.href)
+        .then(function (response) {
+          if (!response.ok) throw new Error(response.status);
+          return response.json();
+        })
+        .then(function (result) { complete("fireDanger", result.fireDanger); })
+        .catch(function () { complete("fireDanger", null); });
+    }
+
+    if (location.epaStation) {
+      fetch(airQualityUrl + (isLocal ? "?id=" + location.epaStation : ""))
+        .then(function (response) {
+          if (!response.ok) throw new Error(response.status);
+          return response.json();
+        })
+        .then(function (result) {
+          var station = isLocal ? result : readAirStations(result).find(function (item) {
+            return item.id === location.epaStation;
+          });
+          var value = station && station.index;
+          if ((typeof value !== "number" && typeof value !== "string") ||
+              !/^\d+(?:\.\d+)?$/.test(String(value).trim()) || !Number.isFinite(Number(value))) {
+            throw new Error("Invalid air-quality index");
+          }
+          complete("airQuality", { index: Number(value), colour: station.colour, category: station.category });
+        })
+        .catch(function () { complete("airQuality", null); });
+    }
   }
 
   function setLocation(key) {
@@ -269,6 +289,7 @@
         lat: numberAttribute(station, "lat"),
         lon: numberAttribute(station, "lon"),
         workerKey: Object.prototype.hasOwnProperty.call(workerKeys, name) ? workerKeys[name] : null,
+        epaStation: Object.prototype.hasOwnProperty.call(epaStations, name) ? epaStations[name] : null,
         temperature: {
           min: temperature(station, "minimum_air_temperature"),
           max: temperature(station, "maximum_air_temperature"),
@@ -281,6 +302,44 @@
     });
   }
 
+  function readAirStations(data) {
+    if (isLocal) {
+      if (!Array.isArray(data.stations)) throw new Error("Invalid EPA station list");
+      return data.stations;
+    }
+    if (!Array.isArray(data.d)) throw new Error("Invalid EPA station feed");
+    return data.d.filter(function (station) { return station != null; }).map(function (station) {
+      return { id: station.serialCode, name: station.name, index: station.IndexValue,
+        colour: station.IndexColorStrHex, category: station.IndexColorDescription };
+    });
+  }
+
+  function addAirLocations(data) {
+    readAirStations(data).forEach(function (station) {
+      if (!Number.isInteger(station.id) || station.id < 1 || station.id > 4 ||
+          typeof station.name !== "string" || !station.name.trim()) return;
+      var name = station.name.trim();
+      var existing = locations.find(function (location) {
+        return location.name.toLowerCase() === name.toLowerCase();
+      });
+      if (existing) {
+        existing.epaStation = station.id;
+        return;
+      }
+      if (locations.some(function (location) { return location.key === "epa-" + station.id; })) return;
+      locations.push({
+        key: "epa-" + station.id,
+        name: name,
+        lat: null,
+        lon: null,
+        workerKey: station.id === 1 ? "palmerston" : station.id === 4 ? "katherine" : "darwin",
+        epaStation: station.id,
+        temperature: null,
+      });
+    });
+    locations.sort(function (first, second) { return first.name.localeCompare(second.name); });
+  }
+
   status.textContent = "Loading local conditions…";
   cards.setAttribute("aria-busy", "true");
   fetch(observationsUrl)
@@ -291,6 +350,15 @@
     .then(function (text) {
       locations = readLocations(text);
       if (!locations.length) throw new Error("No BOM locations");
+      return fetch(airQualityUrl)
+        .then(function (response) {
+          if (!response.ok) throw new Error(response.status);
+          return response.json();
+        })
+        .then(addAirLocations)
+        .catch(function () {});
+    })
+    .then(function () {
       locations.forEach(function (location) {
         var option = document.createElement("option");
         option.value = location.key;
@@ -312,6 +380,7 @@
       var initial = locations.find(function (location) { return location.key === saved; }) ||
         (saved && locations.find(function (location) { return location.workerKey === saved; })) ||
         locations.find(function (location) { return location.name === "Darwin Airport"; }) ||
+        locations.find(function (location) { return !location.key.startsWith("epa-"); }) ||
         locations[0];
       setLocation(initial.key);
     })

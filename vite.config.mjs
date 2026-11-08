@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
 import { cloudflare } from "@cloudflare/vite-plugin";
+import { fetchAirQuality, fetchAirQualityStations } from "./src/local-conditions/air-quality.mjs";
 
 const sourceThemeOnly = {
   name: "source-theme-only",
@@ -70,6 +71,27 @@ const eventPreview = {
 const localConditionsMock = {
   name: "local-conditions-mock",
   configureServer(server) {
+    server.middlewares.use("/api/air-quality", async (req, res) => {
+      res.setHeader("Content-Type", "application/json");
+      res.setHeader("Cache-Control", "no-store");
+      if (req.method !== "GET") {
+        res.statusCode = 405;
+        res.setHeader("Allow", "GET");
+        res.end(JSON.stringify({ error: "Method not allowed" }));
+        return;
+      }
+      const id = new URL(req.url, "http://localhost").searchParams.get("id");
+      try {
+        res.end(JSON.stringify(id === null
+          ? { stations: await fetchAirQualityStations() }
+          : await fetchAirQuality(id)));
+      } catch (error) {
+        console.warn("Local EPA request failed:", error.message);
+        res.statusCode = error instanceof RangeError ? 400 : 502;
+        res.end(JSON.stringify({ error: res.statusCode === 400
+          ? "Invalid EPA station ID" : "Air-quality data is unavailable" }));
+      }
+    });
     server.middlewares.use("/api/local-conditions", (req, res) => {
       const key = new URL(req.url, "http://localhost").searchParams.get("location");
       const body = {
@@ -77,7 +99,6 @@ const localConditionsMock = {
         updated: new Date().toISOString(),
         temperature: { min: 27, max: 32 },
         fireDanger: { label: "Moderate", level: 1 },
-        airQuality: key === "darwin" ? { category: "Fair", pm25: 17, station: "Winnellie" } : null,
       };
       res.setHeader("Content-Type", "application/json");
       res.end(JSON.stringify(body));
