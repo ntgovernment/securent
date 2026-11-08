@@ -243,6 +243,12 @@ The latest warning banner uses `.warning-banner` markup with `role="alert"`, `da
 
 The local-conditions widget renders three cards for fire danger, air quality, and temperature. Its styles live in `src/local-conditions/local-conditions.css`, imported by `src/css/main.css` into the shared `dist/theme.css` bundle. Below 576px, location controls stack at full width and condition cards use outlined panels with 32px separation. If a request fails or an individual value is unavailable, the cards remain visible and show `Data is currently unavailable. Try again later.` in place of the unavailable data. The page-level status remains available for loading and location messages.
 
+The location list, coordinates, and running observed minimum and maximum temperatures come from the BOM Northern Territory observations XML. Temperatures are rounded to whole degrees for display. Local development uses the checked-in `public/IDD60920.xml` snapshot, so its values are not live; refresh it from `https://www.bom.gov.au/fwo/IDD60920.xml` when needed. Production requests the same-origin Matrix asset `./?a=1657184`. The fire and air-quality service supports only matched locations; other stations show those cards as unavailable. Run `node --test src/local-conditions/local-conditions.test.mjs` for widget tests, and `npm run build` to update `dist/local-conditions.js` and `dist/theme.css` for deployment.
+
+Each location option exposes its latitude and longitude as `data-coordinates="latitude,longitude"`; an empty value means the station has no valid coordinates and is excluded from geolocation matching. Use location selects the nearest station by great-circle distance.
+
+Each card has a source link beneath it: Bushfires NT links to the NT incident map, NTEPA links to its homepage, and the temperature card links to BOM's Northern Territory observations. The current worker obtains fire-danger data from the BOM forecast API, not Bushfires NT; the incident-map link does not change that data source. Air-quality data comes from NTEPA, and failed or unsupported requests do not prevent BOM temperatures from displaying.
+
 ### Homepage news JS (`src/js/homepage-news.js`)
 
 Runs at page load to transform the CMS-rendered category label markup into tag elements:

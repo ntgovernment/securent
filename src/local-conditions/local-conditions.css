@@ -48,6 +48,15 @@
   gap: 1.5rem;
 }
 
+.lc-card-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.lc-card-group .lc-card {
+  flex: 1;
+}
+
 .lc-card {
   position: relative;
   overflow: hidden;
@@ -176,7 +185,7 @@
 }
 
 .lc-attribution {
-  margin-top: 1rem;
+  margin: 0.5rem 0 0;
   font-size: 0.875rem;
 }
 

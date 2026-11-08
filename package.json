@@ -13,6 +13,7 @@
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.67.0",
     "dotenv-cli": "^11.1.0",
+    "happy-dom": "^21.0.4",
     "vite": "^6.0.0",
     "wrangler": "^4.157.0"
   }
