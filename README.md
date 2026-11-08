@@ -249,6 +249,8 @@ Air quality displays the NT EPA station-level `IndexValue`, not a pollutant conc
 
 The air-quality badge uses the station's `IndexColorStrHex` for its dot and `IndexColorDescription` for text such as Good or Fair; it does not infer a category from the numeric index. Missing or invalid colours use a neutral dot, and missing descriptions omit the badge without hiding a valid index.
 
+When a valid AQI is available, its source line includes the EPA station name and reading date/time in `Australia/Darwin` (ACST), with a machine-readable `time` element. The feed has no station-level timestamp: use the latest valid `Date` among pollutants whose `IndexValue` matches the station AQI. Missing timestamps are omitted rather than replaced with the fetch time. Unavailable AQI keeps the plain NTEPA source link without station or time details.
+
 Production requests `./?a=1657186`, which returns the same JSON feed with a Matrix cache expiry of 900 seconds. No station query parameter or cache-busting parameter is added; the widget selects the station from the response by `serialCode`. Catalog failures leave the original BOM dropdown usable. Air quality loads independently of the fire-danger worker; the widget ignores the worker's old air-quality payload. Either request failing does not erase successful readings from the other source or BOM temperatures. Local fire-danger values remain mocked; the production worker is unchanged.
 
 Each location option exposes its latitude and longitude as `data-coordinates="latitude,longitude"`; an empty value means the station has no valid coordinates and is excluded from geolocation matching. Use location selects the nearest station by great-circle distance.

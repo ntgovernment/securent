@@ -23,20 +23,24 @@ function response(body, ok = true) {
   return { ok, status: ok ? 200 : 500, text: async () => body, json: async () => body };
 }
 
+const readingTimestamp = Date.parse("2026-11-08T11:30:00.000Z");
 const epaFixture = { d: [
   { name: "Palmerston", serialCode: 1, IndexValue: 0, IndexColorStrHex: "#42A93C", IndexColorDescription: "Good" },
   { name: "Winnellie", serialCode: 2, IndexValue: 51, IndexColorStrHex: "#EEC900", IndexColorDescription: "Fair",
-    pollutants: [{ IndexValue: 999, IndexColorStrHex: "#FF0000", IndexColorDescription: "Poor" }] },
+    pollutants: [
+      { IndexValue: 999, IndexColorStrHex: "#FF0000", IndexColorDescription: "Poor", Date: `/Date(${readingTimestamp + 3600000})/` },
+      { IndexValue: 51, Date: `/Date(${readingTimestamp})/` },
+    ] },
   { name: "Stokes Hill", serialCode: 3, IndexValue: 64.5 },
   { name: "Katherine", serialCode: 4, IndexValue: 90 },
 ] };
 
 test("EPA reads station-level JSON indices and rejects invalid or missing readings", () => {
   assert.deepEqual(parseAirQualityStations(epaFixture), [
-    { id: 1, name: "Palmerston", index: 0, colour: "#42A93C", category: "Good" },
-    { id: 2, name: "Winnellie", index: 51, colour: "#EEC900", category: "Fair" },
-    { id: 3, name: "Stokes Hill", index: 64.5, colour: null, category: null },
-    { id: 4, name: "Katherine", index: 90, colour: null, category: null },
+    { id: 1, name: "Palmerston", index: 0, colour: "#42A93C", category: "Good", time: null },
+    { id: 2, name: "Winnellie", index: 51, colour: "#EEC900", category: "Fair", time: "2026-11-08T11:30:00.000Z" },
+    { id: 3, name: "Stokes Hill", index: 64.5, colour: null, category: null, time: null },
+    { id: 4, name: "Katherine", index: 90, colour: null, category: null, time: null },
   ]);
   for (const value of [undefined, null, "", "N/A", -9999, Infinity]) {
     assert.equal(parseAirQualityStations({ d: [{ name: "Katherine", serialCode: 4, IndexValue: value }] })[0].index, null);
@@ -56,7 +60,8 @@ test("EPA fetches the JSON source and selects each station by serialCode", async
   };
   for (const id of [1, 2, 3, 4]) {
     const station = parseAirQualityStations(epaFixture)[id - 1];
-    assert.deepEqual(await fetchAirQuality(id, fetcher), { index: station.index, colour: station.colour, category: station.category });
+    assert.deepEqual(await fetchAirQuality(id, fetcher), { index: station.index, colour: station.colour,
+      category: station.category, station: station.name, time: station.time });
     assert.equal(requests.at(-1), "https://api.brainiumlabs.com.au/ntepa/stationindex.json");
   }
   for (const id of [null, undefined, "", 0, 5, "2&other=1", "02"]) {
@@ -73,6 +78,19 @@ test("EPA fetches the JSON source and selects each station by serialCode", async
 async function settle() {
   await new Promise((resolve) => setImmediate(resolve));
 }
+
+test("AQI timestamp uses the latest valid matching pollutant, not unrelated readings", () => {
+  const row = { ...epaFixture.d[1], pollutants: [
+    ...epaFixture.d[1].pollutants,
+    { IndexValue: 51, Date: `/Date(${readingTimestamp - 3600000}+0930)/` },
+    { IndexValue: 51, Date: "invalid" },
+    { IndexValue: 51, Date: "/Date(999999999999999999999)/" },
+  ] };
+  assert.equal(parseAirQualityStations({ d: [row] })[0].time, "2026-11-08T11:30:00.000Z");
+  for (const pollutants of [undefined, [], [{ IndexValue: 999, Date: `/Date(${readingTimestamp})/` }]]) {
+    assert.equal(parseAirQualityStations({ d: [{ ...row, pollutants }] })[0].time, null);
+  }
+});
 
 async function widget({ url = "http://localhost:5173/", saved, feed = fixture, worker, air, catalog, geolocation } = {}) {
   const window = new Window({ url });
@@ -191,6 +209,34 @@ test("air quality displays the station colour and description in both environmen
       assert.equal(card.querySelector(".lc-air__dot").style.backgroundColor, colour);
       assert.equal(card.querySelector(".lc-air__dot").getAttribute("aria-hidden"), "true");
       assert.doesNotMatch(card.textContent, /Poor|999/);
+    }
+  }
+});
+
+test("available AQI source includes the station and reading date/time in NT time", async () => {
+  for (const local of [true, false]) {
+    const station = parseAirQualityStations(epaFixture)[1];
+    const context = await widget({
+      url: local ? "http://localhost/" : "https://example.com/conditions",
+      air: () => Promise.resolve(response(local
+        ? { index: station.index, station: station.name, time: station.time }
+        : epaFixture)),
+    });
+    const source = context.window.document.querySelectorAll(".lc-attribution")[1];
+    assert.match(source.textContent, /Source: NTEPA, Winnellie, 08\/11\/2026, 21:00 ACST/);
+    assert.equal(source.querySelector("a").href, "https://ntepa.nt.gov.au/");
+    assert.equal(source.querySelector("time").dateTime, station.time);
+  }
+});
+
+test("unavailable AQI omits source details and absent timestamps are not fabricated", async () => {
+  for (const index of [null, 0]) {
+    for (const time of [null, "invalid", "2026-11-08T11:30:00.000Z"]) {
+      const context = await widget({ air: () => Promise.resolve(response({ index, station: "Winnellie", time })) });
+      const source = context.window.document.querySelectorAll(".lc-attribution")[1];
+      if (index === null) assert.equal(source.textContent, "Source: NTEPA");
+      else assert.match(source.textContent, /Source: NTEPA, Winnellie/);
+      assert.equal(Boolean(source.querySelector("time")), index === 0 && time === "2026-11-08T11:30:00.000Z");
     }
   }
 });

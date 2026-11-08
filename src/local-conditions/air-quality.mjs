@@ -16,6 +16,16 @@ function fetchStationPage(url, options) {
   });
 }
 
+function readingTime(station) {
+  const dates = (Array.isArray(station.pollutants) ? station.pollutants : [])
+    .filter((pollutant) => pollutant && pollutant.IndexValue === station.IndexValue && pollutant.IndexValue >= 0)
+    .map((pollutant) => {
+      const match = typeof pollutant.Date === "string" && /^\/Date\((-?\d+)(?:[+-]\d{4})?\)\/$/.exec(pollutant.Date);
+      return match ? new Date(Number(match[1])).getTime() : NaN;
+    }).filter(Number.isFinite);
+  return dates.length ? new Date(Math.max(...dates)).toISOString() : null;
+}
+
 export function parseAirQualityStations(data) {
   if (!Array.isArray(data?.d)) throw new Error("Invalid EPA station feed");
   const stations = [];
@@ -30,6 +40,7 @@ export function parseAirQualityStations(data) {
       colour: typeof row.IndexColorStrHex === "string" && /^#[0-9a-f]{6}$/i.test(row.IndexColorStrHex)
         ? row.IndexColorStrHex : null,
       category: typeof row.IndexColorDescription === "string" ? row.IndexColorDescription.trim() : null,
+      time: readingTime(row),
     });
   }
   return stations;
@@ -49,5 +60,6 @@ export async function fetchAirQuality(id, fetcher = fetchStationPage) {
   const stations = await fetchAirQualityStations(fetcher);
   const station = stations.find((item) => item.id === Number(id));
   if (!station) throw new Error("Missing EPA station");
-  return { index: station.index, colour: station.colour, category: station.category };
+  return { index: station.index, colour: station.colour, category: station.category,
+    station: station.name, time: station.time };
 }

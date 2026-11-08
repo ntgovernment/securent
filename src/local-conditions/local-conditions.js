@@ -132,7 +132,7 @@
     return c;
   }
 
-  function cardWithSource(cardNode, name, url) {
+  function cardWithSource(cardNode, name, url, reading) {
     var group = el("div", "lc-card-group");
     var source = el("p", "lc-attribution");
     source.appendChild(document.createTextNode("Source: "));
@@ -143,6 +143,21 @@
     } else {
       source.appendChild(document.createTextNode(name));
     }
+    if (reading && Number.isFinite(reading.index)) {
+      if (typeof reading.station === "string" && reading.station.trim()) {
+        source.appendChild(document.createTextNode(", " + reading.station.trim()));
+      }
+      var date = typeof reading.time === "string" ? new Date(reading.time) : null;
+      if (date && Number.isFinite(date.getTime())) {
+        var time = el("time", null, new Intl.DateTimeFormat("en-AU", {
+          timeZone: "Australia/Darwin", day: "2-digit", month: "2-digit", year: "numeric",
+          hour: "2-digit", minute: "2-digit", hour12: false, timeZoneName: "short",
+        }).format(date));
+        time.dateTime = date.toISOString();
+        source.appendChild(document.createTextNode(", "));
+        source.appendChild(time);
+      }
+    }
     group.appendChild(cardNode);
     group.appendChild(source);
     return group;
@@ -151,7 +166,7 @@
   function render(data, pending) {
     cards.replaceChildren(
       cardWithSource(fireCard(data.fireDanger), "Bushfires NT", "https://www.pfes.nt.gov.au/incidentmap"),
-      cardWithSource(airCard(data.airQuality), "NTEPA", "https://ntepa.nt.gov.au/"),
+      cardWithSource(airCard(data.airQuality), "NTEPA", "https://ntepa.nt.gov.au/", data.airQuality),
       cardWithSource(tempCard(data.temperature), "Bureau of Meteorology",
         "https://www.bom.gov.au/location/australia/northern-territory#observations"),
     );
@@ -199,7 +214,8 @@
               !/^\d+(?:\.\d+)?$/.test(String(value).trim()) || !Number.isFinite(Number(value))) {
             throw new Error("Invalid air-quality index");
           }
-          complete("airQuality", { index: Number(value), colour: station.colour, category: station.category });
+          complete("airQuality", { index: Number(value), colour: station.colour, category: station.category,
+            station: isLocal ? station.station : station.name, time: station.time });
         })
         .catch(function () { complete("airQuality", null); });
     }
@@ -302,6 +318,17 @@
     });
   }
 
+  function airReadingTime(station) {
+    var dates = (Array.isArray(station.pollutants) ? station.pollutants : [])
+      .filter(function (pollutant) {
+        return pollutant && pollutant.IndexValue === station.IndexValue && pollutant.IndexValue >= 0;
+      }).map(function (pollutant) {
+        var match = typeof pollutant.Date === "string" && /^\/Date\((-?\d+)(?:[+-]\d{4})?\)\/$/.exec(pollutant.Date);
+        return match ? new Date(Number(match[1])).getTime() : NaN;
+      }).filter(Number.isFinite);
+    return dates.length ? new Date(Math.max.apply(null, dates)).toISOString() : null;
+  }
+
   function readAirStations(data) {
     if (isLocal) {
       if (!Array.isArray(data.stations)) throw new Error("Invalid EPA station list");
@@ -310,7 +337,7 @@
     if (!Array.isArray(data.d)) throw new Error("Invalid EPA station feed");
     return data.d.filter(function (station) { return station != null; }).map(function (station) {
       return { id: station.serialCode, name: station.name, index: station.IndexValue,
-        colour: station.IndexColorStrHex, category: station.IndexColorDescription };
+        colour: station.IndexColorStrHex, category: station.IndexColorDescription, time: airReadingTime(station) };
     });
   }
 
