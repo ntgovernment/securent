@@ -19,6 +19,13 @@ securent/
 │   │   ├── homepage-hero.css         # Purple-light homepage hero and responsive conditions alignment
 │   │   ├── landing-hero.css          # Alt landing variant, breadcrumbs and optional CTA
 │   │   └── hero-banners.js           # Landing-only breadcrumb relocation and optional CTA enhancement
+│   ├── local-conditions/
+│   │   ├── local-conditions.js       # Independent BOM/EPA catalogs and condition cards
+│   │   ├── local-conditions.css      # Conditions panel and responsive reading styles
+│   │   ├── local-conditions.test.mjs # Widget, fallback, timeout and EPA regression tests
+│   │   ├── air-quality.mjs           # Node HTTPS proxy and EPA station parsing
+│   │   ├── worker.js                 # Production fire-danger proxy
+│   │   └── wrangler.toml             # Worker deployment configuration
 │   ├── social-share/
 │   │   ├── social-share.css          # Standalone styles for the Squiz share nester
 │   │   └── social-share.js           # Share popups and copy-link behavior
@@ -48,6 +55,7 @@ securent/
 │   ├── print.css
 │   ├── social-share.css
 │   ├── social-share.js
+│   ├── local-conditions.js
 │   ├── theme.css
 │   └── theme.js
 ├── assets/hazard-icons/              # Shared hazard alert pictograms
@@ -81,7 +89,7 @@ npm run dev
 Vite starts a local dev server and opens `/`, serving the Alerts and warnings capture in `alerts-and-warnings.html`. The homepage capture remains available at `/SecureNT.html`, and the event capture remains available at `/Severe%20Storm%20%E2%80%93%20Alice%20Springs%20_%20SecureNT.html`. The development middleware in `vite.config.mjs` serves the Alerts and warnings and event captures through Vite's HTML transforms and serves saved `.js.download` dependencies as JavaScript. External navigation links still point to the CMS, and externally hosted fonts and favicons require network access. These captures are development snapshots, not live emergency feeds.
 The HTML captures link stylesheets and scripts from `dist/`. Run `npm run build` after source changes so the updated assets are available for local preview.
 
-Existing Vite servers and browser tabs can cache built assets even after rebuilding. When changing the theme, increment the `?v=` values on the `dist/theme.css` and `dist/theme.js` references in all three local captures, including the gitignored homepage, then verify a normal reload without temporary test URLs. The current versions are CSS `32` and JavaScript `25`. Update equivalent CMS asset references separately when deploying.
+Existing Vite servers and browser tabs can cache built assets even after rebuilding. When changing the theme, increment the `?v=` values on the `dist/theme.css` and `dist/theme.js` references in all three local captures, including the gitignored homepage, then verify a normal reload without temporary test URLs. The current versions are CSS `35` and JavaScript `25`; the homepage's standalone `dist/local-conditions.js` reference is version `2`. Update equivalent CMS asset references separately when deploying.
 
 To select a different port on Windows without npm dropping the forwarded flags, launch Vite directly:
 
@@ -114,9 +122,10 @@ Outputs to `dist/`:
 - `more-updates-cards.css` — styles for the bottom update cards on the Alerts and warnings page
 - `event.css` and `social-share.css` — standalone event page and share nester styles
 - `social-share.js` — standalone event share popup and copy-link behavior
+- `local-conditions.js` — standalone location catalog and condition-card behavior; its CSS is included in `theme.css`
 - `print.css` — print stylesheet
 
-`theme.css`, `theme.js`, `alerts-listing.css`, `alerts-listing.js`, `alerts-pagination.css`, `more-updates-cards.css`, `event.css`, `social-share.css`, `social-share.js`, and `print.css` are referenced in Squiz Matrix via the git file bridge. Reference `dist/social-share.css` from the Squiz share nester after the global theme; it remains a standalone asset rather than part of `dist/theme.css`.
+`theme.css`, `theme.js`, `alerts-listing.css`, `alerts-listing.js`, `alerts-pagination.css`, `more-updates-cards.css`, `event.css`, `social-share.css`, `social-share.js`, `local-conditions.js`, and `print.css` are referenced in Squiz Matrix via the git file bridge. Reference `dist/social-share.css` from the Squiz share nester after the global theme; it remains a standalone asset rather than part of `dist/theme.css`.
 
 The build excludes the captured homepage's reference to the previous `dist/theme.css` so generated styles are not imported back into the next bundle. The current source styles remain the authority.
 
@@ -243,6 +252,10 @@ The latest warning banner uses `.warning-banner` markup with `role="alert"`, `da
 
 The local-conditions widget renders three cards for fire danger, air quality, and temperature. Its styles live in `src/local-conditions/local-conditions.css`, imported by `src/css/main.css` into the shared `dist/theme.css` bundle. Below 576px, location controls stack at full width and condition cards use outlined panels with 32px separation. If a request fails or an individual value is unavailable, the cards remain visible and show `Data is currently unavailable. Try again later.` in place of the unavailable data. The page-level status remains available for loading and location messages.
 
+On the homepage, Local conditions forms a separate lower panel immediately after Latest events within the current-conditions frame. A full-width top border separates the sections, with 40px spacing on either side of the divider and content aligned to the frame's responsive gutters.
+
+Temperature readings keep each caret icon, number and Celsius unit together without line breaks. When both readings do not fit side by side, the maximum wraps above the minimum.
+
 The location list, coordinates, and running observed minimum and maximum temperatures come from the BOM Northern Territory observations XML. Temperatures are rounded to whole degrees for display. Local development uses the checked-in `public/IDD60920.xml` snapshot, so its values are not live; refresh it from `https://www.bom.gov.au/fwo/IDD60920.xml` when needed. Production requests the same-origin Matrix asset `./?a=1657184`. The fire and air-quality service supports only matched locations; other stations show those cards as unavailable. Run `node --test src/local-conditions/local-conditions.test.mjs` for widget tests, and `npm run build` to update `dist/local-conditions.js` and `dist/theme.css` for deployment.
 
 Air quality displays the NT EPA station-level `IndexValue`, not a pollutant concentration or an inferred category. Localhost proxies `https://api.brainiumlabs.com.au/ntepa/stationindex.json`: `/api/air-quality` returns the station catalog, and `/api/air-quality?id=<id>` returns the matching index. The JSON feed's `d` array identifies stations by `serialCode`: 1 (Palmerston), 2 (Winnellie), 3 (Stokes Hill), and 4 (Katherine). Darwin Airport uses Winnellie, and Darwin Harbour uses Stokes Hill. Missing EPA locations are added to the dropdown in both environments; existing locations match by name and retain their BOM keys, coordinates, and temperatures. EPA-only entries use stable `epa-<id>` keys, have no invented coordinates, and show temperatures as unavailable. Missing or negative sentinel indices show unavailable data, not zero.
@@ -253,7 +266,21 @@ When a valid AQI is available, its source line includes the EPA station name and
 
 Production requests `./?a=1657186`, which returns the same JSON feed with a Matrix cache expiry of 900 seconds. No station query parameter or cache-busting parameter is added; the widget selects the station from the response by `serialCode`. Catalog failures leave the original BOM dropdown usable. Air quality loads independently of the fire-danger worker; the widget ignores the worker's old air-quality payload. Either request failing does not erase successful readings from the other source or BOM temperatures. Local fire-danger values remain mocked; the production worker is unchanged.
 
+The BOM and EPA catalogs load concurrently with independent 10-second timeouts, including response body reading. The dropdown is populated once both requests have completed or timed out, using whichever catalogs are usable. A failed, invalid or empty BOM feed does not prevent EPA locations and AQI from loading; temperatures remain unavailable for EPA-only locations. If neither catalog provides usable locations, the controls remain disabled and the status reports that locations are unavailable. Late timed-out responses cannot replace the initialized catalog.
+
+#### Matrix Feed Setup and Verification
+
+Asset `1657184` must return raw BOM XML with a `product` root and `observations > station` entries; asset `1657186` must return raw EPA JSON with a `d` array. Remove or override inherited site designs and paint layouts on integration endpoints so they do not wrap feeds in SecureNT HTML. Use an XML content type for BOM and `application/json` for EPA only after the response bodies are correct. Forwarding upstream headers alone does not remove HTML wrappers. Follow the normal publishing workflow and verify read permissions for the intended audience.
+
+An integration's successful HTTP test confirms upstream access, not its frontend output. On the homepage, inspect the actual requests for `./?a=1657184` and `./?a=1657186`, including redirects, status, content type and response body. A raw `/_nocache` integration response does not establish that the widget's asset-ID URL serves the same payload. HTML login/error pages and site-wrapped feeds remain invalid even with HTTP 200. Do not change the widget to parse HTML as a fallback.
+
+Load `dist/local-conditions.js` after the widget markup with `type="module"`, and load the shared `dist/theme.css`. Remove empty or query-only stylesheet references such as `href="?h=..."`, which request the current HTML page as CSS. Publish source and rebuilt artifacts together through the Git bridge and refresh its asset references. Keep the separately deployed fire-danger worker URL in the widget's `data-endpoint`; the `/api/local-conditions` default is a development mock route, not a CMS deployment endpoint.
+
+Before release, run `node --test src/local-conditions/local-conditions.test.mjs` and `npm run build`. Check successful feeds, BOM failure with EPA fallback, EPA failure with BOM fallback, both catalogs unavailable, and delayed catalog responses. Confirm saved selection, AQI attribution, temperature wrapping, the section divider, and coordinate-based control availability in desktop and mobile previews.
+
 Each location option exposes its latitude and longitude as `data-coordinates="latitude,longitude"`; an empty value means the station has no valid coordinates and is excluded from geolocation matching. Use location selects the nearest station by great-circle distance.
+
+Use location is disabled when no available locations have valid coordinates; the dropdown remains usable for EPA-only locations.
 
 Each card has a source link beneath it: Bushfires NT links to the NT incident map, NTEPA links to its homepage, and the temperature card links to BOM's Northern Territory observations. The current worker obtains fire-danger data from the BOM forecast API, not Bushfires NT; the incident-map link does not change that data source. Air-quality data comes from NTEPA, and failed or unsupported requests do not prevent BOM temperatures from displaying.
 

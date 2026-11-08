@@ -1,4 +1,5 @@
 main.ntg-body--homepage #current-conditions.container-xl {
+  --conditions-gutter: 2rem;
   width: calc(100% - 4rem);
   max-width: 80rem;
   margin-top: -2.125rem;
@@ -60,6 +61,7 @@ main.ntg-body--homepage #current-conditions.container-xl {
 
 @media (min-width: 992px) {
   main.ntg-body--homepage #current-conditions.container-xl {
+    --conditions-gutter: 3rem;
     width: calc(100% - 6rem);
     margin-top: -3.0625rem;
     padding: 2.25rem 3rem 3rem;
@@ -93,6 +95,7 @@ main.ntg-body--homepage #current-conditions.container-xl {
 
 @media (max-width: 575.98px) {
   main.ntg-body--homepage #current-conditions.container-xl {
+    --conditions-gutter: 1.25rem;
     width: 100%;
     margin-top: 0;
     padding: 1.25rem;

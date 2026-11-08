@@ -116,7 +116,7 @@
 
     function part(arrow, label, v) {
       var p = el("span", "lc-temp");
-      var a = el("span", "lc-temp__arrow", arrow);
+      var a = el("i", "lc-temp__arrow fa-solid " + arrow);
       a.setAttribute("aria-hidden", "true");
       p.appendChild(a);
       var sr = el("span", "visually-hidden", label + " ");
@@ -125,9 +125,9 @@
       return p;
     }
 
-    var row = el("div", "lc-card__row");
-    row.appendChild(part("▼", "Observed minimum", data.min));
-    row.appendChild(part("▲", "Observed maximum", data.max));
+    var row = el("div", "lc-card__row lc-temp-row");
+    row.appendChild(part("fa-caret-down", "Observed minimum", data.min));
+    row.appendChild(part("fa-caret-up", "Observed maximum", data.max));
     c.appendChild(row);
     return c;
   }
@@ -367,25 +367,39 @@
     locations.sort(function (first, second) { return first.name.localeCompare(second.name); });
   }
 
+  function fetchCatalog(url, format, parse) {
+    var controller = new AbortController();
+    var timer;
+    var timeout = new Promise(function (resolve, reject) {
+      timer = setTimeout(function () {
+        reject(new Error("Local conditions catalog timed out"));
+        controller.abort();
+      }, 10000);
+    });
+    var request = Promise.resolve().then(function () {
+      return fetch(url, { signal: controller.signal });
+    }).then(function (response) {
+      if (!response.ok) throw new Error(response.status);
+      return response[format]();
+    }).then(parse);
+    return Promise.race([request, timeout]).finally(function () {
+      clearTimeout(timer);
+    });
+  }
+
   status.textContent = "Loading local conditions…";
   cards.setAttribute("aria-busy", "true");
-  fetch(observationsUrl)
-    .then(function (response) {
-      if (!response.ok) throw new Error(response.status);
-      return response.text();
-    })
-    .then(function (text) {
-      locations = readLocations(text);
-      if (!locations.length) throw new Error("No BOM locations");
-      return fetch(airQualityUrl)
-        .then(function (response) {
-          if (!response.ok) throw new Error(response.status);
-          return response.json();
-        })
-        .then(addAirLocations)
-        .catch(function () {});
-    })
-    .then(function () {
+  Promise.allSettled([
+    fetchCatalog(observationsUrl, "text", readLocations),
+    fetchCatalog(airQualityUrl, "json", function (data) {
+      readAirStations(data);
+      return data;
+    }),
+  ])
+    .then(function (results) {
+      locations = results[0].status === "fulfilled" ? results[0].value : [];
+      if (results[1].status === "fulfilled") addAirLocations(results[1].value);
+      if (!locations.length) throw new Error("No local conditions locations");
       locations.forEach(function (location) {
         var option = document.createElement("option");
         option.value = location.key;
@@ -396,7 +410,7 @@
         select.appendChild(option);
       });
       select.disabled = false;
-      useBtn.disabled = false;
+      useBtn.disabled = !locations.some(hasCoordinates);
 
       var saved = null;
       try {

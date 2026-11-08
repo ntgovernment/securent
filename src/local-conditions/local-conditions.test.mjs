@@ -92,7 +92,7 @@ test("AQI timestamp uses the latest valid matching pollutant, not unrelated read
   }
 });
 
-async function widget({ url = "http://localhost:5173/", saved, feed = fixture, worker, air, catalog, geolocation } = {}) {
+async function widget({ url = "http://localhost:5173/", saved, feed = fixture, observations, worker, air, catalog, geolocation, timers } = {}) {
   const window = new Window({ url });
   window.document.body.innerHTML = `
     <section id="local-conditions" data-endpoint="/api/local-conditions">
@@ -103,19 +103,23 @@ async function widget({ url = "http://localhost:5173/", saved, feed = fixture, w
     </section>`;
   if (saved) window.localStorage.setItem("securent.localConditions.location", saved);
   if (geolocation) Object.defineProperty(window.navigator, "geolocation", { value: geolocation });
+  if (timers) {
+    window.setTimeout = timers.setTimeout;
+    window.clearTimeout = timers.clearTimeout;
+  }
   const requests = [];
-  window.fetch = (input) => {
+  window.fetch = (input, options) => {
     const request = String(input);
     requests.push(request);
     if (request.includes("IDD60920.xml") || request.includes("1657184")) {
-      return Promise.resolve(response(feed));
+      return observations ? observations(options) : Promise.resolve(response(feed));
     }
     if (request === "/api/air-quality") {
-      return catalog ? catalog() : Promise.resolve(response({ stations: parseAirQualityStations(epaFixture) }));
+      return catalog ? catalog(options) : Promise.resolve(response({ stations: parseAirQualityStations(epaFixture) }));
     }
     if (request === "./?a=1657186") {
       const first = requests.filter((item) => item === request).length === 1;
-      if (first) return catalog ? catalog() : Promise.resolve(response(epaFixture));
+      if (first) return catalog ? catalog(options) : Promise.resolve(response(epaFixture));
       return air ? air(request) : Promise.resolve(response(epaFixture));
     }
     if (request.includes("/api/air-quality")) {
@@ -145,6 +149,13 @@ test("the feed populates every station and shows its observed temperatures", asy
   assert.match(context.window.document.querySelector(".lc-cards").textContent, /32 °C/);
   assert.match(context.window.document.querySelector(".lc-cards").textContent, /36 °C/);
   assert.doesNotMatch(context.window.document.querySelector(".lc-cards").textContent, /Observed temperatures/);
+  const temperatures = context.window.document.querySelectorAll(".lc-temp-row .lc-temp");
+  assert.equal(temperatures.length, 2);
+  assert.match(temperatures[0].textContent, /Observed minimum 32 °C/);
+  assert.match(temperatures[1].textContent, /Observed maximum 36 °C/);
+  assert.ok(temperatures[0].querySelector(".fa-caret-down"));
+  assert.ok(temperatures[1].querySelector(".fa-caret-up"));
+  assert.equal(temperatures[0].querySelector("i").getAttribute("aria-hidden"), "true");
   const groups = context.window.document.querySelectorAll(".lc-card-group");
   assert.deepEqual(Array.from(groups, (group) => group.querySelector(".lc-attribution").textContent),
     ["Source: Bushfires NT", "Source: NTEPA", "Source: Bureau of Meteorology"]);
@@ -441,20 +452,139 @@ test("geolocation finds the nearest station across the antimeridian", async () =
   assert.equal(context.select.value, "nearest");
 });
 
-test("geolocation reports when no stations have usable coordinates", async () => {
+test("geolocation is disabled when no stations have usable coordinates", async () => {
   const geolocation = { getCurrentPosition: (success) => success({ coords: { latitude: 0, longitude: 0 } }) };
   const feed = '<product><observations><station bom-id="missing" description="Missing coordinates" /></observations></product>';
   const context = await widget({ geolocation, feed });
+  assert.equal(context.window.document.querySelector(".lc-use-location").disabled, true);
   context.window.document.querySelector(".lc-use-location").click();
   assert.equal(context.select.value, "missing");
-  assert.match(context.window.document.querySelector(".lc-status").textContent, /No locations with coordinates/);
+  assert.equal(context.window.document.querySelector(".lc-status").textContent, "");
 });
 
-test("invalid or empty feeds leave controls disabled and report a failure", async () => {
+test("invalid or empty feeds leave controls disabled when EPA also fails", async () => {
   for (const feed of ["not xml", "<product><observations /></product>"]) {
-    const context = await widget({ feed });
+    const context = await widget({ feed, catalog: () => Promise.reject(new Error("offline")) });
     assert.equal(context.select.disabled, true);
     assert.equal(context.select.options.length, 0);
     assert.match(context.window.document.querySelector(".lc-status").textContent, /locations are currently unavailable/);
+  }
+});
+
+test("BOM failures still populate EPA locations and display their readings", async () => {
+  const failures = [
+    () => Promise.reject(new Error("offline")),
+    () => Promise.resolve(response("", false)),
+    () => Promise.resolve(response("<!DOCTYPE html><html><body>Temperatures</body></html>")),
+    () => Promise.resolve(response("not xml")),
+    () => Promise.resolve(response("<product><observations /></product>")),
+  ];
+  for (const local of [true, false]) {
+    for (const observations of failures) {
+      const context = await widget({
+        url: local ? "http://localhost/" : "https://example.com/conditions",
+        saved: "epa-2", observations,
+        air: () => Promise.resolve(response(local
+          ? { ...parseAirQualityStations(epaFixture)[1], station: "Winnellie" } : epaFixture)),
+      });
+      assert.ok(context.requests.includes(local ? "/api/air-quality" : "./?a=1657186"));
+      assert.equal(context.select.disabled, false);
+      assert.equal(context.select.options.length, 4);
+      assert.equal(context.select.value, "epa-2");
+      assert.equal(context.window.document.querySelector(".lc-use-location").disabled, true);
+      const cards = context.window.document.querySelectorAll(".lc-card");
+      assert.match(cards[1].textContent, /51 Index/);
+      assert.equal(cards[1].querySelector(".lc-air").textContent, "Fair");
+      assert.match(cards[2].textContent, /unavailable/);
+      assert.match(context.window.document.querySelectorAll(".lc-attribution")[1].textContent, /Winnellie/);
+    }
+  }
+});
+
+test("catalog timeouts preserve the other feed and ignore late results", async () => {
+  for (const stalled of ["observations", "catalog"]) {
+    const pendingTimers = new Map();
+    const timers = {
+      setTimeout(callback, delay) {
+        assert.equal(delay, 10000);
+        const key = {};
+        pendingTimers.set(key, callback);
+        return key;
+      },
+      clearTimeout(key) { pendingTimers.delete(key); },
+    };
+    let resolveRequest;
+    let signal;
+    const context = await widget({ timers,
+      [stalled]: (options) => {
+        signal = options.signal;
+        return new Promise((resolve) => { resolveRequest = resolve; });
+      },
+      air: () => Promise.resolve(response({ index: 51 })),
+    });
+    assert.deepEqual(context.requests, ["/IDD60920.xml", "/api/air-quality"]);
+    assert.equal(context.select.disabled, true);
+    assert.equal(pendingTimers.size, 1);
+    Array.from(pendingTimers.values())[0]();
+    await settle();
+    assert.equal(signal.aborted, true);
+    assert.equal(pendingTimers.size, 0);
+    assert.equal(context.select.disabled, false);
+    assert.equal(context.select.options.length, stalled === "observations" ? 4 : 6);
+    if (stalled === "observations") {
+      assert.match(context.window.document.querySelectorAll(".lc-card")[1].textContent, /51 Index/);
+    } else {
+      assert.match(context.window.document.querySelectorAll(".lc-card")[2].textContent, /36 °C/);
+    }
+    const keys = Array.from(context.select.options, (option) => option.value);
+    resolveRequest(response(stalled === "observations" ? fixture : { stations: parseAirQualityStations(epaFixture) }));
+    await settle();
+    assert.deepEqual(Array.from(context.select.options, (option) => option.value), keys);
+  }
+});
+
+test("catalog timeout includes response body reading", async () => {
+  for (const stalled of ["observations", "catalog"]) {
+    const pendingTimers = new Map();
+    const timers = {
+      setTimeout(callback) {
+        const key = {};
+        pendingTimers.set(key, callback);
+        return key;
+      },
+      clearTimeout(key) { pendingTimers.delete(key); },
+    };
+    const context = await widget({ timers,
+      [stalled]: () => Promise.resolve({ ok: true,
+        [stalled === "observations" ? "text" : "json"]: () => new Promise(() => {}),
+      }),
+    });
+    assert.equal(pendingTimers.size, 1);
+    Array.from(pendingTimers.values())[0]();
+    await settle();
+    assert.equal(pendingTimers.size, 0);
+    assert.equal(context.select.disabled, false);
+    assert.equal(context.select.options.length, stalled === "observations" ? 4 : 6);
+  }
+});
+
+test("no usable catalogs leave controls disabled and end loading", async () => {
+  for (const local of [true, false]) {
+    for (const catalog of [
+      () => Promise.reject(new Error("offline")),
+      () => Promise.resolve(response("", false)),
+      () => Promise.resolve(response({})),
+      () => Promise.resolve(response(local ? { stations: [] } : { d: [] })),
+      () => Promise.resolve(response(local ? { stations: [{ id: 5, name: "Invalid" }] }
+        : { d: [{ serialCode: 5, name: "Invalid" }] })),
+    ]) {
+      const context = await widget({ url: local ? "http://localhost/" : "https://example.com/conditions",
+        observations: () => Promise.reject(new Error("offline")), catalog });
+      assert.equal(context.select.options.length, 0);
+      assert.equal(context.select.disabled, true);
+      assert.equal(context.window.document.querySelector(".lc-use-location").disabled, true);
+      assert.equal(context.window.document.querySelector(".lc-cards").hasAttribute("aria-busy"), false);
+      assert.match(context.window.document.querySelector(".lc-status").textContent, /locations are currently unavailable/);
+    }
   }
 });
