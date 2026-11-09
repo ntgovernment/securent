@@ -1,4 +1,5 @@
 import { sortAlerts, updatedTimestamp } from "../alerts-listing/sorting.mjs";
+import { getPlaceSearchValues } from "../search/autocomplete.mjs";
 
 export const sourceOrder = ["Bushfires NT", "NTES", "PFES", "SecureNT", "WoG"];
 
@@ -61,7 +62,7 @@ export function filterAndSortNotices(items, {
   const matches = items.filter((item) => {
     const groups = [[sources, item.sources], [regions, item.regions],
       [emergencyTypes, item.emergencyTypes], [declarations, item.declarations || []], [warningLevels, [item.warningLevel]]];
-    const searchable = [item.title, item.name, item.fromName, ...item.sources,
+    const searchable = [item.title, item.name, item.fromName, ...(item.locationTerms || []), ...item.sources,
       ...item.regions, ...item.emergencyTypes, ...(item.declarations || []), item.warningLevel].filter(Boolean).join(" ").toLocaleLowerCase();
     return (!search || searchable.includes(search)) && groups.every(([selected, values]) =>
       !selected.length || selected.some((value) => values.includes(value)));
@@ -87,6 +88,7 @@ function normalizeRecord(record, source, index) {
   const subject = cleanText(record.Subject);
   const title = subject || name;
   const campaignId = cleanText(record.CampaignID);
+  const locationTerms = getPlaceSearchValues(record);
 
   return {
     id: campaignId || `${source}:${index}`,
@@ -98,6 +100,7 @@ function normalizeRecord(record, source, index) {
     sources: [source],
     source,
     url: cleanText(record.WebVersionURL),
+    ...(locationTerms.length ? { locationTerms } : {}),
     ...classifyNotice({ title, name }),
   };
 }

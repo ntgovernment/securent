@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="./SecureNT_files/ntgbase.min.css">
   <link rel="stylesheet" href="./SecureNT_files/alt.css">
   <link rel="stylesheet" href="./dist/theme.css?v=36">
-  <link rel="stylesheet" href="./dist/media-releases.css?v=13">
+  <link rel="stylesheet" href="./dist/media-releases.css?v=14">
   <script>
     document.documentElement.classList.remove("no-js");
     document.documentElement.classList.add("js");
@@ -106,10 +106,12 @@
 
       <section class="media-releases__listing" data-media-releases aria-label="Media releases">
         <div class="media-releases__search">
-          <label for="media-releases-search">
-            <span class="visually-hidden">Search media releases</span>
+          <div class="media-releases__search-field">
+            <label class="visually-hidden" for="media-releases-search">Search media releases</label>
             <input id="media-releases-search" type="search" data-search placeholder="Search media releases">
-          </label>
+            <span class="media-releases__search-icon" aria-hidden="true"><i class="fa-regular fa-magnifying-glass"></i></span>
+            <ul id="media-releases-search-suggestions" class="search-autocomplete" data-search-suggestions hidden></ul>
+          </div>
         </div>
         <div class="media-releases__layout">
           <div class="media-releases__main">
@@ -185,6 +187,6 @@
   <script src="./SecureNT_files/ntgbase-components.min.js"></script>
   <script src="./SecureNT_files/ntgbase-main.min.js"></script>
   <script type="module" src="./dist/theme.js?v=25"></script>
-  <script type="module" src="./dist/media-releases.js?v=24"></script>
+  <script type="module" src="./dist/media-releases.js?v=26"></script>
 </body>
 </html>

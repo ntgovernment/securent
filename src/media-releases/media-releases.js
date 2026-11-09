@@ -1,4 +1,5 @@
 import "./media-releases.css";
+import { attachAutocomplete, getAutocompleteCandidates } from "../search/autocomplete.mjs";
 import { curateFeeds, filterAndSortNotices, warningLevelOrder } from "./curation.mjs";
 import { fetchMediaReleaseFeeds, mediaReleaseSources, resolveMediaReleaseEndpoint } from "./feeds.mjs";
 import { updatedTimestamp } from "../alerts-listing/sorting.mjs";
@@ -15,6 +16,7 @@ const listing = document.querySelector("[data-media-releases]");
 if (listing) {
   const isLocalPreview = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
   const search = listing.querySelector("[data-search]");
+  const searchSuggestions = listing.querySelector("[data-search-suggestions]");
   const filters = listing.querySelector("[data-filters]");
   const sort = listing.querySelector("[data-sort]");
   const filterPanel = listing.querySelector("[data-filter-panel]");
@@ -28,6 +30,11 @@ if (listing) {
   const pageSize = 10;
   let items = [];
   let currentPage = 1;
+
+  const searchAutocomplete = attachAutocomplete(search, searchSuggestions, () => items
+    .flatMap((item) => getAutocompleteCandidates([
+      item.title, item.name, ...item.regions, ...(item.locationTerms || []),
+    ])));
 
   function selectedValues(name) {
     return [...filters.querySelectorAll(`input[name="${name}"]:checked`)].map((input) => input.value);
@@ -280,6 +287,7 @@ if (listing) {
     .then(({ feeds, failedSources }) => {
       items = curateFeeds(feeds);
       renderFilters();
+      searchAutocomplete.refresh();
       showFeedNotes(failedSources);
       render();
     })

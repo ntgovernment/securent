@@ -144,6 +144,19 @@ test("filters declarations alone and in combination with existing filters", () =
   assert.equal(filterAndSortNotices([legacyItem], { declarations: ["Fire ban"] }).length, 0);
 });
 
+test("preserves and searches structured town, street, and suburb values", () => {
+  const [notice] = curateFeeds([{ source: "NTES", items: [record({
+    CampaignID: "street-alert",
+    Town: "Alice Springs",
+    Street: "Todd Street",
+    Suburb: "The Gap",
+  })] }]);
+
+  assert.deepEqual(notice.locationTerms, ["Alice Springs", "Todd Street", "The Gap"]);
+  assert.deepEqual(filterAndSortNotices([notice], { query: "Todd Street" }), [notice]);
+  assert.deepEqual(filterAndSortNotices([notice], { query: "The Gap" }), [notice]);
+});
+
 test("recognizes warning variants and reduced threats without treating generic warnings as emergency warnings", () => {
   assert.equal(classifyNotice({ Subject: "Bushfire Emergency Warning - Katherine" }).warningLevel, "Emergency warning");
   assert.equal(classifyNotice({ Subject: "Watch & Act - Darwin" }).warningLevel, "Watch and act");

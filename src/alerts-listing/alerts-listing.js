@@ -1,12 +1,14 @@
 import "./alerts-listing.css";
 import { sortAlerts } from "./sorting.mjs";
 import { getPageWindow } from "../pagination/page-window.mjs";
+import { attachAutocomplete, getAutocompleteCandidates, getPlaceSearchValues } from "../search/autocomplete.mjs";
 
 const endpoint = "https://cmsexternal.nt.gov.au/securent/_design/listing/alerts-listing/_nocache";
 const listing = document.querySelector("[data-alerts-listing]");
 
 if (listing) {
   const search = listing.querySelector("#alerts-search");
+  const searchSuggestions = listing.querySelector("[data-search-suggestions]");
   const results = listing.querySelector("[data-alert-results]");
   const status = listing.querySelector("[data-results-status]");
   const pagination = listing.querySelector("[data-alert-pagination]");
@@ -59,6 +61,12 @@ if (listing) {
   let mobileExpanded = false;
   let data;
   let currentPage = 1;
+
+  const searchAutocomplete = attachAutocomplete(search, searchSuggestions, () => data?.items
+    .flatMap((item) => getAutocompleteCandidates([
+      titleFor(item), item.summary, item.location, item.region, item.emergencyType, item.warningLevel,
+      ...getPlaceSearchValues(item),
+    ])) || []);
 
   function syncFilters() {
     const focused = document.activeElement;
@@ -156,7 +164,8 @@ if (listing) {
     const topics = selectedValues(topicFilters, "topic");
 
     return data.items.filter((item) => {
-      const searchable = [titleFor(item), item.location, item.region, item.emergencyType, item.warningLevel]
+      const searchable = [titleFor(item), item.summary, item.location, item.region, item.emergencyType, item.warningLevel,
+        ...getPlaceSearchValues(item)]
         .filter(Boolean)
         .join(" ")
         .toLocaleLowerCase();
@@ -287,6 +296,7 @@ if (listing) {
       if (!Array.isArray(payload.items)) throw new Error("Alert response has no items array");
       data = payload;
       renderFilters();
+      searchAutocomplete.refresh();
       render();
     } catch (error) {
       results.setAttribute("aria-busy", "false");

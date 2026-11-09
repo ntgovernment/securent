@@ -1,3 +1,5 @@
+@import "../search/autocomplete.css";
+
 .alerts-page,
 .alerts-page .ntg-body {
   background-color: #f5f5f7;
@@ -44,6 +46,7 @@ section.alerts-page {
 
 .alerts-listing__search-field {
   position: relative;
+  z-index: 1;
   flex: 1 1 645px;
   max-width: 645px;
   min-width: 0;
