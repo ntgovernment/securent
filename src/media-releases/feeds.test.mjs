@@ -61,7 +61,7 @@ test("parses focused-feed arrays", () => {
   });
 });
 
-test("marks a paginated feed as incomplete when only its first page is returned", () => {
+test("ignores upstream page metadata when parsing feed results", () => {
   const parsed = parseFeedPayload({
     Results: [{ CampaignID: "one" }],
     PageNumber: 1,
@@ -69,11 +69,11 @@ test("marks a paginated feed as incomplete when only its first page is returned"
     TotalNumberOfRecords: 2051,
   }, source);
 
-  assert.equal(parsed.incomplete, "WoG shows page 1 of 3 (2051 records). ".trim());
+  assert.deepEqual(parsed, { source: "WoG", items: [{ CampaignID: "one" }] });
 });
 
-test("loads available sources and reports failed sources", async () => {
-  const { feeds, failedSources, incompleteSources } = await fetchMediaReleaseFeeds(async (url) => {
+test("loads available sources and reports failed sources without page notes", async () => {
+  const { feeds, failedSources, ...otherResults } = await fetchMediaReleaseFeeds(async (url) => {
     const matchingSource = mediaReleaseSources.find((item) => `/feed/${item.id}` === url);
     if (matchingSource.id === "ntes") throw new Error("offline");
     const payload = matchingSource.id === "wog"
@@ -84,7 +84,7 @@ test("loads available sources and reports failed sources", async () => {
 
   assert.equal(feeds.length, 4);
   assert.deepEqual(failedSources, ["NTES"]);
-  assert.deepEqual(incompleteSources, ["WoG shows page 1 of 2 (900 records)."]);
+  assert.deepEqual(otherResults, {});
 });
 
 test("rejects when all feeds are unavailable", async () => {

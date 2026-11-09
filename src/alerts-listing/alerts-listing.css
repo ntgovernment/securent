@@ -177,8 +177,7 @@ section.alerts-page {
   text-decoration: underline;
 }
 
-.alerts-listing__card-link:focus-visible,
-.alerts-listing__page-button:focus-visible {
+.alerts-listing__card-link:focus-visible {
   outline: 3px solid #174c4e;
   outline-offset: 2px;
 }

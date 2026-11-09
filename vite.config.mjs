@@ -159,7 +159,7 @@ export default defineConfig({
         ...(includeLocalCapture ? { page: "./SecureNT.html" } : {}),
         "alerts-listing": "./src/alerts-listing/alerts-listing.js",
         "media-releases": "./src/media-releases/media-releases.js",
-        "alerts-pagination": "./src/alerts-listing/alerts-pagination.css",
+        pagination: "./src/pagination/pagination.css",
         "more-updates-cards": "./src/alerts-listing/more-updates-cards.css",
         "theme-styles": "./src/css/main.css",
         "event-styles": "./src/events/event.css",
@@ -194,8 +194,8 @@ export default defineConfig({
           if (assetInfo.name === "social-share-styles.css") {
             return "social-share.css";
           }
-          if (assetInfo.name === "alerts-pagination.css") {
-            return "alerts-pagination.css";
+          if (assetInfo.name === "pagination.css") {
+            return "pagination.css";
           }
           if (assetInfo.name === "more-updates-cards.css") {
             return "more-updates-cards.css";

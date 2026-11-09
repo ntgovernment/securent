@@ -35,14 +35,9 @@ export function resolveMediaReleaseEndpoint(source, pageUrl) {
 export function parseFeedPayload(payload, source) {
   if (Array.isArray(payload)) return { source: source.name, items: payload };
   if (payload && Array.isArray(payload.Results)) {
-    const pageNumber = Number(payload.PageNumber) || 1;
-    const numberOfPages = Number(payload.NumberOfPages) || pageNumber;
     return {
       source: source.name,
       items: payload.Results,
-      incomplete: pageNumber < numberOfPages
-        ? `${source.name} shows page ${pageNumber} of ${numberOfPages} (${payload.TotalNumberOfRecords || "more"} records).`
-        : "",
     };
   }
   throw new TypeError(`${source.name} feed has an unsupported response shape`);
@@ -64,7 +59,6 @@ export async function fetchMediaReleaseFeeds(fetcher = fetch, endpointFor = (sou
 
   const feeds = [];
   const failedSources = [];
-  const incompleteSources = [];
   settled.forEach((result, index) => {
     const source = mediaReleaseSources[index];
     if (result.status === "rejected") {
@@ -72,7 +66,6 @@ export async function fetchMediaReleaseFeeds(fetcher = fetch, endpointFor = (sou
       return;
     }
     feeds.push(result.value);
-    if (result.value.incomplete) incompleteSources.push(result.value.incomplete);
   });
 
   if (!feeds.length) {
@@ -81,5 +74,5 @@ export async function fetchMediaReleaseFeeds(fetcher = fetch, endpointFor = (sou
       "All emergency update feeds are unavailable",
     );
   }
-  return { feeds, failedSources, incompleteSources };
+  return { feeds, failedSources };
 }

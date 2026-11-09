@@ -2,6 +2,7 @@ import "./media-releases.css";
 import { curateFeeds, filterAndSortNotices, warningLevelOrder } from "./curation.mjs";
 import { fetchMediaReleaseFeeds, mediaReleaseSources, resolveMediaReleaseEndpoint } from "./feeds.mjs";
 import { updatedTimestamp } from "../alerts-listing/sorting.mjs";
+import { getPageWindow } from "../pagination/page-window.mjs";
 
 const listing = document.querySelector("[data-media-releases]");
 
@@ -18,7 +19,7 @@ if (listing) {
   const status = listing.querySelector("[data-results-status]");
   const feedNote = listing.querySelector("[data-feed-note]");
   const pagination = listing.querySelector("[data-pagination]");
-  const pageSize = 8;
+  const pageSize = 10;
   let items = [];
   let currentPage = 1;
 
@@ -121,11 +122,12 @@ if (listing) {
     if (pageCount <= 1) return;
 
     const list = document.createElement("ul");
-    list.className = "media-releases__page-list";
+    list.className = "pagination__page-list";
     const addButton = (label, page, disabled, current = false) => {
       const entry = document.createElement("li");
       const button = document.createElement("button");
       button.type = "button";
+      button.className = "pagination__page-button";
       button.dataset.page = String(page);
       button.textContent = label;
       button.disabled = disabled;
@@ -133,10 +135,23 @@ if (listing) {
       entry.append(button);
       list.append(entry);
     };
+    const addEllipsis = () => {
+      const entry = document.createElement("li");
+      const ellipsis = document.createElement("span");
+      ellipsis.className = "pagination__ellipsis";
+      ellipsis.setAttribute("aria-hidden", "true");
+      ellipsis.textContent = "\u2026";
+      entry.append(ellipsis);
+      list.append(entry);
+    };
 
     addButton("Previous", currentPage - 1, currentPage === 1);
-    for (let page = 1; page <= pageCount; page += 1) {
-      addButton(String(page), page, false, page === currentPage);
+    for (const page of getPageWindow(currentPage, pageCount)) {
+      if (page === "ellipsis") {
+        addEllipsis();
+      } else {
+        addButton(String(page), page, false, page === currentPage);
+      }
     }
     addButton("Next", currentPage + 1, currentPage === pageCount);
     pagination.append(list);
@@ -151,17 +166,16 @@ if (listing) {
     results.replaceChildren(...pageItems.map(renderCard));
     results.setAttribute("aria-busy", "false");
     status.textContent = matches.length
-      ? `Showing ${start + 1}-${Math.min(start + pageSize, matches.length)} of ${matches.length} emergency updates. Sorted by ${sort.selectedOptions[0].textContent.toLowerCase()}.`
-      : "No emergency updates match your search or filters.";
+      ? `Showing ${start + 1}-${Math.min(start + pageSize, matches.length)} of ${matches.length} media releases. Sorted by ${sort.selectedOptions[0].textContent.toLowerCase()}.`
+      : "No media releases match your search or filters.";
     renderPagination(pageCount);
   }
 
-  function showFeedNotes(failedSources, incompleteSources) {
+  function showFeedNotes(failedSources) {
     const messages = [];
     if (failedSources.length) {
       messages.push(`Some feeds are unavailable: ${failedSources.join(", ")}.`);
     }
-    messages.push(...incompleteSources);
     feedNote.hidden = messages.length === 0;
     feedNote.textContent = messages.join(" ");
   }
@@ -191,17 +205,17 @@ if (listing) {
       ? `/api/media-releases/${source.id}`
       : resolveMediaReleaseEndpoint(source, window.location.href),
   )
-    .then(({ feeds, failedSources, incompleteSources }) => {
+    .then(({ feeds, failedSources }) => {
       items = curateFeeds(feeds);
       renderFilters();
-      showFeedNotes(failedSources, incompleteSources);
+      showFeedNotes(failedSources);
       render();
     })
     .catch((error) => {
       results.setAttribute("aria-busy", "false");
-      status.textContent = "Emergency updates are temporarily unavailable. Please try again later.";
+      status.textContent = "Media releases are temporarily unavailable. Please try again later.";
       feedNote.hidden = false;
       feedNote.textContent = "No source feeds could be loaded.";
-      console.error("Unable to load emergency updates", error);
+      console.error("Unable to load media releases", error);
     });
 }

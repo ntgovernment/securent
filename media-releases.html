@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="./SecureNT_files/ntgbase.min.css">
   <link rel="stylesheet" href="./SecureNT_files/alt.css">
   <link rel="stylesheet" href="./dist/theme.css?v=36">
-  <link rel="stylesheet" href="./dist/media-releases.css?v=5">
+  <link rel="stylesheet" href="./dist/media-releases.css?v=7">
   <script>
     document.documentElement.classList.remove("no-js");
     document.documentElement.classList.add("js");
@@ -113,38 +113,41 @@
         </div>
         <div class="media-releases__layout">
           <div class="media-releases__main">
-            <p class="media-releases__status" data-results-status role="status" aria-live="polite">Loading emergency updates...</p>
+            <p class="media-releases__status" data-results-status role="status" aria-live="polite">Loading media releases...</p>
             <p class="media-releases__feed-note" data-feed-note role="status" aria-live="polite" hidden></p>
             <div class="media-releases__results" data-results aria-busy="true"></div>
-            <nav class="media-releases__pagination" data-pagination aria-label="Emergency update pages"></nav>
+            <nav class="media-releases__pagination" data-pagination aria-label="Media release pages"></nav>
           </div>
-          <aside class="media-releases__sources" aria-label="Sort and filter emergency updates">
-            <label class="media-releases__sort" for="media-releases-sort">
-              <span>Sort by</span>
-              <select id="media-releases-sort" data-sort>
-                <option value="newest">Newest first</option>
-                <option value="oldest">Oldest first</option>
-                <option value="level">Warning level</option>
-                <option value="title">Title A-Z</option>
-              </select>
-            </label>
+          <aside class="media-releases__sources" aria-label="Sort and filter media releases">
             <details class="media-releases__filter-panel" data-filter-panel data-filters open>
-              <summary>Filters</summary>
+              <summary>
+                <span class="media-releases__filter-label"><i class="fa-light fa-sliders" aria-hidden="true"></i>Sort and filter</span>
+                <i class="fa-light fa-chevron-right media-releases__filter-chevron" aria-hidden="true"></i>
+              </summary>
+              <label class="media-releases__sort" for="media-releases-sort">
+                <span>Sort by</span>
+                <select id="media-releases-sort" data-sort>
+                  <option value="newest">Newest first</option>
+                  <option value="oldest">Oldest first</option>
+                  <option value="level">Warning level</option>
+                  <option value="title">Title A-Z</option>
+                </select>
+              </label>
               <fieldset>
-                <legend>Source</legend>
-                <div class="media-releases__filter-list" data-source-filters></div>
-              </fieldset>
-              <fieldset>
-                <legend>Region</legend>
-                <div class="media-releases__filter-list" data-region-filters></div>
+                <legend>Warning level</legend>
+                <div class="media-releases__filter-list" data-level-filters></div>
               </fieldset>
               <fieldset>
                 <legend>Emergency type</legend>
                 <div class="media-releases__filter-list" data-type-filters></div>
               </fieldset>
               <fieldset>
-                <legend>Warning level</legend>
-                <div class="media-releases__filter-list" data-level-filters></div>
+                <legend>Region</legend>
+                <div class="media-releases__filter-list" data-region-filters></div>
+              </fieldset>
+              <fieldset>
+                <legend>Source</legend>
+                <div class="media-releases__filter-list" data-source-filters></div>
               </fieldset>
             </details>
           </aside>
@@ -172,6 +175,6 @@
   <script src="./SecureNT_files/ntgbase-components.min.js"></script>
   <script src="./SecureNT_files/ntgbase-main.min.js"></script>
   <script type="module" src="./dist/theme.js?v=25"></script>
-  <script type="module" src="./dist/media-releases.js?v=13"></script>
+  <script type="module" src="./dist/media-releases.js?v=16"></script>
 </body>
 </html>

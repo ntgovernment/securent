@@ -1,5 +1,6 @@
 import "./alerts-listing.css";
 import { sortAlerts } from "./sorting.mjs";
+import { getPageWindow } from "../pagination/page-window.mjs";
 
 const endpoint = "https://cmsexternal.nt.gov.au/securent/_design/listing/alerts-listing/_nocache";
 const listing = document.querySelector("[data-alerts-listing]");
@@ -207,16 +208,16 @@ if (listing) {
   function renderPagination(pageCount) {
     pagination.replaceChildren();
     const list = document.createElement("ul");
-    list.className = "alerts-listing__page-list";
+    list.className = "pagination__page-list";
 
     const addButton = (label, page, disabled, current = false) => {
       const item = document.createElement("li");
       const button = document.createElement("button");
       button.type = "button";
-      button.className = "alerts-listing__page-button";
+      button.className = "pagination__page-button";
       if (label === "Previous" || label === "Next") {
         const icon = document.createElement("i");
-        icon.className = `fa-light fa-chevron-${label === "Previous" ? "left" : "right"} alerts-listing__page-icon`;
+        icon.className = `fa-light fa-chevron-${label === "Previous" ? "left" : "right"} pagination__page-icon`;
         icon.setAttribute("aria-hidden", "true");
         if (label === "Previous") {
           button.append(icon, document.createTextNode(label));
@@ -233,9 +234,23 @@ if (listing) {
       list.append(item);
     };
 
+    const addEllipsis = () => {
+      const item = document.createElement("li");
+      const ellipsis = document.createElement("span");
+      ellipsis.className = "pagination__ellipsis";
+      ellipsis.setAttribute("aria-hidden", "true");
+      ellipsis.textContent = "\u2026";
+      item.append(ellipsis);
+      list.append(item);
+    };
+
     addButton("Previous", currentPage - 1, currentPage <= 1);
-    for (let page = 1; page <= pageCount; page += 1) {
-      addButton(String(page), page, false, page === currentPage);
+    for (const page of getPageWindow(currentPage, pageCount)) {
+      if (page === "ellipsis") {
+        addEllipsis();
+      } else {
+        addButton(String(page), page, false, page === currentPage);
+      }
     }
     addButton("Next", currentPage + 1, currentPage >= pageCount);
     pagination.append(list);

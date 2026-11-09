@@ -2,7 +2,7 @@ node_modules/
 SecureNT_files/
 !dist/SecureNT_files/
 dist/SecureNT_files/*
-!dist/SecureNT_files/sorting.js
+!dist/SecureNT_files/page-window.js
 SecureNT.html
 Severe Storm – Alice Springs _ SecureNT.html
 alerts-and-warnings.html
