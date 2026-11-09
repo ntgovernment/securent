@@ -4,6 +4,24 @@ import { fetchMediaReleaseFeeds, mediaReleaseSources, parseFeedPayload } from ".
 
 const source = { name: "WoG" };
 
+test("uses all five production Matrix asset URLs and supports localhost proxy overrides", async () => {
+  const requested = [];
+  const fetcher = async (url) => {
+    requested.push(url);
+    return { ok: true, json: async () => [] };
+  };
+  await fetchMediaReleaseFeeds(fetcher);
+  assert.deepEqual(requested, [
+    "./?a=1657482", "./?a=1657484", "./?a=1657483", "./?a=1657299", "./?a=1657265",
+  ]);
+  requested.length = 0;
+  await fetchMediaReleaseFeeds(fetcher, (item) => `/api/media-releases/${item.id}`);
+  assert.deepEqual(requested, [
+    "/api/media-releases/bushfires-nt", "/api/media-releases/ntes", "/api/media-releases/pfes",
+    "/api/media-releases/securent", "/api/media-releases/wog",
+  ]);
+});
+
 test("parses focused-feed arrays", () => {
   assert.deepEqual(parseFeedPayload([{ CampaignID: "one" }], source), {
     source: "WoG",
@@ -32,7 +50,7 @@ test("loads available sources and reports failed sources", async () => {
     return { ok: true, json: async () => payload };
   });
 
-  assert.equal(feeds.length, 3);
+  assert.equal(feeds.length, 4);
   assert.deepEqual(failedSources, ["NTES"]);
   assert.deepEqual(incompleteSources, ["WoG shows page 1 of 2 (900 records)."]);
 });

@@ -60,7 +60,7 @@ if (listing) {
   }
 
   function renderFilters() {
-    renderFilterGroup("source", filters.querySelector("[data-source-filters]"), (item) => item.sources,
+    renderFilterGroup("source", filters.querySelector("[data-source-filters]"), (item) => item.sources.filter((source) => source !== "WoG"),
       mediaReleaseSources.map((source) => source.name));
     renderFilterGroup("region", filters.querySelector("[data-region-filters]"), (item) => item.regions);
     renderFilterGroup("emergencyType", filters.querySelector("[data-type-filters]"), (item) => item.emergencyTypes);

@@ -2,22 +2,27 @@ export const mediaReleaseSources = [
   {
     id: "bushfires-nt",
     name: "Bushfires NT",
-    endpoint: "https://securent.nt.gov.au/_design/integration-points/socials/media-releases-bushfiresnt/_nocache",
+    endpoint: "./?a=1657482",
   },
   {
     id: "ntes",
     name: "NTES",
-    endpoint: "https://securent.nt.gov.au/_design/integration-points/socials/media-releases-ntes/_nocache",
+    endpoint: "./?a=1657484",
+  },
+  {
+    id: "pfes",
+    name: "PFES",
+    endpoint: "./?a=1657483",
   },
   {
     id: "securent",
     name: "SecureNT",
-    endpoint: "https://securent.nt.gov.au/_design/integration-points/socials/media-releases-securent/_nocache",
+    endpoint: "./?a=1657299",
   },
   {
     id: "wog",
     name: "WoG",
-    endpoint: "https://securent.nt.gov.au/_design/integration-points/socials/campaign-monitor-api-wog-departments-v3.3/_nocache",
+    endpoint: "./?a=1657265",
   },
 ];
 

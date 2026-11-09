@@ -110,10 +110,11 @@ const mediaReleaseFeedProxy = {
   name: "media-release-feed-proxy",
   configureServer(server) {
     const feeds = new Map([
-      ["bushfires-nt", "https://securent.nt.gov.au/_design/integration-points/socials/media-releases-bushfiresnt/_nocache"],
-      ["ntes", "https://securent.nt.gov.au/_design/integration-points/socials/media-releases-ntes/_nocache"],
-      ["securent", "https://securent.nt.gov.au/_design/integration-points/socials/media-releases-securent/_nocache"],
-      ["wog", "https://securent.nt.gov.au/_design/integration-points/socials/campaign-monitor-api-wog-departments-v3.3/_nocache"],
+      ["bushfires-nt", "https://securent.nt.gov.au/_design/integration-points/socials/media-releases-bushfiresnt"],
+      ["ntes", "https://securent.nt.gov.au/_design/integration-points/socials/media-releases-ntes"],
+      ["pfes", "https://cmsexternal.nt.gov.au/securent/?a=1657483"],
+      ["securent", "https://securent.nt.gov.au/_design/integration-points/socials/media-releases-securent"],
+      ["wog", "https://securent.nt.gov.au/_design/integration-points/socials/campaign-monitor-api-wog-departments-v3.3"],
     ]);
 
     server.middlewares.use("/api/media-releases", async (req, res) => {
