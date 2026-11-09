@@ -35,6 +35,7 @@ securent/
 │   │       ├── accordion.css         # CMS accordion styling, states and content-width alignment
 │   │       ├── alert.css             # Global alert banner styles: information (#FFC72C yellow, dark text AAA), warning (#D6410A orange, white AA), critical (#FC4141 red, white AA large text only); 24×24 close button anchored top-right
 │   │       ├── buttons.css           # Button overrides: primary bg Charcoal (#343741), secondary outline Charcoal + white bg, hover Territory orange (#D6410A)
+│   │       ├── content-page.css      # Content page body alignment when no in-page navigation is present
 │   │       ├── mainmenu-dropdown.css # Content-width desktop mega-menu and mobile drawer styles
 │   │       ├── header-footer.css     # Header/footer brand colour overrides; background: Charcoal (#343741)
 │   │       ├── homepage-featured-content.css # CMS homepage feature cards: responsive image/text layout and CTA styling
@@ -61,13 +62,14 @@ securent/
 ├── assets/hazard-icons/              # Shared hazard alert pictograms
 ├── SecureNT.html                     # Local page capture (gitignored)
 ├── SecureNT_files/                   # Local page assets (gitignored)
+├── Content page _ SecureNT.html      # Local emergency-plans content capture (gitignored)
 ├── alerts-and-warnings.html          # Alerts and warnings page capture
 ├── Severe Storm – Alice Springs _ SecureNT.html   # Secondary development event capture
 ├── vite.config.mjs
 └── package.json
 ```
 
-The homepage capture (`SecureNT.html`) and shared `SecureNT_files/` assets are excluded from Git. All local HTML captures reference built assets from `dist/`, not source files from `src/`. The event capture uses the shared local assets, hazard icons from `assets/hazard-icons/`, and the standalone `dist/event.css`, `dist/social-share.css`, and `dist/social-share.js` assets; it no longer has a separate asset folder. On desktop, the share panel aligns with the first content section after the event H1. Both captures use the same two-row header: `.header-top` holds the logo, emergency contacts, and desktop search, while `.header-navigation` holds the primary navigation. The separate mobile search banner remains below the header. `vite.config.mjs` includes `SecureNT.html` as the build HTML entry when that optional capture exists; its production HTML transform removes references to the two local WEBP photos so they are not emitted in `dist/`, while development preview retains them. The event preview does not change production build inputs. The `dist/` files are tracked because they are consumed by the Squiz Matrix file bridge.
+The homepage capture (`SecureNT.html`), emergency-plans content capture (`Content page _ SecureNT.html`), and shared `SecureNT_files/` assets are excluded from Git. Local captures use built page-specific styles and scripts from `dist/`; captured upstream dependencies and static assets may remain in `SecureNT_files/`. The event capture uses shared local assets, hazard icons from `assets/hazard-icons/`, and standalone `dist/event.css`, `dist/social-share.css`, and `dist/social-share.js` assets; it no longer has a separate asset folder. The content-page capture uses the same standalone event and share assets. On desktop, the event share panel aligns with the first content section after the event H1; on content pages, `content-page.css` aligns the first content block with the share panel when there is no in-page navigation. The local captures share the same two-row header: `.header-top` holds the logo, emergency contacts, and desktop search, while `.header-navigation` holds the primary navigation. The separate mobile search banner remains below the header. `vite.config.mjs` includes `SecureNT.html` as the build HTML entry when that optional capture exists; its production HTML transform removes references to the two local WEBP photos so they are not emitted in `dist/`, while development preview retains them. The event preview does not change production build inputs. The `dist/` files are tracked because they are consumed by the Squiz Matrix file bridge.
 
 ## Prerequisites
 
@@ -89,7 +91,7 @@ npm run dev
 Vite starts a local dev server and opens `/`, serving the Alerts and warnings capture in `alerts-and-warnings.html`. The homepage capture remains available at `/SecureNT.html`, and the event capture remains available at `/Severe%20Storm%20%E2%80%93%20Alice%20Springs%20_%20SecureNT.html`. The development middleware in `vite.config.mjs` serves the Alerts and warnings and event captures through Vite's HTML transforms and serves saved `.js.download` dependencies as JavaScript. External navigation links still point to the CMS, and externally hosted fonts and favicons require network access. These captures are development snapshots, not live emergency feeds.
 The HTML captures link stylesheets and scripts from `dist/`. Run `npm run build` after source changes so the updated assets are available for local preview.
 
-Existing Vite servers and browser tabs can cache built assets even after rebuilding. When changing the theme, increment the `?v=` values on the `dist/theme.css` and `dist/theme.js` references in all three local captures, including the gitignored homepage, then verify a normal reload without temporary test URLs. The current versions are CSS `35` and JavaScript `25`; the homepage's standalone `dist/local-conditions.js` reference is version `3`. Update equivalent CMS asset references separately when deploying.
+Existing Vite servers and browser tabs can cache built assets even after rebuilding. When changing theme CSS, increment the `?v=` value on `dist/theme.css` in all four local captures, including the gitignored homepage and emergency-plans page. When changing theme JavaScript, increment `dist/theme.js` in the captures that reference it. Then verify a normal reload without temporary test URLs. The current versions are CSS `36` and JavaScript `25`; the homepage's standalone `dist/local-conditions.js` reference is version `3`. Update equivalent CMS asset references separately when deploying.
 
 To select a different port on Windows without npm dropping the forwarded flags, launch Vite directly:
 
@@ -179,6 +181,7 @@ Overrides of the upstream `ntgbase.min.css` theme are isolated in `src/css/compo
 | `main.css`              | `.homepage-news .card`                                                                    | Border radius removed from news cards                                                                                                                                                                                                                                                                                                |
 | `main.css`              | `.homepage-news .card-header`                                                             | Bottom border removed from card header                                                                                                                                                                                                                                                                                               |
 | `main.css`              | `.homepage-news .card-tag`                                                                | Category label styled as a tag (design system default variant: white bg, `#1f1e27` text, `#d3d3d7` border)                                                                                                                                                                                                                           |
+| `content-page.css`      | Content pages with a share panel and no in-page navigation                               | At widths of 768px and above, offsets the first content block to align with the share panel; mobile layout is unchanged                                                                                                                                                                                                              |
 
 ### CMS accordions
 
