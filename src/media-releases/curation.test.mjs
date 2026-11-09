@@ -98,10 +98,25 @@ test("keeps ambiguous classifications unknown and avoids highway region guesses"
 test("recognizes warning variants and reduced threats without treating generic warnings as emergency warnings", () => {
   assert.equal(classifyNotice({ Subject: "Bushfire Emergency Warning - Katherine" }).warningLevel, "Emergency warning");
   assert.equal(classifyNotice({ Subject: "Watch & Act - Darwin" }).warningLevel, "Watch and act");
-  assert.equal(classifyNotice({ Subject: "Advice - Decreasing threat - Katherine" }).warningLevel, "Decreasing threat");
+  assert.equal(classifyNotice({ Subject: "Advice - Decreasing threat - Katherine" }).warningLevel, "Advice");
   assert.equal(classifyNotice({ Subject: "Cyclone warning - Darwin" }).warningLevel, "Not identified");
   assert.equal(classifyNotice({ Subject: "Flood Emergency Warning", Name: "Flood Advice Decreasing threat" }).warningLevel, "Emergency warning");
   assert.deepEqual(classifyNotice({ Subject: "Flood Advice - Camooweal" }).regions, ["Not identified"]);
+});
+
+test("maps decreasing-threat variants to Advice and includes them in the Advice filter", () => {
+  for (const wording of ["Decreasing threat", "Decreasing threats", "Decreasing-threat", "Threat is reduced", "All clear"]) {
+    assert.equal(classifyNotice({ Subject: `Flood ${wording} - Katherine` }).warningLevel, "Advice");
+  }
+  const items = curateFeeds([{ source: "NTES", items: [
+    record({ CampaignID: "reduced", Name: "Flood Decreasing threat - Katherine", Subject: "Flood Decreasing threat - Katherine" }),
+    record({ CampaignID: "reduced-plural", Name: "Flood Decreasing threats - Katherine", Subject: "Flood Decreasing threats - Katherine" }),
+    record({ CampaignID: "advice" }),
+  ] }]);
+  assert.equal(items.length, 3);
+  assert.ok(items.every((item) => item.warningLevel === "Advice"));
+  assert.equal(filterAndSortNotices(items, { warningLevels: ["Advice"], order: "level" }).length, 3);
+  assert.equal(filterAndSortNotices(items, { warningLevels: ["Decreasing threat"] }).length, 0);
 });
 
 test("combines filter groups with OR within each group and AND between groups", () => {

@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { fetchAirQuality, fetchAirQualityStations } from "./src/local-conditions/air-quality.mjs";
+import { mediaReleaseSources, resolveMediaReleaseEndpoint } from "./src/media-releases/feeds.mjs";
 
 const sourceThemeOnly = {
   name: "source-theme-only",
@@ -109,13 +110,8 @@ const localConditionsMock = {
 const mediaReleaseFeedProxy = {
   name: "media-release-feed-proxy",
   configureServer(server) {
-    const feeds = new Map([
-      ["bushfires-nt", "https://securent.nt.gov.au/_design/integration-points/socials/media-releases-bushfiresnt"],
-      ["ntes", "https://securent.nt.gov.au/_design/integration-points/socials/media-releases-ntes"],
-      ["pfes", "https://cmsexternal.nt.gov.au/securent/?a=1657483"],
-      ["securent", "https://securent.nt.gov.au/_design/integration-points/socials/media-releases-securent"],
-      ["wog", "https://securent.nt.gov.au/_design/integration-points/socials/campaign-monitor-api-wog-departments-v3.3"],
-    ]);
+    const origin = process.env.SECURENT_MEDIA_FEED_ORIGIN || "https://cmsexternal.nt.gov.au";
+    const feeds = new Map(mediaReleaseSources.map((source) => [source.id, resolveMediaReleaseEndpoint(source, origin)]));
 
     server.middlewares.use("/api/media-releases", async (req, res) => {
       const sourceId = new URL(req.url, "http://localhost").pathname.replace(/^\//, "");

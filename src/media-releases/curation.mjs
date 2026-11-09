@@ -3,13 +3,13 @@ import { sortAlerts, updatedTimestamp } from "../alerts-listing/sorting.mjs";
 export const sourceOrder = ["Bushfires NT", "NTES", "PFES", "SecureNT", "WoG"];
 
 const sourceRank = new Map(sourceOrder.map((source, index) => [source, index]));
-const alertLanguage = /\b(?:advice|warning|watch\s*(?:&|and)\s*act|emergency\s+(?:warning|alert|declaration)|decreasing threat|threat is reduced|evacu\w*|take shelter|shelter now|prepare now|stay informed|fire ban|fire danger period|boil water alert|public health alert|code yellow|rescue operation|incidents?\b|hazmat|dangerous surf|avoid (?:the )?flooded area)\b/i;
+const alertLanguage = /\b(?:advice|warning|watch\s*(?:&|and)\s*act|emergency\s+(?:warning|alert|declaration)|decreasing[\s_-]+threats?|threat is reduced|evacu\w*|take shelter|shelter now|prepare now|stay informed|fire ban|fire danger period|boil water alert|public health alert|code yellow|rescue operation|incidents?\b|hazmat|dangerous surf|avoid (?:the )?flooded area)\b/i;
 const hazardLanguage = /\b(?:storm|flood|cyclone|bushfires?|fires?|emergency|incident|hazmat|health|boil water|evacu\w*|surf)\b/i;
 const generalNews = /\b(?:awards?|recruit(?:ment|ing)?|ceremon(?:y|ies)|outlook|symposium|funding|grant recipients|honours? list|anniversary|celebrates?\b|celebration)\b/i;
 const operationalSender = /\b(?:ntes|northern territory emergency service|territory emergency operations centre|nt fire and emergency services|bushfires? nt|securent)\b|territorydutyofficer\.ntes@pfes\.nt\.gov\.au/i;
 const approvedDutyOfficer = /\bterritorydutyofficer\.ntes@pfes\.nt\.gov\.au\b/i;
 
-export const warningLevelOrder = ["Emergency warning", "Watch and act", "Advice", "Decreasing threat", "Not identified"];
+export const warningLevelOrder = ["Emergency warning", "Watch and act", "Advice", "Not identified"];
 
 const regionPatterns = [
   ["Darwin, Palmerston and Litchfield", /\b(?:darwin|palmerston|litchfield|humpty doo|howard springs|acacia hills|berry springs|coolalinga|nightcliff|casuarina)\b/i],
@@ -38,7 +38,7 @@ export function classifyNotice(record) {
     return matches.length ? matches : ["Not identified"];
   };
   const warningPatterns = [
-    ["Decreasing threat", /\b(?:decreasing threat|threat (?:is )?reduced|all clear)\b/i],
+    ["Advice", /\b(?:decreasing[\s_-]+threats?|threat (?:is )?reduced|all clear)\b/i],
     ["Emergency warning", /\bemergency[\s_-]+warning\b/i],
     ["Watch and act", /\bwatch[\s_-]*(?:&|and)[\s_-]*act\b/i],
     ["Advice", /\badvice\b/i],

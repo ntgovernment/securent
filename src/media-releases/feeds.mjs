@@ -2,29 +2,35 @@ export const mediaReleaseSources = [
   {
     id: "bushfires-nt",
     name: "Bushfires NT",
-    endpoint: "%globals_asset_url:1657482%",
+    endpoint: "/_design/integrations/campaign-monitor-bushfires-nt",
   },
   {
     id: "ntes",
     name: "NTES",
-    endpoint: "%globals_asset_url:1657484%",
+    endpoint: "/_design/integrations/campaign-monitor-ntes",
   },
   {
     id: "pfes",
     name: "PFES",
-    endpoint: "%globals_asset_url:1657483%",
+    endpoint: "/_design/integrations/campaign-monitor-pfes",
   },
   {
     id: "securent",
     name: "SecureNT",
-    endpoint: "%globals_asset_url:1657299%",
+    endpoint: "/_design/integrations/campaign-monitor-securent",
   },
   {
     id: "wog",
     name: "WoG",
-    endpoint: "%globals_asset_url:1657265%",
+    endpoint: "/_design/integrations/campaign-monitor-all-agencies",
   },
 ];
+
+export function resolveMediaReleaseEndpoint(source, pageUrl) {
+  const page = new URL(pageUrl);
+  const prefix = page.hostname === "cmsexternal.nt.gov.au" ? "/securent" : "";
+  return new URL(`${prefix}${source.endpoint}`, page.origin).href;
+}
 
 export function parseFeedPayload(payload, source) {
   if (Array.isArray(payload)) return { source: source.name, items: payload };
@@ -45,8 +51,8 @@ export function parseFeedPayload(payload, source) {
 export async function fetchMediaReleaseFeeds(fetcher = fetch, endpointFor = (source) => source.endpoint) {
   const settled = await Promise.allSettled(mediaReleaseSources.map(async (source) => {
     const endpoint = endpointFor(source);
-    if (typeof endpoint !== "string" || !endpoint.trim() || endpoint.includes("%globals_asset_url:")) {
-      throw new Error(`Missing or unresolved Matrix feed URL for ${source.name}`);
+    if (typeof endpoint !== "string" || !endpoint.trim()) {
+      throw new Error(`Missing feed URL for ${source.name}`);
     }
     const response = await fetcher(endpoint, {
       headers: { Accept: "application/json" },

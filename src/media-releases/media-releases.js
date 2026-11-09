@@ -1,6 +1,6 @@
 import "./media-releases.css";
 import { curateFeeds, filterAndSortNotices, warningLevelOrder } from "./curation.mjs";
-import { fetchMediaReleaseFeeds, mediaReleaseSources } from "./feeds.mjs";
+import { fetchMediaReleaseFeeds, mediaReleaseSources, resolveMediaReleaseEndpoint } from "./feeds.mjs";
 import { updatedTimestamp } from "../alerts-listing/sorting.mjs";
 
 const listing = document.querySelector("[data-media-releases]");
@@ -189,7 +189,7 @@ if (listing) {
     fetch,
     (source) => isLocalPreview
       ? `/api/media-releases/${source.id}`
-      : listing.getAttribute(`data-feed-${source.id}`) || source.endpoint,
+      : resolveMediaReleaseEndpoint(source, window.location.href),
   )
     .then(({ feeds, failedSources, incompleteSources }) => {
       items = curateFeeds(feeds);
