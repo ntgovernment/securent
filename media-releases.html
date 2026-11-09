@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="./SecureNT_files/ntgbase.min.css">
   <link rel="stylesheet" href="./SecureNT_files/alt.css">
   <link rel="stylesheet" href="./dist/theme.css?v=36">
-  <link rel="stylesheet" href="./dist/media-releases.css?v=12">
+  <link rel="stylesheet" href="./dist/media-releases.css?v=13">
   <script>
     document.documentElement.classList.remove("no-js");
     document.documentElement.classList.add("js");
@@ -133,6 +133,12 @@
                   <option value="title">Title A-Z</option>
                 </select>
               </label>
+              <div class="media-releases__filter-heading">
+                <h2>Filters</h2>
+                <button type="button" class="media-releases__clear-filters" data-clear-filters>
+                  Clear all filters
+                </button>
+              </div>
               <fieldset>
                 <legend>Warning level</legend>
                 <div class="media-releases__filter-list" data-level-filters></div>
@@ -140,6 +146,10 @@
               <fieldset>
                 <legend>Emergency type</legend>
                 <div class="media-releases__filter-list" data-type-filters></div>
+              </fieldset>
+              <fieldset>
+                <legend>Declaration</legend>
+                <div class="media-releases__filter-list" data-declaration-filters></div>
               </fieldset>
               <fieldset>
                 <legend>Region</legend>
@@ -175,6 +185,6 @@
   <script src="./SecureNT_files/ntgbase-components.min.js"></script>
   <script src="./SecureNT_files/ntgbase-main.min.js"></script>
   <script type="module" src="./dist/theme.js?v=25"></script>
-  <script type="module" src="./dist/media-releases.js?v=21"></script>
+  <script type="module" src="./dist/media-releases.js?v=24"></script>
 </body>
 </html>

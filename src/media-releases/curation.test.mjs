@@ -70,6 +70,7 @@ test("deduplicates campaigns by source precedence while retaining lineage", () =
     url: "http://createsend.com/campaign-1",
     regions: ["Big Rivers"],
     emergencyTypes: ["Bushfire", "Flooding"],
+    declarations: [],
     warningLevel: "Advice",
   }]);
 });
@@ -81,18 +82,66 @@ test("extracts multiple regions and hazards from names and subjects", () => {
   }), {
     regions: ["Big Rivers", "Central Australia"],
     emergencyTypes: ["Flooding", "Severe storm"],
+    declarations: [],
     warningLevel: "Watch and act",
   });
   assert.deepEqual(classifyNotice({ Subject: "Bushfires NT Advice - Acacia Hills" }), {
-    regions: ["Darwin, Palmerston and Litchfield"], emergencyTypes: ["Bushfire"], warningLevel: "Advice",
+    regions: ["Darwin, Palmerston and Litchfield"], emergencyTypes: ["Bushfire"], declarations: [], warningLevel: "Advice",
   });
 });
 
 test("keeps ambiguous classifications unknown and avoids highway region guesses", () => {
   assert.deepEqual(classifyNotice({ Subject: "Emergency update - Stuart Highway", FromName: "NT Fire and Emergency Services" }), {
-    regions: ["Not identified"], emergencyTypes: ["Not identified"], warningLevel: "Not identified",
+    regions: ["Not identified"], emergencyTypes: ["Not identified"], declarations: [], warningLevel: "Not identified",
   });
   assert.deepEqual(classifyNotice({ Subject: "Advice - Barkly Highway" }).regions, ["Not identified"]);
+});
+
+test("classifies explicit fire bans as declarations without emergency types or warning levels", () => {
+  for (const wording of ["Fire ban", "TOTAL FIRE BAN", "Total fire bans"]) {
+    for (const field of ["Subject", "Name", "title", "name"]) {
+      const notice = { [field]: `${wording} - Darwin` };
+      const classified = classifyNotice(notice);
+      assert.deepEqual(classified.declarations, ["Fire ban"]);
+      assert.deepEqual(classified.emergencyTypes, ["Not identified"]);
+      assert.equal(classified.warningLevel, "Not identified");
+      assert.equal(isOperationalNotice(notice), true);
+    }
+  }
+  const classified = classifyNotice({ Subject: "Bushfires NT Advice - Total fire ban - Darwin" });
+  assert.deepEqual(classified.declarations, ["Fire ban"]);
+  assert.deepEqual(classified.emergencyTypes, ["Not identified"]);
+  assert.equal(classified.warningLevel, "Not identified");
+  for (const Subject of ["Fire danger period - Darwin", "Bushfire Advice - Darwin", "Fire banquet - Darwin"]) {
+    assert.deepEqual(classifyNotice({ Subject }).declarations, []);
+  }
+});
+
+test("filters declarations alone and in combination with existing filters", () => {
+  const items = curateFeeds([{ source: "Bushfires NT", items: [
+    record({ CampaignID: "darwin-ban", Name: "Total fire ban - Darwin", Subject: "Total fire ban Advice - Darwin" }),
+    record({ CampaignID: "katherine-ban", Name: "Fire bans - Katherine", Subject: "Fire bans - Katherine" }),
+    record({ CampaignID: "bushfire", Name: "Bushfire Advice - Darwin", Subject: "Bushfire Advice - Darwin" }),
+    record({ CampaignID: "flood" }),
+  ] }]);
+  assert.equal(filterAndSortNotices(items).length, 4);
+  assert.deepEqual(filterAndSortNotices(items, { declarations: ["Fire ban"] })
+    .map((item) => item.campaignId), ["katherine-ban", "darwin-ban"]);
+  assert.deepEqual(filterAndSortNotices(items, {
+    declarations: ["Fire ban"], sources: ["Bushfires NT"],
+    regions: ["Darwin, Palmerston and Litchfield"],
+    query: "Darwin", order: "title",
+  }).map((item) => item.campaignId), ["darwin-ban"]);
+  assert.deepEqual(filterAndSortNotices(items, { emergencyTypes: ["Bushfire"], warningLevels: ["Advice"] })
+    .map((item) => item.campaignId), ["bushfire"]);
+  assert.equal(filterAndSortNotices(items, { declarations: ["Fire ban"], emergencyTypes: ["Bushfire"] }).length, 0);
+  assert.equal(filterAndSortNotices(items, { declarations: ["Fire ban"], warningLevels: ["Advice"] }).length, 0);
+  assert.equal(filterAndSortNotices(items, { declarations: ["Fire ban"], emergencyTypes: ["Flooding"] }).length, 0);
+  const fireBan = items.find((item) => item.campaignId === "darwin-ban");
+  assert.equal(filterAndSortNotices([{ ...fireBan, title: "Update", name: "" }], { query: "fire ban" }).length, 1);
+  const { declarations, ...legacyItem } = fireBan;
+  assert.equal(filterAndSortNotices([legacyItem]).length, 1);
+  assert.equal(filterAndSortNotices([legacyItem], { declarations: ["Fire ban"] }).length, 0);
 });
 
 test("recognizes warning variants and reduced threats without treating generic warnings as emergency warnings", () => {

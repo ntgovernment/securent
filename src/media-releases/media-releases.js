@@ -39,6 +39,7 @@ if (listing) {
       sources: selectedValues("source"),
       regions: selectedValues("region"),
       emergencyTypes: selectedValues("emergencyType"),
+      declarations: selectedValues("declaration"),
       warningLevels: selectedValues("warningLevel"),
       order: sort.value,
     });
@@ -71,6 +72,7 @@ if (listing) {
       mediaReleaseSources.map((source) => source.name));
     renderFilterGroup("region", filters.querySelector("[data-region-filters]"), (item) => item.regions);
     renderFilterGroup("emergencyType", filters.querySelector("[data-type-filters]"), (item) => item.emergencyTypes);
+    renderFilterGroup("declaration", filters.querySelector("[data-declaration-filters]"), (item) => item.declarations);
     renderFilterGroup("warningLevel", filters.querySelector("[data-level-filters]"), (item) => [item.warningLevel], warningLevelOrder);
   }
 
@@ -175,7 +177,9 @@ if (listing) {
 
     content.append(title);
     if (meta.hasChildNodes()) content.append(meta);
-    content.append(region, hazardDetails, source);
+    content.append(region);
+    if (!item.declarations.includes("Fire ban")) content.append(hazardDetails);
+    content.append(source);
     article.append(content);
     return article;
   }
@@ -248,6 +252,11 @@ if (listing) {
     render();
   });
   filters.addEventListener("change", () => {
+    currentPage = 1;
+    render();
+  });
+  filters.querySelector("[data-clear-filters]")?.addEventListener("click", () => {
+    filters.querySelectorAll('input[type="checkbox"]').forEach((input) => { input.checked = false; });
     currentPage = 1;
     render();
   });

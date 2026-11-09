@@ -62,6 +62,7 @@ section.media-releases__hero {
 .media-releases__search input:focus-visible,
 .media-releases__sort select:focus-visible,
 .media-releases__filter-panel summary:focus-visible,
+.media-releases__clear-filters:focus-visible,
 .media-releases__filter input:focus-visible,
 .media-releases__title:focus-visible {
   outline: 3px solid #267e82;
@@ -234,8 +235,41 @@ a.media-releases__title:hover {
   cursor: pointer;
 }
 
-.media-releases__sources fieldset + fieldset {
-  border-top: 1px solid #d3d3d7;
+.media-releases__filter-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 16px 20px 0;
+}
+
+.media-releases__filter-heading h2 {
+  margin: 0;
+  color: #1f1e27;
+  font-family: Lato, sans-serif;
+  font-size: 20px !important;
+  font-weight: 700;
+  line-height: 28px;
+}
+
+.media-releases__clear-filters {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: #174c4e;
+  font-family: Lato, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+.media-releases__clear-filters:hover {
+  text-decoration: underline;
 }
 
 .media-releases__sources fieldset {
@@ -299,6 +333,10 @@ a.media-releases__title:hover {
 
   .media-releases__sort {
     padding: 16px;
+  }
+
+  .media-releases__filter-heading {
+    padding-inline: 16px;
   }
 
   .media-releases__filter-panel summary {
