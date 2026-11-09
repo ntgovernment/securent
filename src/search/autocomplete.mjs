@@ -66,7 +66,12 @@ export function attachAutocomplete(input, listbox, getCandidates) {
       option.className = "search-autocomplete__option";
       option.setAttribute("role", "option");
       option.setAttribute("aria-selected", "false");
-      option.textContent = suggestion;
+      const icon = document.createElement("i");
+      icon.className = "fa-regular fa-magnifying-glass";
+      icon.setAttribute("aria-hidden", "true");
+      const label = document.createElement("span");
+      label.textContent = suggestion;
+      option.append(icon, label);
       listbox.append(option);
     });
     listbox.hidden = false;

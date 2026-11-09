@@ -12,15 +12,35 @@
   border: 1px solid #d3d3d7;
   background: #fff;
   color: #1f1e27;
-  list-style: none;
+  list-style: none !important;
+  list-style-image: none !important;
+  padding-inline-start: 0 !important;
   box-shadow: 0 4px 8px rgb(31 30 39 / 12%);
 }
 
 .search-autocomplete__option {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   padding: 10px 16px;
   color: inherit;
   cursor: pointer;
+  list-style: none !important;
+}
+
+.search-autocomplete__option::before {
+  display: none !important;
+  content: none !important;
+}
+
+.search-autocomplete__option::marker {
+  content: none;
+}
+
+.search-autocomplete__option > i {
+  flex: 0 0 20px;
+  width: 20px;
+  text-align: center;
 }
 
 .search-autocomplete__option:hover,

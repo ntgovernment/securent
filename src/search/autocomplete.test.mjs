@@ -32,6 +32,9 @@ test("keyboard selection updates the input and dispatches its input event", () =
 
   assert.equal(listbox.hidden, false);
   assert.equal(input.getAttribute("aria-expanded"), "true");
+  assert.equal(listbox.querySelector('[role="option"] i').className, "fa-regular fa-magnifying-glass");
+  assert.equal(listbox.querySelector('[role="option"] i').getAttribute("aria-hidden"), "true");
+  assert.equal(listbox.querySelector('[role="option"] span').textContent, "Alice Springs");
   input.dispatchEvent(new window.KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
   assert.equal(input.getAttribute("aria-activedescendant"), "search-options-option-0");
   input.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
