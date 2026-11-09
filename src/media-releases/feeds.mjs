@@ -2,27 +2,27 @@ export const mediaReleaseSources = [
   {
     id: "bushfires-nt",
     name: "Bushfires NT",
-    endpoint: "./?a=1657482",
+    endpoint: "%globals_asset_url:1657482%",
   },
   {
     id: "ntes",
     name: "NTES",
-    endpoint: "./?a=1657484",
+    endpoint: "%globals_asset_url:1657484%",
   },
   {
     id: "pfes",
     name: "PFES",
-    endpoint: "./?a=1657483",
+    endpoint: "%globals_asset_url:1657483%",
   },
   {
     id: "securent",
     name: "SecureNT",
-    endpoint: "./?a=1657299",
+    endpoint: "%globals_asset_url:1657299%",
   },
   {
     id: "wog",
     name: "WoG",
-    endpoint: "./?a=1657265",
+    endpoint: "%globals_asset_url:1657265%",
   },
 ];
 
@@ -44,7 +44,11 @@ export function parseFeedPayload(payload, source) {
 
 export async function fetchMediaReleaseFeeds(fetcher = fetch, endpointFor = (source) => source.endpoint) {
   const settled = await Promise.allSettled(mediaReleaseSources.map(async (source) => {
-    const response = await fetcher(endpointFor(source), {
+    const endpoint = endpointFor(source);
+    if (typeof endpoint !== "string" || !endpoint.trim() || endpoint.includes("%globals_asset_url:")) {
+      throw new Error(`Missing or unresolved Matrix feed URL for ${source.name}`);
+    }
+    const response = await fetcher(endpoint, {
       headers: { Accept: "application/json" },
       credentials: "same-origin",
     });
@@ -65,6 +69,11 @@ export async function fetchMediaReleaseFeeds(fetcher = fetch, endpointFor = (sou
     if (result.value.incomplete) incompleteSources.push(result.value.incomplete);
   });
 
-  if (!feeds.length) throw new Error("All emergency update feeds are unavailable");
+  if (!feeds.length) {
+    throw new AggregateError(
+      settled.filter((result) => result.status === "rejected").map((result) => result.reason),
+      "All emergency update feeds are unavailable",
+    );
+  }
   return { feeds, failedSources, incompleteSources };
 }

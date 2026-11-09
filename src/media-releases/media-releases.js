@@ -187,7 +187,9 @@ if (listing) {
 
   fetchMediaReleaseFeeds(
     fetch,
-    (source) => isLocalPreview ? `/api/media-releases/${source.id}` : source.endpoint,
+    (source) => isLocalPreview
+      ? `/api/media-releases/${source.id}`
+      : listing.getAttribute(`data-feed-${source.id}`) || source.endpoint,
   )
     .then(({ feeds, failedSources, incompleteSources }) => {
       items = curateFeeds(feeds);
