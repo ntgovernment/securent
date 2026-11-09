@@ -101,15 +101,38 @@ section.media-releases__hero {
 
 .media-releases__results {
   display: grid;
-  gap: 1px;
-  background: #d3d3d7;
+  gap: 12px;
 }
 
 .media-releases__item {
+  --media-releases-accent: var(--clr-status-neutral);
+
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
   min-width: 0;
   padding: 22px 28px;
-  border-left: 8px solid #267e82;
+  border: 1px solid #d3d3d7;
+  border-left: 8px solid var(--media-releases-accent);
   background: #fff;
+}
+
+.media-releases__item--with-icon {
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 20px;
+}
+
+.media-releases__item[data-warning-level="advice"] {
+  --media-releases-accent: var(--clr-status-advice);
+}
+
+.media-releases__item[data-warning-level="watch_act"] {
+  --media-releases-accent: var(--clr-status-watch-act);
+}
+
+.media-releases__item[data-warning-level="emergency_warning"] {
+  --media-releases-accent: var(--clr-status-emergency-warning);
 }
 
 .media-releases__title {
@@ -145,6 +168,61 @@ a.media-releases__title:hover {
 .media-releases__classification {
   margin-top: 8px;
   overflow-wrap: anywhere;
+}
+
+.media-releases__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.media-releases__date-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.media-releases__date-time i,
+.media-releases__region i {
+  flex: 0 0 auto;
+}
+
+.media-releases__agency {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.media-releases__agency > i {
+  flex: 0 0 auto;
+}
+
+.media-releases__region {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.media-releases__region i {
+  width: 14px;
+  line-height: 20px;
+  text-align: center;
+}
+
+.media-releases__hazard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.media-releases__hazard-icon {
+  display: block;
+  width: 48px;
+  height: auto;
+  aspect-ratio: 583 / 550;
+  object-fit: contain;
 }
 
 .media-releases__filter-panel {
@@ -293,6 +371,15 @@ a.media-releases__title:hover {
 
   .media-releases__item {
     padding: 18px 20px;
+  }
+
+  .media-releases__item--with-icon {
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .media-releases__hazard-icon {
+    width: 48px;
   }
 
   .media-releases__title {

@@ -3,7 +3,13 @@ import { curateFeeds, filterAndSortNotices, warningLevelOrder } from "./curation
 import { fetchMediaReleaseFeeds, mediaReleaseSources, resolveMediaReleaseEndpoint } from "./feeds.mjs";
 import { updatedTimestamp } from "../alerts-listing/sorting.mjs";
 import { getPageWindow } from "../pagination/page-window.mjs";
+import { awsHazardIconFilename, warningLevelSlug } from "./aws-icons.mjs";
 
+const hazardIcons = import.meta.glob("../../assets/hazard-icons/*.webp", {
+  eager: true,
+  query: "?url",
+  import: "default",
+});
 const listing = document.querySelector("[data-media-releases]");
 
 if (listing) {
@@ -77,20 +83,33 @@ if (listing) {
     }
   }
 
-  function formatDate(value) {
+  function formatDateTime(value) {
     const timestamp = updatedTimestamp(value);
     if (timestamp === null) return "";
     return new Intl.DateTimeFormat("en-AU", {
       day: "numeric",
       month: "long",
       year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
       timeZone: "Australia/Darwin",
     }).format(timestamp);
+  }
+
+  function hazardIconFor(item) {
+    const filename = awsHazardIconFilename(item.emergencyTypes, item.warningLevel);
+    if (!filename) return "";
+    const assetUrl = hazardIcons[`../../assets/hazard-icons/${filename}`];
+    if (!assetUrl) return "";
+    return import.meta.env.DEV ? assetUrl : new URL(assetUrl.slice(1), import.meta.url).href;
   }
 
   function renderCard(item) {
     const article = document.createElement("article");
     article.className = "media-releases__item";
+    article.dataset.warningLevel = warningLevelSlug(item.warningLevel);
+    const content = document.createElement("div");
+    content.className = "media-releases__content";
     const link = safeLink(item.url);
     const title = document.createElement(link ? "a" : "h2");
     title.className = "media-releases__title";
@@ -103,17 +122,61 @@ if (listing) {
 
     const meta = document.createElement("p");
     meta.className = "media-releases__meta";
-    const details = [item.fromName, formatDate(item.publishedAt)].filter(Boolean);
-    meta.textContent = details.join(" · ");
+    const publishedAt = formatDateTime(item.publishedAt);
+    if (publishedAt) {
+      const dateTime = document.createElement("span");
+      dateTime.className = "media-releases__date-time";
+      const clock = document.createElement("i");
+      clock.className = "fa-light fa-clock";
+      clock.setAttribute("aria-hidden", "true");
+      dateTime.append(clock, document.createTextNode(publishedAt));
+      meta.append(dateTime);
+    }
+    if (item.fromName) {
+      const agency = document.createElement("span");
+      agency.className = "media-releases__agency";
+      const megaphone = document.createElement("i");
+      megaphone.className = "fa-light fa-bullhorn";
+      megaphone.setAttribute("aria-hidden", "true");
+      const agencyName = document.createElement("span");
+      agencyName.textContent = item.fromName;
+      agency.append(megaphone, agencyName);
+      meta.append(agency);
+    }
 
     const source = document.createElement("p");
     source.className = "media-releases__source";
     source.textContent = `Source${item.sources.length > 1 ? "s" : ""}: ${item.sources.join(", ")}`;
-    const classification = document.createElement("p");
-    classification.className = "media-releases__classification";
-    classification.title = "Best-effort classification from the notice title and subject";
-    classification.textContent = `Region: ${item.regions.join(", ")} | Emergency type: ${item.emergencyTypes.join(", ")} | Warning level: ${item.warningLevel}`;
-    article.append(title, meta, classification, source);
+
+    const region = document.createElement("p");
+    region.className = "media-releases__classification media-releases__region";
+    const mapPin = document.createElement("i");
+    mapPin.className = "fa-light fa-location-dot";
+    mapPin.setAttribute("aria-hidden", "true");
+    const regionLabel = document.createElement("span");
+    regionLabel.textContent = `Region: ${item.regions.join(", ")}`;
+    region.append(mapPin, regionLabel);
+
+    const hazardDetails = document.createElement("p");
+    hazardDetails.className = "media-releases__classification media-releases__hazard";
+    hazardDetails.title = "Best-effort classification from the notice title and subject";
+    const iconUrl = hazardIconFor(item);
+    if (iconUrl) {
+      const icon = document.createElement("img");
+      icon.className = "media-releases__hazard-icon";
+      icon.src = iconUrl;
+      icon.alt = "";
+      article.classList.add("media-releases__item--with-icon");
+      article.append(icon);
+    }
+    const hazardLabel = document.createElement("span");
+    hazardLabel.textContent = `Emergency type: ${item.emergencyTypes.join(", ")} | Warning level: ${item.warningLevel}`;
+    hazardDetails.append(hazardLabel);
+
+    content.append(title);
+    if (meta.hasChildNodes()) content.append(meta);
+    content.append(region, hazardDetails, source);
+    article.append(content);
     return article;
   }
 
