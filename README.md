@@ -15,6 +15,13 @@ securent/
 │   │   ├── sorting.mjs               # Stable alert sorting and CMS timestamp parsing
 │   │   ├── sorting.test.mjs          # Built-in Node sorting regression tests
 │   │   └── alerts-listing.local.json  # Local development fixture
+│   ├── media-releases/
+│   │   ├── curation.mjs               # Emergency notice filtering, deduplication and source precedence
+│   │   ├── curation.test.mjs          # Curation regression tests
+│   │   ├── feeds.mjs                  # Four-source feed loading and pagination metadata
+│   │   ├── feeds.test.mjs             # Feed parsing and error-state tests
+│   │   ├── media-releases.js          # Search, source filtering and result pagination
+│   │   └── media-releases.css         # Standalone listing styles
 │   ├── hero-banners/
 │   │   ├── homepage-hero.css         # Purple-light homepage hero and responsive conditions alignment
 │   │   ├── landing-hero.css          # Alt landing variant, breadcrumbs and optional CTA
@@ -51,6 +58,9 @@ securent/
 │   ├── alerts-listing.css
 │   ├── alerts-listing.js
 │   ├── alerts-pagination.css
+│   ├── media-releases.css
+│   ├── media-releases.js
+│   ├── SecureNT_files/sorting.js      # Shared sorting dependency required by both listings
 │   ├── more-updates-cards.css
 │   ├── event.css
 │   ├── print.css
@@ -64,6 +74,7 @@ securent/
 ├── SecureNT_files/                   # Local page assets (gitignored)
 ├── Content page _ SecureNT.html      # Local emergency-plans content capture (gitignored)
 ├── alerts-and-warnings.html          # Alerts and warnings page capture
+├── media-releases.html                # Media releases preview page
 ├── Severe Storm – Alice Springs _ SecureNT.html   # Secondary development event capture
 ├── vite.config.mjs
 └── package.json
@@ -109,6 +120,27 @@ The shared **Sort by** dropdown offers Current order (the default feed order), W
 
 The controls enhance existing `.alerts-listing__filters` markup automatically, so no extra CMS control markup is needed. Rebuild and refresh the listing CSS/JS asset versions in both the local capture and CMS references after changes. The local listing references currently use CSS version `13` and JavaScript version `7`. Run focused sorting regressions with `node --test src/alerts-listing/sorting.test.mjs`.
 
+### Media Releases
+
+The standalone [Media releases page](media-releases.html) combines the SecureNT, NTES, Bushfires NT and WoG Campaign Monitor feeds defined in [feeds.mjs](src/media-releases/feeds.mjs). It curates operational emergency notices rather than showing all government news. Matching `CampaignID` values are deduplicated with Bushfires NT > NTES > SecureNT > WoG precedence; matching source labels remain visible. Warning/action language and the approved NTES duty-officer email in `FromName` identify operational items. General awards, recruitment, ceremonies, outlooks and corporate announcements are excluded unless operational warning language takes precedence. [curation.mjs](src/media-releases/curation.mjs) owns these rules.
+
+Run `npm run build`, start `npm run dev`, then open `/media-releases.html` (Vite may normalize the URL to `/media-releases`). The heading is **Media releases** and the listing search is **Search media releases**. The preview uses local, gitignored `SecureNT_files/` dependencies, just like the other captured pages. Rebuild source changes before previewing; the current media-release asset versions are CSS `5` and JavaScript `4`.
+
+Source, Region, Emergency type and Warning level filters appear in the sidebar. Region, type and level are best-effort inferences from campaign names and subjects, not structured or authoritative warning metadata. Region matching uses six NT regions and a conservative set of place-name aliases; notices can match multiple regions or emergency types. Unmatched values remain available under **Not identified**, without guessing from agency sender names or long highway names. Warning levels prefer the displayed subject over the internal campaign name, recognize decreasing-threat notices, and do not treat a generic cyclone/flood warning as an AWS Emergency warning.
+
+Selections use OR within a filter group and AND across groups, combined with search. **Sort by** appears at the top of the sidebar and offers Newest first (default), Oldest first, Warning level (severity order), and Title A-Z. Filtering and sorting happen before eight-item pagination and reset to page 1. Missing or invalid dates sort last in either date order. Cards show the inferred classifications. On mobile, the sidebar moves above the results and filters collapse into a native disclosure; sorting stays visible outside that disclosure.
+
+A Vite-only, allowlisted `/api/media-releases/:sourceId` proxy supports localhost because the upstream feeds do not allow browser CORS. Outside localhost the module calls the SecureNT feed URLs directly, so the production host needs same-origin access or an approved CORS/proxy arrangement. Available sources still render if another source fails, with a partial-feed notice; total feed failure shows an unavailable state. At validation the WoG endpoint returned page 1 of 3 (750 of 2,051 records), and common page query parameters returned that same page. The listing reports this incomplete window rather than implying full history; upstream counts may change.
+
+This HTML is a local preview shell, not a Vite production HTML entry. For Matrix integration, use the listing markup and built media-release CSS/JS alongside the shared theme. Publish `dist/SecureNT_files/sorting.js` with both listing bundles, preserving that relative path: both bundles import it. The ignore rules include this generated dependency without including captured assets or generated capture scripts. Rebuild and refresh the page and CMS asset versions together when shipping changes.
+
+Validation checklist:
+
+- Run `node --test src/media-releases/curation.test.mjs src/media-releases/feeds.test.mjs src/alerts-listing/sorting.test.mjs` for extraction, precedence, combined filters, sorting, date parsing and feed failures.
+- Run `npm run build` and commit the standalone assets and shared sorting chunk with their source changes.
+- Manually inspect excluded candidates after curation changes, especially borderline operational announcements. Keep this review in validation; do not add a public exclusions section or generated review report.
+- Check desktop/mobile search, combined filters, sidebar sorting, page resets, collapsed filter accessibility, and partial/all-source failures. Live feeds may stall; controlled browser fixtures can isolate UI checks without changing production feed configuration.
+
 ## Build
 
 ```bash
@@ -120,6 +152,8 @@ Outputs to `dist/`:
 - `theme.css` — compiled, minified CSS imported by `src/css/main.css`, including `src/hero-banners/` styles
 - `theme.js` — compiled JS imported by `src/js/main.js`, including the landing hero initializer
 - `alerts-listing.css` and `alerts-listing.js` — standalone assets for the Alerts and warnings page
+- `media-releases.css` and `media-releases.js` — standalone assets for the Media releases page
+- `SecureNT_files/sorting.js` — shared sorting/date dependency imported by the alerts and media-release bundles; preserve its relative URL when publishing
 - `alerts-pagination.css` — standalone pagination styling and list-marker overrides
 - `more-updates-cards.css` — styles for the bottom update cards on the Alerts and warnings page
 - `event.css` and `social-share.css` — standalone event page and share nester styles

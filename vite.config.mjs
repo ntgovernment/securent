@@ -106,6 +106,42 @@ const localConditionsMock = {
   },
 };
 
+const mediaReleaseFeedProxy = {
+  name: "media-release-feed-proxy",
+  configureServer(server) {
+    const feeds = new Map([
+      ["bushfires-nt", "https://securent.nt.gov.au/_design/integration-points/socials/media-releases-bushfiresnt/_nocache"],
+      ["ntes", "https://securent.nt.gov.au/_design/integration-points/socials/media-releases-ntes/_nocache"],
+      ["securent", "https://securent.nt.gov.au/_design/integration-points/socials/media-releases-securent/_nocache"],
+      ["wog", "https://securent.nt.gov.au/_design/integration-points/socials/campaign-monitor-api-wog-departments-v3.3/_nocache"],
+    ]);
+
+    server.middlewares.use("/api/media-releases", async (req, res) => {
+      const sourceId = new URL(req.url, "http://localhost").pathname.replace(/^\//, "");
+      const endpoint = feeds.get(sourceId);
+      res.setHeader("Content-Type", "application/json; charset=utf-8");
+      res.setHeader("Cache-Control", "no-store");
+      if (req.method !== "GET" || !endpoint) {
+        res.statusCode = req.method === "GET" ? 404 : 405;
+        res.setHeader("Allow", "GET");
+        res.end(JSON.stringify({ error: "Feed is unavailable" }));
+        return;
+      }
+
+      try {
+        const response = await fetch(endpoint, { headers: { Accept: "application/json" } });
+        if (!response.ok) throw new Error(`Feed request failed (${response.status})`);
+        res.statusCode = response.status;
+        res.end(JSON.stringify(await response.json()));
+      } catch (error) {
+        console.warn(`Local media-release feed failed (${sourceId}):`, error.message);
+        res.statusCode = 502;
+        res.end(JSON.stringify({ error: "Feed is unavailable" }));
+      }
+    });
+  },
+};
+
 const includeLocalCapture =
   process.env.SECURENT_NO_LOCAL_CAPTURE !== "1" &&
   existsSync(new URL("./SecureNT.html", import.meta.url));
@@ -117,6 +153,7 @@ export default defineConfig({
     excludeLocalCapturePhotos,
     eventPreview,
     localConditionsMock,
+    mediaReleaseFeedProxy,
     cloudflare(),
   ],
   build: {
@@ -124,6 +161,7 @@ export default defineConfig({
       input: {
         ...(includeLocalCapture ? { page: "./SecureNT.html" } : {}),
         "alerts-listing": "./src/alerts-listing/alerts-listing.js",
+        "media-releases": "./src/media-releases/media-releases.js",
         "alerts-pagination": "./src/alerts-listing/alerts-pagination.css",
         "more-updates-cards": "./src/alerts-listing/more-updates-cards.css",
         "theme-styles": "./src/css/main.css",
@@ -138,6 +176,7 @@ export default defineConfig({
         entryFileNames: (chunk) =>
           chunk.name === "theme" ||
           chunk.name === "alerts-listing" ||
+          chunk.name === "media-releases" ||
           chunk.name === "social-share" ||
           chunk.name === "local-conditions"
             ? "[name].js"
@@ -166,6 +205,9 @@ export default defineConfig({
           }
           if (assetInfo.name === "alerts-listing.css") {
             return "alerts-listing.css";
+          }
+          if (assetInfo.name === "media-releases.css") {
+            return "media-releases.css";
           }
           if (assetInfo.name && assetInfo.name.endsWith(".css")) {
             return "theme.css";
