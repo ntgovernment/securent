@@ -13,7 +13,7 @@ test("uses the three integration paths and supports localhost proxy overrides", 
   const expected = [
     "/_design/integrations/campaign-monitor-bushfires-nt",
     "/_design/integrations/campaign-monitor-ntes",
-    "/_design/integrations/campaign-monitor-all-agencies",
+    "/_design/integrations/campaign-monitor-ntg-agencies",
   ];
   assert.deepEqual(mediaReleaseSources.map((item) => item.endpoint), expected);
   assert.equal(new Set(expected).size, 3);

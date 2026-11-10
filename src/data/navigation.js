@@ -5,7 +5,7 @@ export const primaryNavigation = [
   },
   {
     label: "Current warnings",
-    href: "https://cmsexternal.nt.gov.au/securent/media-releases",
+    href: "/current-warnings",
   },
   {
     label: "Prepare",

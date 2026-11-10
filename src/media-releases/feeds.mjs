@@ -12,7 +12,7 @@ export const mediaReleaseSources = [
   {
     id: "ntg-agencies",
     name: "NTG agencies",
-    endpoint: "/_design/integrations/campaign-monitor-all-agencies",
+    endpoint: "/_design/integrations/campaign-monitor-ntg-agencies",
   },
 ];
 
