@@ -13,7 +13,7 @@ const approvedDutyOfficer = /\bterritorydutyofficer\.ntes@pfes\.nt\.gov\.au\b/i;
 export const warningLevelOrder = ["Emergency warning", "Watch and act", "Advice", "Not identified"];
 
 const regionPatterns = [
-  ["Darwin, Palmerston and Litchfield", /\b(?:darwin|palmerston|litchfield|humpty doo|howard springs|acacia hills|berry springs|coolalinga|nightcliff|casuarina)\b/i],
+  ["Greater Darwin", /\b(?:darwin|palmerston|litchfield|humpty doo|howard springs|acacia hills|berry springs|coolalinga|nightcliff|casuarina)\b/i],
   ["Top End", /\b(?:top end|tiwi|bathurst island|melville island|west arnhem|jabiru|gunbalanya|kakadu|adelaide river|batchelor|wagait|dundee)\b/i],
   ["Big Rivers", /\b(?:big rivers|katherine|daly river|douglas daly|pine creek|mataranka|beswick|barunga|ngukurr|borroloola|roper|victoria river|timber creek|kalkarindji|lajamanu)\b/i],
   ["East Arnhem", /\b(?:east arnhem|nhulunbuy|gove|yirrkala|alyangula|groote eylandt|galiwin['\u2019]?ku|elcho island|gapuwiyak|ramingining|milingimbi)\b/i],
@@ -22,7 +22,7 @@ const regionPatterns = [
 ];
 
 const emergencyPatterns = [
-  ["Bushfire", /\b(?:bush\s*fires?|wildfires?|grass\s*fires?|fire bans?|fire danger|planned burn|vegetation fire)\b/i],
+  ["Bushfire", /\b(?:bush\s*fires?(?:\s*nt)?|wildfires?|grass\s*fires?|fire bans?|fire danger|planned burn|vegetation fire)\b/i],
   ["Cyclone", /\b(?:cyclones?|tropical low)\b/i],
   ["Flooding", /\b(?:flood\w*|flash flooding|rising river)\b/i],
   ["Severe storm", /\b(?:storms?|thunderstorms?|damaging winds?|large hail)\b/i],

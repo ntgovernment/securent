@@ -83,10 +83,23 @@ test("extracts multiple regions and hazards from names and subjects", () => {
     declarations: [],
     warningLevel: "Watch and act",
   });
-  assert.deepEqual(classifyNotice({ Subject: "Bushfires NT Advice - Acacia Hills" }), {
-    regions: ["Darwin, Palmerston and Litchfield"], emergencyTypes: ["Bushfire"], declarations: [], warningLevel: "Advice",
+    assert.deepEqual(classifyNotice({ Subject: "Bushfires NT Advice - Acacia Hills" }), {
+      regions: ["Greater Darwin"], emergencyTypes: ["Bushfire"], declarations: [], warningLevel: "Advice",
   });
 });
+
+  test("maps BushfiresNT titles to Bushfire and Darwin localities to Greater Darwin", () => {
+    const notice = classifyNotice({ title: "BushfiresNT Emergency Warning - Darwin" });
+    assert.deepEqual(notice, {
+      regions: ["Greater Darwin"], emergencyTypes: ["Bushfire"], declarations: [], warningLevel: "Emergency warning",
+    });
+    for (const place of ["Darwin", "Palmerston", "Litchfield"]) {
+      assert.deepEqual(classifyNotice({ title: `Flood Advice - ${place}` }).regions, ["Greater Darwin"]);
+    }
+    const fireBan = classifyNotice({ title: "BushfiresNT Fire ban - Darwin" });
+    assert.deepEqual(fireBan.emergencyTypes, ["Not identified"]);
+    assert.deepEqual(fireBan.declarations, ["Fire ban"]);
+  });
 
 test("keeps ambiguous classifications unknown and avoids highway region guesses", () => {
   assert.deepEqual(classifyNotice({ Subject: "Emergency update - Stuart Highway", FromName: "NT Fire and Emergency Services" }), {
@@ -127,7 +140,7 @@ test("filters declarations alone and in combination with existing filters", () =
     .map((item) => item.campaignId), ["katherine-ban", "darwin-ban"]);
   assert.deepEqual(filterAndSortNotices(items, {
     declarations: ["Fire ban"], sources: ["Bushfires NT"],
-    regions: ["Darwin, Palmerston and Litchfield"],
+    regions: ["Greater Darwin"],
     query: "Darwin", order: "title",
   }).map((item) => item.campaignId), ["darwin-ban"]);
   assert.deepEqual(filterAndSortNotices(items, { emergencyTypes: ["Bushfire"], warningLevels: ["Advice"] })
