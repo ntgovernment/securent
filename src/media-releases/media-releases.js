@@ -240,8 +240,8 @@ if (listing) {
     results.replaceChildren(...pageItems.map(renderCard));
     results.setAttribute("aria-busy", "false");
     status.textContent = matches.length
-      ? `Showing ${start + 1}-${Math.min(start + pageSize, matches.length)} of ${matches.length} media releases. Sorted by ${sort.selectedOptions[0].textContent.toLowerCase()}.`
-      : "No media releases match your search or filters.";
+      ? `Showing ${start + 1}-${Math.min(start + pageSize, matches.length)} of ${matches.length} current warnings. Sorted by ${sort.selectedOptions[0].textContent.toLowerCase()}.`
+      : "No current warnings match your search or filters.";
     renderPagination(pageCount);
   }
 
@@ -293,9 +293,9 @@ if (listing) {
     })
     .catch((error) => {
       results.setAttribute("aria-busy", "false");
-      status.textContent = "Media releases are temporarily unavailable. Please try again later.";
+      status.textContent = "Current warnings are temporarily unavailable. Please try again later.";
       feedNote.hidden = false;
       feedNote.textContent = "No source feeds could be loaded.";
-      console.error("Unable to load media releases", error);
+      console.error("Unable to load current warnings", error);
     });
 }

@@ -4,6 +4,10 @@ export const primaryNavigation = [
     href: "https://cmsexternal.nt.gov.au/securent/alerts-and-warnings",
   },
   {
+    label: "Current warnings",
+    href: "https://cmsexternal.nt.gov.au/securent/media-releases",
+  },
+  {
     label: "Prepare",
     href: "https://cmsexternal.nt.gov.au/securent/prepare-for-an-emergency",
     description: "Knowing what needs to be done makes it easier for you to stay safe in an emergency.",
