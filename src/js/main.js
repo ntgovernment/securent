@@ -50,7 +50,7 @@ guardQuickExit(window);
   }
 
   function closeDesktopMenu(returnFocus) {
-    const expanded = renderedMenu.querySelector(':scope > li > button[aria-expanded="true"]');
+    const expanded = renderedMenu.querySelector(':scope > li > button[aria-expanded="true"]:not([hidden])');
     if (!expanded || !isDesktop()) return;
     setExpanded(expanded.parentElement, false);
     if (returnFocus) expanded.focus();
@@ -95,8 +95,10 @@ guardQuickExit(window);
     const child = childContainer(item);
     const link = item.querySelector(":scope > a");
     const toggle = item.querySelector(":scope > .mobile-submenu-toggle");
+    const desktopToggle = item.querySelector(":scope > .desktop-main-nav__toggle");
     const hasChildren = child && child.querySelector("li > a");
     if (!hasChildren && toggle) toggle.hidden = true;
+    if (!hasChildren && desktopToggle) desktopToggle.hidden = true;
     if (child && !hasChildren) child.hidden = true;
     return hasChildren && link && toggle;
   });
@@ -114,6 +116,12 @@ guardQuickExit(window);
     toggle.setAttribute("aria-expanded", "false");
     toggle.setAttribute("aria-label", "Expand " + link.textContent.trim() + " submenu");
     toggle.title = toggle.getAttribute("aria-label");
+    const desktopToggle = item.querySelector(":scope > .desktop-main-nav__toggle");
+    if (desktopToggle) {
+      desktopToggle.id = menuId + "-desktop-toggle-" + index;
+      desktopToggle.setAttribute("aria-controls", childList.id);
+      desktopToggle.setAttribute("aria-expanded", "false");
+    }
     if (childList.classList.contains("desktop-main-nav__panel")) {
       childList.setAttribute("role", "region");
       childList.setAttribute("aria-labelledby", toggle.id);
@@ -144,11 +152,21 @@ guardQuickExit(window);
     const childList = childContainer(item);
     const link = item.querySelector(":scope > a");
     const toggle = item.querySelector(":scope > .mobile-submenu-toggle");
+    const desktopToggle = item.querySelector(":scope > .desktop-main-nav__toggle");
+    const root = item.parentElement === renderedMenu;
+    const desktop = isDesktop();
     item.classList.toggle("open", expanded);
-    childList.hidden = isDesktop() && item.parentElement !== renderedMenu ? false : !expanded;
+    childList.hidden = desktop && !root ? false : !expanded;
+    toggle.hidden = desktop && (!root || Boolean(desktopToggle));
     toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
     toggle.setAttribute("aria-label", (expanded ? "Collapse " : "Expand ") + link.textContent.trim() + " submenu");
     toggle.title = toggle.getAttribute("aria-label");
+    if (desktopToggle) {
+      desktopToggle.hidden = !desktop;
+      desktopToggle.setAttribute("aria-expanded", expanded ? "true" : "false");
+      link.hidden = desktop;
+      childList.setAttribute("aria-labelledby", desktop ? desktopToggle.id : toggle.id);
+    }
     updateWrappedLabels();
   }
 
@@ -205,11 +223,11 @@ guardQuickExit(window);
   });
 
   renderedMenu.addEventListener("click", function (event) {
-    const control = event.target.closest("a, .mobile-submenu-toggle");
+    const control = event.target.closest("a, .mobile-submenu-toggle, .desktop-main-nav__toggle");
     const item = control && control.parentElement;
     if (!item || !renderedMenu.contains(item)) return;
 
-    if (control.classList.contains("mobile-submenu-toggle")) {
+    if (control.classList.contains("mobile-submenu-toggle") || control.classList.contains("desktop-main-nav__toggle")) {
       if (!parents.includes(item) || (isDesktop() && item.parentElement !== renderedMenu)) return;
       const expanded = control.getAttribute("aria-expanded") === "true";
       const siblings = Array.from(item.parentElement.children).filter(function (sibling) {

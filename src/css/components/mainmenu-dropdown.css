@@ -911,6 +911,10 @@ nav.nav-masthead .cms-main-nav a {
   overflow-wrap: anywhere;
 }
 
+.desktop-main-nav__toggle {
+  display: none;
+}
+
 @media (min-width: 768px) {
   header.ntg-header .header-navigation .cms-main-nav {
     display: flex;
@@ -926,6 +930,43 @@ nav.nav-masthead .cms-main-nav a {
 
   nav.nav-masthead .cms-main-nav > li > a {
     white-space: normal;
+  }
+
+  .cms-main-nav > li > .desktop-main-nav__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 56px;
+    padding: 0 var(--menu-item-padding);
+    border: 0;
+    background: transparent;
+    color: #ffffff;
+    font: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.5;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .cms-main-nav > li > .desktop-main-nav__toggle:hover,
+  .cms-main-nav > li > .desktop-main-nav__toggle[aria-expanded="true"] {
+    background: #343741;
+  }
+
+  .cms-main-nav > li > .desktop-main-nav__toggle:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: -3px;
+  }
+
+  .desktop-main-nav__toggle > .fa-chevron-right {
+    flex-shrink: 0;
+    font-size: 0.75rem;
+    transform: rotate(90deg);
+  }
+
+  .desktop-main-nav__toggle[aria-expanded="true"] > .fa-chevron-right {
+    transform: rotate(-90deg);
   }
 
   nav.nav-masthead .cms-main-nav > li.has-children > a {
@@ -996,6 +1037,12 @@ nav.nav-masthead .cms-main-nav a {
   }
 }
 
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  .cms-main-nav > li > .desktop-main-nav__toggle {
+    font-size: 0.875rem;
+  }
+}
+
 @media (max-width: 767.98px) {
   .cms-main-nav .desktop-main-nav__overview {
     display: none;
@@ -1018,49 +1065,55 @@ nav.nav-masthead .cms-main-nav a {
   }
 }
 
-header.ntg-header .header-navigation .container-xl nav.nav-masthead:not(.navigation-enhanced) {
-  position: static;
-  display: block !important;
-  width: 100%;
-  height: auto;
-  max-height: none;
-  overflow: visible;
-  transform: none;
-  visibility: visible;
-  pointer-events: auto;
+nav.nav-masthead:not(.navigation-enhanced) .cms-main-nav .desktop-main-nav__panel {
+  display: none !important;
 }
 
-nav.nav-masthead:not(.navigation-enhanced) .ntg-main-nav__links {
-  display: block;
-}
+@media (scripting: none) {
+  header.ntg-header .header-navigation .container-xl nav.nav-masthead:not(.navigation-enhanced) {
+    position: static;
+    display: block !important;
+    width: 100%;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    transform: none;
+    visibility: visible;
+    pointer-events: auto;
+  }
 
-nav.nav-masthead:not(.navigation-enhanced) .ntg-main-nav__links li > ul,
-nav.nav-masthead:not(.navigation-enhanced) .ntg-main-nav__links .desktop-main-nav__panel {
-  position: static;
-  display: block !important;
-  min-width: 0;
-  max-height: none;
-  margin: 0;
-  padding: 0 0 0 1rem;
-  border: 0;
-  background: #343741;
-  box-shadow: none;
-  opacity: 1;
-  visibility: visible;
-  transform: none;
-}
+  nav.nav-masthead:not(.navigation-enhanced) .ntg-main-nav__links {
+    display: block;
+  }
 
-nav.nav-masthead:not(.navigation-enhanced) .desktop-main-nav__overview {
-  display: none;
-}
+  nav.nav-masthead:not(.navigation-enhanced) .ntg-main-nav__links li > ul,
+  nav.nav-masthead:not(.navigation-enhanced) .ntg-main-nav__links .desktop-main-nav__panel {
+    position: static;
+    display: block !important;
+    min-width: 0;
+    max-height: none;
+    margin: 0;
+    padding: 0 0 0 1rem;
+    border: 0;
+    background: #343741;
+    box-shadow: none;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
 
-nav.nav-masthead:not(.navigation-enhanced) .ntg-main-nav__links li > a {
-  display: block;
-  padding: 0.5rem 1rem;
-  color: #ffffff !important;
-  white-space: normal;
-}
+  nav.nav-masthead:not(.navigation-enhanced) .desktop-main-nav__overview {
+    display: none;
+  }
 
-nav.nav-masthead:not(.navigation-enhanced) .ntg-main-nav__groups {
-  column-count: auto;
+  nav.nav-masthead:not(.navigation-enhanced) .ntg-main-nav__links li > a {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: #ffffff !important;
+    white-space: normal;
+  }
+
+  nav.nav-masthead:not(.navigation-enhanced) .ntg-main-nav__groups {
+    column-count: auto;
+  }
 }

@@ -6,6 +6,24 @@ never creates or changes menu links; `%asset_short_name_linked%` stays authorita
 Keep the existing listing roots, ordering, asset types, permissions and link settings.
 Use raw HTML divisions, not visual-editor paragraphs, around the Nested Content divisions.
 
+## Upgrade From the Previous Template
+
+If the earlier three-level templates are already installed:
+
+1. Replace Main's **Default Format: First HTML Division** with the revised version
+  below, which adds the native `.desktop-main-nav__toggle` label-and-arrow button.
+2. Keep Main's Page Contents, closing HTML division and Level 2 Nested Content
+  division unchanged. Level 2 and Level 3 markup and both dynamic-root calls are
+  unchanged. Do not edit the CMS-generated destination URLs.
+3. Publish the revised Main Bodycopy with the rebuilt `dist/theme.js` and
+  `dist/theme.css`, then refresh both CMS asset cache references. Updating JS
+  alone cannot provide the unified desktop control without its new markup.
+4. Keep theme CSS as a normal stylesheet in the document head. Its initial-state
+  rules prevent the expanded-menu flash while the theme module loads.
+
+The alerts preview uses CSS cache version `40` and JS cache version `31`.
+Production cache references are managed separately in Matrix.
+
 ## Main Listing (Level 1)
 
 ### Page Contents
@@ -38,6 +56,10 @@ Replace the HTML division BEFORE the existing Level 2 Nested Content division wi
 ```html
 <li>
   %asset_short_name_linked%
+  <button class="desktop-main-nav__toggle" type="button" hidden>
+    <span>%asset_short_name^escapehtml%</span>
+    <span class="fa-regular fa-chevron-right" aria-hidden="true"></span>
+  </button>
   <button class="mobile-submenu-toggle" type="button" hidden aria-label="Expand %asset_short_name^htmlentities:ENT_QUOTES% submenu">
     <span class="fa-regular fa-chevron-right" aria-hidden="true"></span>
   </button>
@@ -134,11 +156,17 @@ No additional nested listing is needed.
 - Buttons are hidden until successfully bound. JavaScript assigns unique IDs,
   `aria-controls`, `aria-expanded`, accessible labels and panel labels. The CMS
   generates every link and all three content levels; JS only manages interaction.
-- Desktop: top-level links navigate; separate chevrons open mega-menu panels.
+- Desktop: each top-level parent uses one native button containing its label and
+  chevron. Both parts expand/collapse the same panel and form one keyboard stop.
+  The original top-level destination link is hidden, not rewritten; the overview
+  retains its CMS-generated destination link. Items without children remain links.
   Level 2 groups and Level 3 links remain expanded inside each open panel.
 - Mobile: parent links navigate; separate 40px buttons expand their children.
   Opening a sibling resets the previous branch. Escape closes and returns focus.
 - Without JavaScript, the links and nested lists remain visible in normal flow.
+- While JavaScript is loading, panels stay collapsed. The expanded fallback is
+  scoped to `@media (scripting: none)` so a slow module cannot expand the header.
+  Load the shared theme stylesheet in the document head, not asynchronously.
 - There is one shared tree, not duplicate desktop/mobile listing assets. Descriptions
   are HTML-escaped text in the overview, not JSON embedded in HTML attributes.
 - Keep the emergency-contacts link in the header. If it is needed inside the mobile
@@ -166,12 +194,15 @@ and production cache behavior must additionally be checked in Matrix.
 
 Verified locally on 10 November 2026:
 
-- `node --test src/js/navigation.test.mjs src/js/quick-exit.test.mjs src/search/autocomplete.test.mjs`: 17 tests pass.
+- `node --test src/js/navigation.test.mjs src/js/quick-exit.test.mjs src/search/autocomplete.test.mjs`: 19 tests pass, including the pending-initialization CSS regression and unified desktop/split mobile controls.
 - `npm run build`: passes and refreshes the tracked shared theme assets.
 - Alerts preview: desktop panel alignment and visible Level 3 links at 1440px;
   wrapped labels and 40px controls at 320px, 375px and 767px; drawer and scroll-state
   cleanup at 768px; all destination links reachable with JavaScript disabled.
-- The migrated alerts capture uses theme CSS version `38` and theme JS version `30`.
+- First-load check with the theme module blocked: panels remain hidden at 375px
+  and 1440px, with a compact header and a horizontal desktop root list. Applying
+  the disabled-scripting media rules still exposes the fallback links.
+- The migrated alerts capture uses theme CSS version `40` and theme JS version `31`.
   Other captures have not been migrated and must not be treated as enhanced-menu fixtures.
 
 These are local results, not confirmation of production publication. Apply the
