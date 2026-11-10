@@ -19,6 +19,13 @@ test("includes operational warning and public health alert language", () => {
     Subject: "Boil Water Alert - East Arnhem communities",
     FromName: "NT Health",
   })), true);
+  assert.deepEqual(classifyNotice({ Subject: "Boil Water Alert - East Arnhem communities" }), {
+    regions: ["East Arnhem"], emergencyTypes: [], declarations: ["Boil water notice"], warningLevel: "Not identified",
+  });
+  assert.equal(isOperationalNotice({
+    Subject: "Boiling water notice - East Arnhem communities",
+    FromName: "NT Health",
+  }), true);
   assert.equal(isOperationalNotice(record({
     Name: "Evacuees move to Batchelor",
     Subject: "Evacuations underway for Daly River",
@@ -79,7 +86,7 @@ test("extracts multiple regions and hazards from names and subjects", () => {
     Subject: "Flooding - Katherine and Alice Springs",
   }), {
     regions: ["Big Rivers", "Central Australia"],
-    emergencyTypes: ["Flooding", "Severe storm"],
+    emergencyTypes: ["Flooding", "Storm"],
     declarations: [],
     warningLevel: "Watch and act",
   });
@@ -97,8 +104,8 @@ test("extracts multiple regions and hazards from names and subjects", () => {
       assert.deepEqual(classifyNotice({ title: `Flood Advice - ${place}` }).regions, ["Greater Darwin"]);
     }
     const fireBan = classifyNotice({ title: "BushfiresNT Fire ban - Darwin" });
-    assert.deepEqual(fireBan.emergencyTypes, ["Not identified"]);
-    assert.deepEqual(fireBan.declarations, ["Fire ban"]);
+    assert.deepEqual(fireBan.emergencyTypes, []);
+    assert.deepEqual(fireBan.declarations, ["Fire ban declaration"]);
   });
 
 test("keeps ambiguous classifications unknown and avoids highway region guesses", () => {
@@ -108,51 +115,87 @@ test("keeps ambiguous classifications unknown and avoids highway region guesses"
   assert.deepEqual(classifyNotice({ Subject: "Advice - Barkly Highway" }).regions, ["Not identified"]);
 });
 
-test("classifies explicit fire bans as declarations without emergency types or warning levels", () => {
+test("classifies explicit fire bans without an emergency type or identified warning level", () => {
   for (const wording of ["Fire ban", "TOTAL FIRE BAN", "Total fire bans"]) {
     for (const field of ["Subject", "Name", "title", "name"]) {
       const notice = { [field]: `${wording} - Darwin` };
       const classified = classifyNotice(notice);
-      assert.deepEqual(classified.declarations, ["Fire ban"]);
-      assert.deepEqual(classified.emergencyTypes, ["Not identified"]);
+      assert.deepEqual(classified.declarations, ["Fire ban declaration"]);
+      assert.deepEqual(classified.emergencyTypes, []);
       assert.equal(classified.warningLevel, "Not identified");
       assert.equal(isOperationalNotice(notice), true);
     }
   }
   const classified = classifyNotice({ Subject: "Bushfires NT Advice - Total fire ban - Darwin" });
-  assert.deepEqual(classified.declarations, ["Fire ban"]);
-  assert.deepEqual(classified.emergencyTypes, ["Not identified"]);
+  assert.deepEqual(classified.declarations, ["Fire ban declaration"]);
+  assert.deepEqual(classified.emergencyTypes, []);
   assert.equal(classified.warningLevel, "Not identified");
   for (const Subject of ["Fire danger period - Darwin", "Bushfire Advice - Darwin", "Fire banquet - Darwin"]) {
     assert.deepEqual(classifyNotice({ Subject }).declarations, []);
   }
 });
 
+test("classifies planned burns without an emergency type and admits them as operational notices", () => {
+  for (const field of ["Subject", "Name", "title", "name"]) {
+    const notice = { [field]: "Planned burn - Darwin" };
+    const classified = classifyNotice(notice);
+    assert.deepEqual(classified.declarations, ["Planned burn advice"]);
+    assert.deepEqual(classified.emergencyTypes, []);
+    assert.equal(classified.warningLevel, "Not identified");
+    assert.equal(isOperationalNotice(notice), true);
+  }
+
+  assert.equal(isOperationalNotice({
+    Subject: "Community celebrates planned burn - Darwin",
+    FromName: "Local council",
+  }), true);
+  assert.deepEqual(classifyNotice({ Subject: "Bushfire Advice - Darwin" }).declarations, []);
+  const [plannedBurn] = curateFeeds([{ source: "Bushfires NT", items: [record({
+    CampaignID: "planned-burn",
+    Name: "Planned burn advice - Darwin",
+    Subject: "Planned burn advice - Darwin",
+  })] }]);
+  assert.deepEqual(filterAndSortNotices([plannedBurn], { declarations: ["Planned burn advice"] }), [plannedBurn]);
+  assert.equal(filterAndSortNotices([plannedBurn], { emergencyTypes: ["Not identified"] }).length, 0);
+});
+
 test("filters declarations alone and in combination with existing filters", () => {
   const items = curateFeeds([{ source: "Bushfires NT", items: [
     record({ CampaignID: "darwin-ban", Name: "Total fire ban - Darwin", Subject: "Total fire ban Advice - Darwin" }),
     record({ CampaignID: "katherine-ban", Name: "Fire bans - Katherine", Subject: "Fire bans - Katherine" }),
+    record({ CampaignID: "boil-water", Name: "Boil water notice - East Arnhem", Subject: "Boil water notice - East Arnhem" }),
+    record({ CampaignID: "planned-burn", Name: "Planned burn advice - Darwin", Subject: "Planned burn advice - Darwin" }),
     record({ CampaignID: "bushfire", Name: "Bushfire Advice - Darwin", Subject: "Bushfire Advice - Darwin" }),
     record({ CampaignID: "flood" }),
+    record({
+      CampaignID: "unknown",
+      Name: "Cyclone warning - Darwin",
+      Subject: "Cyclone warning - Darwin",
+    }),
   ] }]);
-  assert.equal(filterAndSortNotices(items).length, 4);
-  assert.deepEqual(filterAndSortNotices(items, { declarations: ["Fire ban"] })
+  assert.equal(filterAndSortNotices(items).length, 7);
+  assert.deepEqual(filterAndSortNotices(items, { declarations: ["Fire ban declaration"] })
     .map((item) => item.campaignId), ["katherine-ban", "darwin-ban"]);
+  assert.deepEqual(filterAndSortNotices(items, { declarations: ["Boil water notice"] })
+    .map((item) => item.campaignId), ["boil-water"]);
+  assert.deepEqual(filterAndSortNotices(items, { warningLevels: ["Not identified"] })
+    .map((item) => item.campaignId), ["unknown"]);
   assert.deepEqual(filterAndSortNotices(items, {
-    declarations: ["Fire ban"], sources: ["Bushfires NT"],
+    declarations: ["Fire ban declaration"], sources: ["Bushfires NT"],
     regions: ["Greater Darwin"],
     query: "Darwin", order: "title",
   }).map((item) => item.campaignId), ["darwin-ban"]);
   assert.deepEqual(filterAndSortNotices(items, { emergencyTypes: ["Bushfire"], warningLevels: ["Advice"] })
     .map((item) => item.campaignId), ["bushfire"]);
-  assert.equal(filterAndSortNotices(items, { declarations: ["Fire ban"], emergencyTypes: ["Bushfire"] }).length, 0);
-  assert.equal(filterAndSortNotices(items, { declarations: ["Fire ban"], warningLevels: ["Advice"] }).length, 0);
-  assert.equal(filterAndSortNotices(items, { declarations: ["Fire ban"], emergencyTypes: ["Flooding"] }).length, 0);
+  assert.equal(filterAndSortNotices(items, { declarations: ["Fire ban declaration"], emergencyTypes: ["Bushfire"] }).length, 0);
+  assert.equal(filterAndSortNotices(items, { declarations: ["Fire ban declaration"], warningLevels: ["Advice"] }).length, 0);
+  assert.equal(filterAndSortNotices(items, { declarations: ["Fire ban declaration"], emergencyTypes: ["Flooding"] }).length, 0);
   const fireBan = items.find((item) => item.campaignId === "darwin-ban");
+  assert.equal(filterAndSortNotices([fireBan], { emergencyTypes: ["Not identified"] }).length, 0);
   assert.equal(filterAndSortNotices([{ ...fireBan, title: "Update", name: "" }], { query: "fire ban" }).length, 1);
   const { declarations, ...legacyItem } = fireBan;
   assert.equal(filterAndSortNotices([legacyItem]).length, 1);
-  assert.equal(filterAndSortNotices([legacyItem], { declarations: ["Fire ban"] }).length, 0);
+  assert.equal(filterAndSortNotices([legacyItem], { declarations: ["Fire ban declaration"] }).length, 0);
 });
 
 test("preserves and searches structured town, street, and suburb values", () => {

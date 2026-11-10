@@ -4,6 +4,7 @@ import { awsHazardIconFilename, warningLevelSlug } from "./aws-icons.mjs";
 
 test("maps warning levels to their AWS icon tiers", () => {
   assert.equal(awsHazardIconFilename(["Flooding"], "Advice"), "flood-advice.webp");
+  assert.equal(awsHazardIconFilename(["Storm"], "Advice"), "storm-advice.webp");
   assert.equal(awsHazardIconFilename(["Flooding"], "Watch and act"), "flood-watch_act.webp");
   assert.equal(awsHazardIconFilename(["Flooding"], "Emergency warning"), "flood-emergency_warning.webp");
 });

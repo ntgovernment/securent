@@ -8,7 +8,7 @@ const hazardTypeSlugs = new Map([
   ["Bushfire", "fire"],
   ["Cyclone", "cyclone"],
   ["Flooding", "flood"],
-  ["Severe storm", "storm"],
+  ["Storm", "storm"],
   ["Heatwave", "heat"],
 ]);
 

@@ -106,7 +106,8 @@ if (listing) {
     renderFilterGroup("region", filters.querySelector("[data-region-filters]"), (item) => item.regions);
     renderFilterGroup("emergencyType", filters.querySelector("[data-type-filters]"), (item) => item.emergencyTypes);
     renderFilterGroup("declaration", filters.querySelector("[data-declaration-filters]"), (item) => item.declarations);
-    renderFilterGroup("warningLevel", filters.querySelector("[data-level-filters]"), (item) => [item.warningLevel], warningLevelOrder);
+    renderFilterGroup("warningLevel", filters.querySelector("[data-level-filters]"),
+      (item) => item.declarations?.length ? [] : [item.warningLevel], warningLevelOrder);
   }
 
   function safeLink(value) {
@@ -143,6 +144,7 @@ if (listing) {
     const article = document.createElement("article");
     article.className = "media-releases__item";
     article.dataset.warningLevel = warningLevelSlug(item.warningLevel);
+    article.dataset.declaration = item.declarations.map((declaration) => declaration.toLowerCase().replace(/\s+/g, "-")).join(" ");
     const content = document.createElement("div");
     content.className = "media-releases__content";
     const link = safeLink(item.url);
@@ -211,7 +213,7 @@ if (listing) {
     content.append(title);
     if (meta.hasChildNodes()) content.append(meta);
     content.append(region);
-    if (!item.declarations.includes("Fire ban")) content.append(hazardDetails);
+    if (!item.declarations.length) content.append(hazardDetails);
     content.append(source);
     article.append(content);
     return article;

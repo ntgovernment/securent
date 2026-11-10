@@ -197,6 +197,14 @@ section.media-releases__hero {
   --media-releases-accent: var(--clr-status-emergency-warning);
 }
 
+.media-releases__item[data-declaration~="planned-burn-advice"] {
+  --media-releases-accent: #865aa5;
+}
+
+.media-releases__item[data-declaration~="fire-ban-declaration"] {
+  --media-releases-accent: #52565f;
+}
+
 .media-releases__title {
   display: inline-block;
   margin: 0 0 10px;
@@ -358,7 +366,7 @@ a.media-releases__title:hover {
 .media-releases__filter {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   min-height: 32px;
   margin: 0;
   color: #1f1e27;
@@ -369,11 +377,57 @@ a.media-releases__title:hover {
 }
 
 .media-releases__filter input {
-  flex: 0 0 20px;
-  width: 20px;
-  height: 20px;
+  position: relative;
+  display: grid;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
   margin: 0;
-  accent-color: #174c4e;
+  padding: 0;
+  appearance: none;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.media-releases__filter input::before {
+  position: absolute;
+  inset: 4px;
+  border: 2px solid #1f1e27;
+  background: #fff;
+  content: "";
+}
+
+.media-releases__filter input::after {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  width: 6px;
+  height: 11px;
+  transform: rotate(45deg);
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  content: "";
+  opacity: 0;
+}
+
+.media-releases__filter input:not(:checked):hover::before {
+  background: #ecf0f0;
+}
+
+.media-releases__filter input:checked::before {
+  border-color: #174c4e;
+  background: #174c4e;
+}
+
+.media-releases__filter input:checked::after {
+  opacity: 1;
+}
+
+.media-releases__filter input:focus-visible {
+  outline: 3px solid #267e82;
+  outline-offset: 2px;
 }
 
 @media (max-width: 767.98px) {

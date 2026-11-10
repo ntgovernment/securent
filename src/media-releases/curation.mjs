@@ -4,8 +4,8 @@ import { getPlaceSearchValues } from "../search/autocomplete.mjs";
 export const sourceOrder = ["Bushfires NT", "NTES", "NTG agencies"];
 
 const sourceRank = new Map(sourceOrder.map((source, index) => [source, index]));
-const alertLanguage = /\b(?:advice|warning|watch\s*(?:&|and)\s*act|emergency\s+(?:warning|alert|declaration)|decreasing[\s_-]+threats?|threat is reduced|evacu\w*|take shelter|shelter now|prepare now|stay informed|fire bans?|fire danger period|boil water alert|public health alert|code yellow|rescue operation|incidents?\b|hazmat|dangerous surf|avoid (?:the )?flooded area)\b/i;
-const hazardLanguage = /\b(?:storm|flood|cyclone|bushfires?|fires?|emergency|incident|hazmat|health|boil water|evacu\w*|surf)\b/i;
+const alertLanguage = /\b(?:advice|warning|watch\s*(?:&|and)\s*act|emergency\s+(?:warning|alert|declaration)|decreasing[\s_-]+threats?|threat is reduced|evacu\w*|take shelter|shelter now|prepare now|stay informed|fire bans?|fire danger period|planned burns?|boil(?:ing)? water|public health alert|code yellow|rescue operation|incidents?\b|hazmat|dangerous surf|avoid (?:the )?flooded area)\b/i;
+const hazardLanguage = /\b(?:storm|flood|cyclone|bushfires?|fires?|planned burns?|emergency|incident|hazmat|health|boil(?:ing)? water|evacu\w*|surf)\b/i;
 const generalNews = /\b(?:awards?|recruit(?:ment|ing)?|ceremon(?:y|ies)|outlook|symposium|funding|grant recipients|honours? list|anniversary|celebrates?\b|celebration)\b/i;
 const operationalSender = /\b(?:ntes|northern territory emergency service|territory emergency operations centre|nt fire and emergency services|bushfires? nt|securent)\b|territorydutyofficer\.ntes@pfes\.nt\.gov\.au/i;
 const approvedDutyOfficer = /\bterritorydutyofficer\.ntes@pfes\.nt\.gov\.au\b/i;
@@ -25,9 +25,9 @@ const emergencyPatterns = [
   ["Bushfire", /\b(?:bush\s*fires?(?:\s*nt)?|wildfires?|grass\s*fires?|fire bans?|fire danger|planned burn|vegetation fire)\b/i],
   ["Cyclone", /\b(?:cyclones?|tropical low)\b/i],
   ["Flooding", /\b(?:flood\w*|flash flooding|rising river)\b/i],
-  ["Severe storm", /\b(?:storms?|thunderstorms?|damaging winds?|large hail)\b/i],
+  ["Storm", /\b(?:storms?|thunderstorms?|damaging winds?|large hail)\b/i],
   ["Heatwave", /\b(?:heatwaves?|extreme heat)\b/i],
-  ["Health emergency", /\b(?:health alert|health emergency|boil(?:ing)? water|water alert|disease outbreak)\b/i],
+  ["Health emergency", /\b(?:health alert|health emergency|water alert|disease outbreak)\b/i],
   ["Hazardous materials", /\b(?:hazmat|hazardous materials?|chemical spill|gas leak)\b/i],
   ["Tsunami", /\btsunami\b/i],
 ];
@@ -35,6 +35,14 @@ const emergencyPatterns = [
 export function classifyNotice(record) {
   const content = [record.title || record.Subject, record.name || record.Name].filter(Boolean).join(" ");
   const isFireBan = /\bfire bans?\b/i.test(content);
+  const isPlannedBurn = /\bplanned burns?\b/i.test(content);
+  const isBoilWaterNotice = /\bboil(?:ing)? water\b/i.test(content);
+  const declarations = [
+    ...(isFireBan ? ["Fire ban declaration"] : []),
+    ...(isPlannedBurn ? ["Planned burn advice"] : []),
+    ...(isBoilWaterNotice ? ["Boil water notice"] : []),
+  ];
+  const isDeclaration = declarations.length > 0;
   const matchingLabels = (patterns) => {
     const matches = patterns.filter(([, pattern]) => pattern.test(content)).map(([label]) => label);
     return matches.length ? matches : ["Not identified"];
@@ -47,9 +55,9 @@ export function classifyNotice(record) {
   ];
   return {
     regions: matchingLabels(regionPatterns),
-    emergencyTypes: isFireBan ? ["Not identified"] : matchingLabels(emergencyPatterns),
-    declarations: isFireBan ? ["Fire ban"] : [],
-    warningLevel: isFireBan ? "Not identified" : [record.title || record.Subject, record.name || record.Name]
+    emergencyTypes: isDeclaration ? [] : matchingLabels(emergencyPatterns),
+    declarations,
+    warningLevel: isDeclaration ? "Not identified" : [record.title || record.Subject, record.name || record.Name]
       .map((text) => warningPatterns.find(([, pattern]) => pattern.test(text || ""))?.[0])
       .find(Boolean) || "Not identified",
   };
@@ -61,7 +69,8 @@ export function filterAndSortNotices(items, {
   const search = query.trim().toLocaleLowerCase();
   const matches = items.filter((item) => {
     const groups = [[sources, item.sources], [regions, item.regions],
-      [emergencyTypes, item.emergencyTypes], [declarations, item.declarations || []], [warningLevels, [item.warningLevel]]];
+      [emergencyTypes, item.emergencyTypes], [declarations, item.declarations || []],
+      [warningLevels, item.declarations?.length ? [] : [item.warningLevel]]];
     const searchable = [item.title, item.name, item.fromName, ...(item.locationTerms || []), ...item.sources,
       ...item.regions, ...item.emergencyTypes, ...(item.declarations || []), item.warningLevel].filter(Boolean).join(" ").toLocaleLowerCase();
     return (!search || searchable.includes(search)) && groups.every(([selected, values]) =>
@@ -110,7 +119,7 @@ export function isOperationalNotice(record) {
   const sender = record.fromName || record.FromName;
   if (approvedDutyOfficer.test(sender)) return true;
   if (!alertLanguage.test(content)) return false;
-  if (generalNews.test(content) && !/\b(?:warning|watch\s*(?:&|and)\s*act|emergency alert|evacu\w*|fire bans?|fire danger period)\b/i.test(content)) {
+  if (generalNews.test(content) && !/\b(?:warning|watch\s*(?:&|and)\s*act|emergency alert|evacu\w*|fire bans?|fire danger period|planned burns?|boil(?:ing)? water)\b/i.test(content)) {
     return false;
   }
   return hazardLanguage.test(content) || operationalSender.test(sender);
