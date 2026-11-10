@@ -5,6 +5,8 @@ import { Window } from "happy-dom";
 
 const html = await readFile(new URL("../../media-releases.html", import.meta.url), "utf8");
 const css = await readFile(new URL("../../dist/media-releases.css", import.meta.url), "utf8");
+const alertsCss = await readFile(new URL("../../dist/alerts-listing.css", import.meta.url), "utf8");
+const themeCss = await readFile(new URL("../../dist/theme.css", import.meta.url), "utf8");
 const notice = {
   Name: "AWS Flood Advice - Daly River",
   Subject: "Flood Advice - Daly River - Stay Informed",
@@ -66,6 +68,19 @@ test("renders declaration-only cards with their accent colors and checkbox style
     assert.equal(filteredCards.length, 1);
     assert.equal(filteredCards[0].dataset.declaration, "");
     assert.match(filteredCards[0].textContent, /Cyclone warning - Darwin/);
+
+    const globalSelectStyles = themeCss.match(/(?:^|})select,\.form-select\{([^}]*)\}/)?.[1];
+    assert.ok(globalSelectStyles);
+    assert.match(globalSelectStyles, /appearance:none/);
+    assert.match(globalSelectStyles, /background-image:url\("data:image\/svg\+xml,/);
+    assert.match(globalSelectStyles, /background-position:right 16px center/);
+    assert.match(globalSelectStyles, /background-size:16px 10px/);
+    const mediaSelectBase = css.match(/\.media-releases__search input,\.media-releases__sort select\{([^}]*)\}/)?.[1];
+    const alertsSelectBase = alertsCss.match(/\.alerts-listing__sort select\{([^}]*)\}/)?.[1];
+    assert.ok(mediaSelectBase);
+    assert.ok(alertsSelectBase);
+    assert.match(mediaSelectBase, /background-color:#fff/);
+    assert.match(alertsSelectBase, /background-color:#fff/);
 
     assert.match(css, /\.media-releases__item\[data-declaration~=planned-burn-advice\]\{--media-releases-accent:\s*#865aa5\}/);
     assert.match(css, /\.media-releases__item\[data-declaration~=fire-ban-declaration\]\{--media-releases-accent:\s*#52565f\}/);

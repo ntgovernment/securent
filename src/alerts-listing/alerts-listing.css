@@ -253,10 +253,10 @@ section.alerts-page {
   width: 100%;
   min-width: 0;
   min-height: 48px;
-  padding: 12px;
+  padding: 12px 48px 12px 12px;
   border: 1px solid #d3d3d7;
   border-radius: 0;
-  background: #fff;
+  background-color: #fff;
   color: #1f1e27;
   font-family: Lato, sans-serif;
   font-size: 16px;
