@@ -21,8 +21,12 @@ If the earlier three-level templates are already installed:
 4. Keep theme CSS as a normal stylesheet in the document head. Its initial-state
   rules prevent the expanded-menu flash while the theme module loads.
 
-The alerts preview uses CSS cache version `40` and JS cache version `31`.
+The alerts preview uses CSS cache version `41` and JS cache version `31`.
 Production cache references are managed separately in Matrix.
+
+For the hover-only update on an already migrated menu, publish the refreshed
+`dist/theme.css` and refresh its CMS cache reference. No additional Bodycopy or
+JavaScript changes are required; URLs and mobile interaction remain unchanged.
 
 ## Main Listing (Level 1)
 
@@ -161,6 +165,8 @@ No additional nested listing is needed.
   The original top-level destination link is hidden, not rewritten; the overview
   retains its CMS-generated destination link. Items without children remain links.
   Level 2 groups and Level 3 links remain expanded inside each open panel.
+- Desktop panel links keep a white background on hover and keyboard focus. A text
+  underline supplies the hover/focus cue without changing borders or moving links.
 - Mobile: parent links navigate; separate 40px buttons expand their children.
   Opening a sibling resets the previous branch. Escape closes and returns focus.
 - Without JavaScript, the links and nested lists remain visible in normal flow.
@@ -199,10 +205,13 @@ Verified locally on 10 November 2026:
 - Alerts preview: desktop panel alignment and visible Level 3 links at 1440px;
   wrapped labels and 40px controls at 320px, 375px and 767px; drawer and scroll-state
   cleanup at 768px; all destination links reachable with JavaScript disabled.
+- Desktop hover: section headings and Level 3 links retain a white background,
+  display a text underline and keep identical position and dimensions before and
+  during hover. Computed borders are zero and transforms are disabled.
 - First-load check with the theme module blocked: panels remain hidden at 375px
   and 1440px, with a compact header and a horizontal desktop root list. Applying
   the disabled-scripting media rules still exposes the fallback links.
-- The migrated alerts capture uses theme CSS version `40` and theme JS version `31`.
+- The migrated alerts capture uses theme CSS version `41` and theme JS version `31`.
   Other captures have not been migrated and must not be treated as enhanced-menu fixtures.
 
 These are local results, not confirmation of production publication. Apply the

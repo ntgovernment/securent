@@ -1026,6 +1026,20 @@ nav.nav-masthead .cms-main-nav a {
     white-space: normal;
   }
 
+  nav.nav-masthead .cms-main-nav .desktop-main-nav__panel a {
+    border: 0 !important;
+    background: #ffffff !important;
+    text-decoration: none !important;
+    text-underline-offset: 0.15em;
+    transform: none !important;
+    transition: none;
+  }
+
+  nav.nav-masthead .cms-main-nav .desktop-main-nav__panel a:hover,
+  nav.nav-masthead .cms-main-nav .desktop-main-nav__panel a:focus-visible {
+    text-decoration: underline !important;
+  }
+
   nav.nav-masthead .cms-main-nav .desktop-main-nav__panel a:focus-visible {
     outline-color: #343741;
   }
