@@ -87,7 +87,7 @@ import { primaryNavigation } from "../data/navigation.js";
       const button = document.createElement("button");
       const panel = document.createElement("div");
       const overview = document.createElement("div");
-      const heading = document.createElement("h2");
+      const overviewTitle = document.createElement("div");
       const columns = document.createElement("div");
       button.type = "button";
       button.textContent = item.label;
@@ -100,8 +100,9 @@ import { primaryNavigation } from "../data/navigation.js";
       panel.setAttribute("aria-labelledby", button.id);
       panel.hidden = true;
       overview.className = "desktop-main-nav__overview";
-      heading.textContent = item.label;
-      overview.append(heading);
+      overviewTitle.className = "desktop-main-nav__overview-title";
+      overviewTitle.textContent = item.label;
+      overview.append(overviewTitle);
       const description = item.description || descriptions.get(new URL(item.href, document.baseURI).href);
       if (description) {
         const paragraph = document.createElement("p");
@@ -115,9 +116,10 @@ import { primaryNavigation } from "../data/navigation.js";
       columns.className = "desktop-main-nav__columns";
       item.children.forEach(function (child) {
         const group = document.createElement("section");
-        const groupHeading = document.createElement("h3");
-        groupHeading.append(makeLink(child));
-        group.append(groupHeading);
+        const groupTitle = document.createElement("div");
+        groupTitle.className = "desktop-main-nav__group-title";
+        groupTitle.append(makeLink(child));
+        group.append(groupTitle);
         if (child.children && child.children.length) {
           const childList = document.createElement("ul");
           child.children.forEach(function (grandchild) {

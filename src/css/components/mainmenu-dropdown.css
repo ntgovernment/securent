@@ -446,9 +446,10 @@
     border-right: 1px solid #d3d3d7;
   }
 
-  .desktop-main-nav__overview h2 {
+  .desktop-main-nav__overview-title {
     margin: 0 0 1rem;
     font-size: 1.5rem;
+    font-weight: 700;
     line-height: 1.25;
   }
 
@@ -490,7 +491,7 @@
     margin-bottom: 1.75rem;
   }
 
-  .desktop-main-nav__columns h3 {
+  .desktop-main-nav__group-title {
     margin: 0 0 0.75rem;
     font-size: 1rem;
     font-weight: 700;
