@@ -2,6 +2,9 @@ import "./homepage-news.js";
 import "./display-cards.js";
 import "../hero-banners/hero-banners.js";
 import { primaryNavigation } from "../data/navigation.js";
+import { guardQuickExit } from "./quick-exit.mjs";
+
+guardQuickExit(window);
 
 /* Expand the desktop search field when the icon is activated empty. */
 (function () {
