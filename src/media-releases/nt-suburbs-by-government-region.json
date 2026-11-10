@@ -1,0 +1,1111 @@
+{
+  "title": "Northern Territory suburbs and localities by NT Government region",
+  "generated": "2026-11-10",
+  "region_classification": "NT Government six administrative regions",
+  "record_count": 270,
+  "regions": [
+    "Greater Darwin, Palmerston and Litchfield",
+    "Top End",
+    "East Arnhem",
+    "Big Rivers",
+    "Barkly",
+    "Central Australia"
+  ],
+  "limitations": "Compiled from the Australia Post NT locality list and NT Government administrative-region descriptions. The NT Government publishes the six-region classification as a map rather than an authoritative suburb-to-region table. Treat boundary localities as a working mapping and spatially validate before operational emergency use.",
+  "sources": [
+    {
+      "name": "NT Government regions map",
+      "url": "https://ldm.nt.gov.au/_resources/documents/factsheets/nt-government-admin-regions-place-names.pdf"
+    },
+    {
+      "name": "Australia Post NT locality list",
+      "url": "https://auspost.com.au/content/dam/auspost_corp/media/documents/delivery-area-nt-locality.csv"
+    },
+    {
+      "name": "Geoscape NT locality boundaries",
+      "url": "https://data.gov.au/data/dataset/nt-suburb-locality-boundaries-geoscape-administrative-boundaries"
+    }
+  ],
+  "localities": [
+    {
+      "suburb_or_locality": "Acacia Hills",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Adelaide River",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Alawa",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Ali Curung",
+      "nt_government_region": "Barkly"
+    },
+    {
+      "suburb_or_locality": "Alice Springs",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Alpururrulam",
+      "nt_government_region": "Barkly"
+    },
+    {
+      "suburb_or_locality": "Alyangula",
+      "nt_government_region": "East Arnhem"
+    },
+    {
+      "suburb_or_locality": "Amoonguna",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Ampilatwatja",
+      "nt_government_region": "Barkly"
+    },
+    {
+      "suburb_or_locality": "Anatye",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Angurugu",
+      "nt_government_region": "East Arnhem"
+    },
+    {
+      "suburb_or_locality": "Anindilyakwa",
+      "nt_government_region": "East Arnhem"
+    },
+    {
+      "suburb_or_locality": "Anmatjere",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Anula",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Araluen",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Archer",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Areyonga",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Arnold",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Arumbera",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Atitjere",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Baines",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Bakewell",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Barrow Creek",
+      "nt_government_region": "Barkly"
+    },
+    {
+      "suburb_or_locality": "Barunga",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Batchelor",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Bayview",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Bees Creek",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Bellamack",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Belyuen",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Berrimah",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Berry Springs",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Beswick Creek",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Binjari",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Birdum",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Black Jungle",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Blackmore",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Borroloola",
+      "nt_government_region": "Barkly"
+    },
+    {
+      "suburb_or_locality": "Bradshaw",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Brinkin",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Buchanan",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Buffalo Creek",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Bulman Weemol",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Burrundie",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Burt Plain",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Bynoe",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Bynoe Harbour",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Calvert",
+      "nt_government_region": "Barkly"
+    },
+    {
+      "suburb_or_locality": "Camp Creek",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Canteen Creek",
+      "nt_government_region": "Barkly"
+    },
+    {
+      "suburb_or_locality": "Casuarina",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Channel Island",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Chilla Well",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Ciccone",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Claravale",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Cobourg",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Coconut Grove",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Connellan",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Coolalinga",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Coomalie Creek",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Coonawarra",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Costello",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Cox Peninsula",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Cresswell",
+      "nt_government_region": "Barkly"
+    },
+    {
+      "suburb_or_locality": "Daly River",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Daly Waters",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Darwin",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Darwin City",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Darwin River",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Davenport",
+      "nt_government_region": "Barkly"
+    },
+    {
+      "suburb_or_locality": "Delamere",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Desert Springs",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Douglas-Daly",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Driver",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Dundee Beach",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Dundee Downs",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Dundee Forest",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Durack",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "East Arm",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "East Point",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "East Side",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Eaton",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Edith",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Elliott",
+      "nt_government_region": "Barkly"
+    },
+    {
+      "suburb_or_locality": "Elsey",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Emungalan",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Engawala",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Eva Valley",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Fannie Bay",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Farrar",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Finke",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Finniss Valley",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Fleming",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Florina",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Fly Creek",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Flying Fox",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Flynn",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Freds Pass",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Galiwinku",
+      "nt_government_region": "East Arnhem"
+    },
+    {
+      "suburb_or_locality": "Gapuwiyak",
+      "nt_government_region": "East Arnhem"
+    },
+    {
+      "suburb_or_locality": "Ghan",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Gillen",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Girraween",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Goulburn Island",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Gray",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Gregory",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Gunbalanya",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Gunn",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Haasts Bluff",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Hale",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Hart",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Heavitree Gap CPA",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Helen Springs Station",
+      "nt_government_region": "Barkly"
+    },
+    {
+      "suburb_or_locality": "Herbert",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Hermannsburg",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Holmes",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Holtze",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Howard Springs",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Hugh",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Hughes",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Humpty Doo",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Ilparpa",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Imanpa",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Irlpme",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Jabiru",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Jingili",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Johnston",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Kakadu",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Kalkarindji",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Kaltukatjara",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Karama",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Katherine",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Katherine East",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Katherine South",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Kilgariff",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Kintore",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Knuckey Lagoon",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Koolpinyah",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Lajamanu",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Lake Bennett",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Lambells Lagoon",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Lansdowne",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Laramba",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Larapinta",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Larrakeyah",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Larrimah",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Leanyer",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Lee Point",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Litchfield Park",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Livingstone",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Lloyd Creek",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Ludmilla",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Lyons",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "MacDonnell Range",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Malak",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Mandorah",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Maningrida",
+      "nt_government_region": "East Arnhem"
+    },
+    {
+      "suburb_or_locality": "Manton",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Maranboy",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Margaret River",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Marlow Lagoon",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Marrakai",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Marrara",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Mataranka",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "McArthur",
+      "nt_government_region": "Barkly"
+    },
+    {
+      "suburb_or_locality": "McMinns Lagoon",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Micket Creek",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Middle Point",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Milingimbi",
+      "nt_government_region": "East Arnhem"
+    },
+    {
+      "suburb_or_locality": "Millner",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Milyakburra",
+      "nt_government_region": "East Arnhem"
+    },
+    {
+      "suburb_or_locality": "Miniyerri",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Minjilang",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Mitchell",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Moil",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Moulden",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Mount Bundey",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Mount Johns",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Mount Liebig",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Mount Zeil",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Muirhead",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Nakara",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Namatjira",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Napperby Station",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Newcastle Waters",
+      "nt_government_region": "Barkly"
+    },
+    {
+      "suburb_or_locality": "Ngukurr",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Nhulunbuy",
+      "nt_government_region": "East Arnhem"
+    },
+    {
+      "suburb_or_locality": "Nightcliff",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Nitjpurru",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Nitmiluk",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Noonamah",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Numbulwar",
+      "nt_government_region": "East Arnhem"
+    },
+    {
+      "suburb_or_locality": "Nyirripi",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Oenpelli",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Palmerston City",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Pamayu",
+      "nt_government_region": "Barkly"
+    },
+    {
+      "suburb_or_locality": "Papunya",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Parap",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Petermann",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Pine Creek",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Pinelands",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Point Stuart",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Pularumpi",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Rakula",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Ramingining",
+      "nt_government_region": "East Arnhem"
+    },
+    {
+      "suburb_or_locality": "Rapid Creek",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Robin Falls",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Rosebery",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Ross",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Rum Jungle",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Sadadeen",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Santa Teresa",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Shoal Bay",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Southport",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Stapleton",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Stuart",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Stuart Park",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Tablelands",
+      "nt_government_region": "Barkly"
+    },
+    {
+      "suburb_or_locality": "Tara",
+      "nt_government_region": "Barkly"
+    },
+    {
+      "suburb_or_locality": "Telegraph Station",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Tennant Creek",
+      "nt_government_region": "Barkly"
+    },
+    {
+      "suburb_or_locality": "The Gap",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "The Gardens",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "The Narrows",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Ti Tree",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Timber Creek",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Tindal",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Titjikala",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Tivendale",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Tiwi",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Tiwi Islands",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Top Springs",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Tortilla Flats",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Tumbling Waters",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Umbakumba",
+      "nt_government_region": "East Arnhem"
+    },
+    {
+      "suburb_or_locality": "Undoolya",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Uralla",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Venn",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Vernon Islands",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Victoria River",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Virginia",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Wadeye",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Wagait Beach",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Wagaman",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Wak Wak",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Wallace Rockhole",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Wanguri",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Warruwi",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Warumungu",
+      "nt_government_region": "Barkly"
+    },
+    {
+      "suburb_or_locality": "Weddell",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "West Arnhem",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "White Gums",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Wickham",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Willowra",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Wilora",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Wilton",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Winnellie",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Wishart",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Woodroffe",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Woolner",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Wugularr",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Wulagi",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Wurrumiyanga",
+      "nt_government_region": "Top End"
+    },
+    {
+      "suburb_or_locality": "Wutunugurra",
+      "nt_government_region": "Barkly"
+    },
+    {
+      "suburb_or_locality": "Yarralin",
+      "nt_government_region": "Big Rivers"
+    },
+    {
+      "suburb_or_locality": "Yarrawonga",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    },
+    {
+      "suburb_or_locality": "Yirrkala",
+      "nt_government_region": "East Arnhem"
+    },
+    {
+      "suburb_or_locality": "Yuelamu",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Yuendumu",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Yulara",
+      "nt_government_region": "Central Australia"
+    },
+    {
+      "suburb_or_locality": "Zuccoli",
+      "nt_government_region": "Greater Darwin, Palmerston and Litchfield"
+    }
+  ]
+}

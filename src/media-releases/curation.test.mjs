@@ -73,7 +73,7 @@ test("deduplicates campaigns by source precedence while retaining lineage", () =
     sources: ["Bushfires NT", "NTES", "NTG agencies"],
     source: "Bushfires NT",
     url: "http://createsend.com/campaign-1",
-    regions: ["Big Rivers"],
+    regions: ["Top End"],
     emergencyTypes: ["Bushfire", "Flooding"],
     declarations: [],
     warningLevel: "Advice",
@@ -113,6 +113,16 @@ test("keeps ambiguous classifications unknown and avoids highway region guesses"
     regions: ["Not identified"], emergencyTypes: ["Not identified"], declarations: [], warningLevel: "Not identified",
   });
   assert.deepEqual(classifyNotice({ Subject: "Advice - Barkly Highway" }).regions, ["Not identified"]);
+});
+
+test("uses dataset localities and structured place fields to identify regions", () => {
+  assert.deepEqual(classifyNotice({ title: "Flood Advice - Canteen Creek" }).regions, ["Barkly"]);
+  assert.deepEqual(classifyNotice({ title: "Flood Advice - Daly River" }).regions, ["Top End"]);
+  assert.deepEqual(classifyNotice({ title: "Flood Advice - Dundee Beach" }).regions, ["Greater Darwin"]);
+  assert.deepEqual(classifyNotice({ Suburb: "Anindilyakwa" }).regions, ["East Arnhem"]);
+  assert.deepEqual(classifyNotice({ Town: "  ali   curung " }).regions, ["Barkly"]);
+  assert.deepEqual(classifyNotice({ title: "Flood Advice - Alice Springs and Darwin" }).regions,
+    ["Greater Darwin", "Central Australia"]);
 });
 
 test("classifies explicit fire bans without an emergency type or identified warning level", () => {
@@ -241,7 +251,7 @@ test("combines filter groups with OR within each group and AND between groups", 
     record({ CampaignID: "alice", Name: "Storm Emergency Warning - Alice Springs", Subject: "Storm Emergency Warning - Alice Springs" }),
   ] }]);
   const selected = filterAndSortNotices(items, {
-    sources: ["NTES"], regions: ["Big Rivers", "Central Australia"], emergencyTypes: ["Flooding"], warningLevels: ["Advice"],
+    sources: ["NTES"], regions: ["Top End", "Central Australia"], emergencyTypes: ["Flooding"], warningLevels: ["Advice"],
   });
   assert.deepEqual(selected.map((item) => item.campaignId), ["daly"]);
   assert.equal(filterAndSortNotices(items, { regions: ["East Arnhem"] }).length, 0);

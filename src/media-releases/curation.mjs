@@ -1,5 +1,6 @@
 import { sortAlerts, updatedTimestamp } from "../alerts-listing/sorting.mjs";
 import { getPlaceSearchValues } from "../search/autocomplete.mjs";
+import localityData from "./nt-suburbs-by-government-region.json" with { type: "json" };
 
 export const sourceOrder = ["Bushfires NT", "NTES", "NTG agencies"];
 
@@ -21,6 +22,44 @@ const regionPatterns = [
   ["Central Australia", /\b(?:central australia|alice springs|lasseter|tanami|simpson|yulara|uluru|santa teresa|ltyentye apurte|hermannsburg|ntaria|papunya|yuendumu|nyirripi|chilla well|ti tree|harts range|hugh)\b/i],
 ];
 
+function normalizePlace(value) {
+  return value.normalize("NFKC").toLocaleLowerCase("en")
+    .replace(/[\p{P}\p{S}]+/gu, " ").replace(/\s+/g, " ").trim();
+}
+
+const localityRegions = new Map(localityData.localities.map((locality) => [
+  normalizePlace(locality.suburb_or_locality),
+  locality.nt_government_region === "Greater Darwin, Palmerston and Litchfield"
+    ? "Greater Darwin"
+    : locality.nt_government_region,
+]));
+const localitiesByLength = [...localityRegions.keys()].sort((first, second) => second.length - first.length);
+
+function matchingRegions(content) {
+  const normalizedContent = ` ${normalizePlace(content)
+    .replace(/\b[\p{L}\p{N}'-]+\s+(?:highway|hwy)\b/gu, " ")} `;
+  const matches = new Set();
+  const matchedLocalities = [];
+  for (const locality of localitiesByLength) {
+    if (normalizedContent.includes(` ${locality} `)) {
+      matchedLocalities.push(locality);
+      matches.add(localityRegions.get(locality));
+    }
+  }
+  for (const [region, pattern] of regionPatterns) {
+    const aliases = normalizedContent.matchAll(new RegExp(pattern.source, `${pattern.flags}g`));
+    for (const alias of aliases) {
+      const normalizedAlias = normalizePlace(alias[0]);
+      if (matchedLocalities.some((locality) => ` ${locality} `.includes(` ${normalizedAlias} `))) continue;
+      const exactRegion = localityRegions.get(normalizedAlias);
+      if (!exactRegion || exactRegion === region) matches.add(region);
+    }
+  }
+  return matches.size
+    ? regionPatterns.map(([region]) => region).filter((region) => matches.has(region))
+    : ["Not identified"];
+}
+
 const emergencyPatterns = [
   ["Bushfire", /\b(?:bush\s*fires?(?:\s*nt)?|wildfires?|grass\s*fires?|fire bans?|fire danger|planned burn|vegetation fire)\b/i],
   ["Cyclone", /\b(?:cyclones?|tropical low)\b/i],
@@ -33,7 +72,8 @@ const emergencyPatterns = [
 ];
 
 export function classifyNotice(record) {
-  const content = [record.title || record.Subject, record.name || record.Name].filter(Boolean).join(" ");
+  const content = [record.title || record.Subject, record.name || record.Name,
+    ...getPlaceSearchValues(record)].filter(Boolean).join(" ");
   const isFireBan = /\bfire bans?\b/i.test(content);
   const isPlannedBurn = /\bplanned burns?\b/i.test(content);
   const isBoilWaterNotice = /\bboil(?:ing)? water\b/i.test(content);
@@ -54,7 +94,7 @@ export function classifyNotice(record) {
     ["Advice", /\badvice\b/i],
   ];
   return {
-    regions: matchingLabels(regionPatterns),
+    regions: matchingRegions(content),
     emergencyTypes: isDeclaration ? [] : matchingLabels(emergencyPatterns),
     declarations,
     warningLevel: isDeclaration ? "Not identified" : [record.title || record.Subject, record.name || record.Name]
@@ -110,7 +150,7 @@ function normalizeRecord(record, source, index) {
     source,
     url: cleanText(record.WebVersionURL),
     ...(locationTerms.length ? { locationTerms } : {}),
-    ...classifyNotice({ title, name }),
+    ...classifyNotice({ ...record, title, name }),
   };
 }
 
