@@ -10,18 +10,8 @@ export const mediaReleaseSources = [
     endpoint: "/_design/integrations/campaign-monitor-ntes",
   },
   {
-    id: "pfes",
-    name: "PFES",
-    endpoint: "/_design/integrations/campaign-monitor-pfes",
-  },
-  {
-    id: "securent",
-    name: "SecureNT",
-    endpoint: "/_design/integrations/campaign-monitor-securent",
-  },
-  {
-    id: "wog",
-    name: "WoG",
+    id: "ntg-agencies",
+    name: "NTG agencies",
     endpoint: "/_design/integrations/campaign-monitor-all-agencies",
   },
 ];

@@ -51,11 +51,9 @@ test("recognizes the NTES duty officer email stored in FromName", () => {
 
 test("deduplicates campaigns by source precedence while retaining lineage", () => {
   const feeds = [
-    { source: "WoG", items: [record({ Subject: "WoG title" })] },
-    { source: "SecureNT", items: [record({ Subject: "SecureNT title" })] },
-    { source: "PFES", items: [record({ Subject: "PFES title" })] },
-    { source: "NTES", items: [record({ Subject: "NTES title" })] },
     { source: "Bushfires NT", items: [record({ Subject: "Bushfires title" })] },
+    { source: "NTES", items: [record({ Subject: "NTES title" })] },
+    { source: "NTG agencies", items: [record({ Subject: "NTG agencies title" })] },
   ];
 
   assert.deepEqual(curateFeeds(feeds), [{
@@ -65,7 +63,7 @@ test("deduplicates campaigns by source precedence while retaining lineage", () =
     name: "AWS Flood Advice - Daly River",
     fromName: "NT Fire and Emergency Services",
     publishedAt: "2026-11-08 09:00:00",
-    sources: ["Bushfires NT", "NTES", "PFES", "SecureNT", "WoG"],
+    sources: ["Bushfires NT", "NTES", "NTG agencies"],
     source: "Bushfires NT",
     url: "http://createsend.com/campaign-1",
     regions: ["Big Rivers"],
@@ -208,17 +206,19 @@ test("sorts dates, titles and warning severity without mutating input, leaving m
   assert.deepEqual(items.map((item) => item.campaignId), ["newer", "older", "undated"]);
 });
 
-test("PFES takes precedence over SecureNT but remains below NTES", () => {
+test("deduplicates with Bushfires NT above NTES above NTG agencies", () => {
   const feeds = [
-    { source: "SecureNT", items: [record({ Subject: "SecureNT title" })] },
-    { source: "PFES", items: [record({ Subject: "PFES title" })] },
+    { source: "NTG agencies", items: [record({ Subject: "NTG agencies title" })] },
   ];
   const [preferred] = curateFeeds(feeds);
-  assert.equal(preferred.source, "PFES");
-  assert.deepEqual(preferred.sources, ["PFES", "SecureNT"]);
+  assert.equal(preferred.source, "NTG agencies");
+  assert.deepEqual(preferred.sources, ["NTG agencies"]);
+  const [bushfires] = curateFeeds([...feeds, { source: "Bushfires NT", items: [record({ Subject: "Bushfires title" })] }]);
+  assert.equal(bushfires.source, "Bushfires NT");
+  assert.deepEqual(bushfires.sources, ["Bushfires NT", "NTG agencies"]);
   const [ntes] = curateFeeds([...feeds, { source: "NTES", items: [record({ Subject: "NTES title" })] }]);
   assert.equal(ntes.source, "NTES");
-  assert.deepEqual(ntes.sources, ["NTES", "PFES", "SecureNT"]);
+  assert.deepEqual(ntes.sources, ["NTES", "NTG agencies"]);
 });
 
 test("items without campaign IDs remain distinct", () => {
@@ -232,7 +232,7 @@ test("items without campaign IDs remain distinct", () => {
 
 test("sorts curated records newest-first with missing dates last", () => {
   const items = curateFeeds([{
-    source: "SecureNT",
+    source: "NTES",
     items: [
       record({ CampaignID: "older", Subject: "Flood Advice - Daly River", SentDate: "2026-11-07 09:00:00" }),
       record({ CampaignID: "newer", Subject: "Flood Emergency Warning - Katherine", SentDate: "2026-11-08 09:00:00" }),

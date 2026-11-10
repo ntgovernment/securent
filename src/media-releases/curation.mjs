@@ -1,7 +1,7 @@
 import { sortAlerts, updatedTimestamp } from "../alerts-listing/sorting.mjs";
 import { getPlaceSearchValues } from "../search/autocomplete.mjs";
 
-export const sourceOrder = ["Bushfires NT", "NTES", "PFES", "SecureNT", "WoG"];
+export const sourceOrder = ["Bushfires NT", "NTES", "NTG agencies"];
 
 const sourceRank = new Map(sourceOrder.map((source, index) => [source, index]));
 const alertLanguage = /\b(?:advice|warning|watch\s*(?:&|and)\s*act|emergency\s+(?:warning|alert|declaration)|decreasing[\s_-]+threats?|threat is reduced|evacu\w*|take shelter|shelter now|prepare now|stay informed|fire bans?|fire danger period|boil water alert|public health alert|code yellow|rescue operation|incidents?\b|hazmat|dangerous surf|avoid (?:the )?flooded area)\b/i;

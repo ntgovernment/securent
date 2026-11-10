@@ -52,15 +52,16 @@ if (listing) {
     });
   }
 
-  function renderFilterGroup(name, container, valuesFor, order) {
+  function renderFilterGroup(name, container, valuesFor, order, alwaysInclude = []) {
     container.replaceChildren();
-    const values = [...new Set(items.flatMap(valuesFor))];
+    const alwaysIncluded = new Set(alwaysInclude);
+    const values = [...new Set([...alwaysInclude, ...items.flatMap(valuesFor)])];
     values.sort((first, second) => order
       ? order.indexOf(first) - order.indexOf(second)
       : first === "Not identified" ? 1 : second === "Not identified" ? -1 : first.localeCompare(second));
     for (const value of values) {
       const count = items.filter((item) => valuesFor(item).includes(value)).length;
-      if (!count) continue;
+      if (!count && !alwaysIncluded.has(value)) continue;
       const label = document.createElement("label");
       label.className = "media-releases__filter";
       const input = document.createElement("input");
@@ -75,8 +76,9 @@ if (listing) {
   }
 
   function renderFilters() {
-    renderFilterGroup("source", filters.querySelector("[data-source-filters]"), (item) => item.sources.filter((source) => source !== "WoG"),
-      mediaReleaseSources.map((source) => source.name));
+    const sourceNames = mediaReleaseSources.map((source) => source.name);
+    renderFilterGroup("source", filters.querySelector("[data-source-filters]"), (item) => item.sources,
+      sourceNames, sourceNames);
     renderFilterGroup("region", filters.querySelector("[data-region-filters]"), (item) => item.regions);
     renderFilterGroup("emergencyType", filters.querySelector("[data-type-filters]"), (item) => item.emergencyTypes);
     renderFilterGroup("declaration", filters.querySelector("[data-declaration-filters]"), (item) => item.declarations);
