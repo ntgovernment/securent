@@ -17,11 +17,12 @@ securent/
 │   ├── media-releases/
 │   │   ├── curation.mjs               # Emergency notice filtering, deduplication and source precedence
 │   │   ├── curation.test.mjs          # Curation regression tests
-│   │   ├── feeds.mjs                  # Five-source feed loading and failure reporting
+│   │   ├── feeds.mjs                  # Three-source feed loading and failure reporting
 │   │   ├── feeds.test.mjs             # Feed parsing and error-state tests
 │   │   ├── aws-icons.mjs               # AWS hazard and warning-level icon mapping
 │   │   ├── aws-icons.test.mjs          # AWS icon mapping and fallback tests
 │   │   ├── media-releases.js          # Search, filters, cards and result pagination
+│   │   ├── media-releases.test.mjs    # Built-bundle loading overlay and cleanup regression tests
 │   │   └── media-releases.css         # Standalone listing styles
 │   ├── pagination/
 │   │   ├── pagination.css             # Shared Alerts and Current warnings pagination styles
@@ -142,8 +143,10 @@ The controls enhance existing `.alerts-listing__filters` markup automatically, s
 
 The standalone **Current warnings** page ([media-releases.html](media-releases.html)) combines the NTES, Bushfires NT and NTG agencies Campaign Monitor feeds defined in [feeds.mjs](src/media-releases/feeds.mjs). It curates operational emergency notices rather than showing all government news. Matching `CampaignID` values are deduplicated with Bushfires NT > NTES > NTG agencies precedence; matching source labels remain visible. Warning/action language and the approved NTES duty-officer email in `FromName` identify operational items. General awards, recruitment, ceremonies, outlooks and corporate announcements are excluded unless operational warning language takes precedence. [curation.mjs](src/media-releases/curation.mjs) owns these rules.
 
-Run `npm run build`, start `npm run dev`, then open `/media-releases.html` (Vite may normalize the URL to `/media-releases`). The page heading is **Current warnings** and the search placeholder is **Search current warnings**. Suggestions include terms from notice titles and available town, street, suburb, locality, and address fields, as well as inferred regions; each option shows a decorative magnifying-glass icon. Selecting a suggestion filters the listing. The preview uses local, gitignored `SecureNT_files/` dependencies, just like the other captured pages. Rebuild source changes before previewing; the current media-release asset versions are CSS `15` and JavaScript `35`.
+Run `npm run build`, start `npm run dev`, then open `/media-releases.html` (Vite may normalize the URL to `/media-releases`). The page heading is **Current warnings** and the search placeholder is **Search current warnings**. Suggestions include terms from notice titles and available town, street, suburb, locality, and address fields, as well as inferred regions; each option shows a decorative magnifying-glass icon. Selecting a suggestion filters the listing. The preview uses local, gitignored `SecureNT_files/` dependencies, just like the other captured pages. Rebuild source changes before previewing; the current media-release asset versions are CSS `16` and JavaScript `36`.
 Original notice titles remain unchanged. This mapping applies only to Current warnings, not the existing Alerts and warnings listing.
+
+During initial feed loading and population, a translucent overlay dims only the warnings listing, including search, results and filters. A centred 100px spinner and an accessible loading status indicate progress. Listing controls are temporarily inert; the header, footer and page scrolling remain usable. The overlay clears after rendering completes or fails, restoring controls and exposing the existing result or error message. Reduced-motion preferences disable spinner rotation. Search, filtering, sorting and pagination do not trigger the overlay. JavaScript creates the overlay automatically, so no additional Matrix markup is required; publish the matching rebuilt CSS and JS together and refresh their cache references.
 
 A **Filters** heading and text-only **Clear all filters** button appear below Sort by. Clearing unchecks all five filter groups and returns to page 1, preserving search text and sort order. Filter fieldsets are separated by spacing, not divider lines; the divider below Sort by remains. Include the heading and `data-clear-filters` button from the preview when updating Matrix listing markup. Both controls appear inside the mobile **Sort and filter** disclosure.
 
@@ -184,12 +187,13 @@ This HTML is a local preview shell, not a Vite production HTML entry. For Matrix
 
 Validation checklist:
 
-- Run `node --test src/search/autocomplete.test.mjs src/pagination/page-window.test.mjs src/media-releases/aws-icons.test.mjs src/media-releases/curation.test.mjs src/media-releases/feeds.test.mjs src/alerts-listing/sorting.test.mjs` for autocomplete, pagination, AWS icon tiers/fallbacks, extraction, precedence, combined filters, sorting, date parsing and feed failures.
+- Run `npm run build` before `node --test src/search/autocomplete.test.mjs src/pagination/page-window.test.mjs src/media-releases/*.test.mjs src/alerts-listing/sorting.test.mjs` for autocomplete, pagination, AWS icon tiers/fallbacks, extraction, precedence, combined filters, sorting, date parsing, feed failures and loading overlay cleanup. The loading DOM tests use happy-dom, the preview HTML and the built media-release module; rebuild after source changes so they exercise the current implementation.
 - Run `npm run build` and publish the standalone assets, shared `autocomplete.js` dependency, and generated AWS WEBP icons with their source changes.
 - Check that Fire ban counts are based on deduplicated notices, including singular/plural wording in campaign names and subjects. Fire bans must appear in Declaration results, not Bushfire or Advice results, and their cards must omit the emergency-type/warning-level line and AWS icon. Ordinary warning cards must retain their classifications and icons.
 - Check that **Clear all filters** unchecks Warning level, Emergency type, Declaration, Region and Source, resets pagination to page 1, and preserves search text and sort order. Confirm that the text-only button and Filters heading fit on desktop/mobile and no fieldset divider lines remain.
 - Manually inspect excluded candidates after curation changes, especially borderline operational announcements. Keep this review in validation; do not add a public exclusions section or generated review report.
 - Check desktop/mobile search, combined filters, sidebar sorting, page resets, collapsed filter accessibility, and partial/all-source failures. Live feeds may stall; controlled browser fixtures can isolate UI checks without changing production feed configuration.
+- Delay feed responses and check the listing-only dimming, 100px spinner, blocked listing controls, usable header/footer and reduced-motion behavior at desktop/mobile widths. Confirm cleanup after populated or empty results, partial/total feed failure and rendering errors. The automated DOM checks cover these cleanup paths; visual browser verification of this overlay remains outstanding because the shared-browser connection timed out.
 
 ## Build
 

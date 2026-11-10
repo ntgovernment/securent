@@ -31,6 +31,30 @@ if (listing) {
   let items = [];
   let currentPage = 1;
 
+  const loadingContents = [...listing.children];
+  const loadingOverlay = document.createElement("div");
+  loadingOverlay.className = "media-releases__loading-overlay";
+  loadingOverlay.hidden = true;
+  loadingOverlay.setAttribute("role", "status");
+  const spinner = document.createElement("span");
+  spinner.className = "media-releases__loading-spinner";
+  spinner.setAttribute("aria-hidden", "true");
+  const loadingMessage = document.createElement("span");
+  loadingMessage.className = "visually-hidden";
+  loadingMessage.textContent = "Loading current warnings...";
+  loadingOverlay.append(spinner, loadingMessage);
+  listing.append(loadingOverlay);
+
+  function setLoading(loading) {
+    listing.classList.toggle("media-releases__listing--loading", loading);
+    loadingOverlay.hidden = !loading;
+    results.setAttribute("aria-busy", String(loading));
+    for (const content of loadingContents) {
+      content.inert = loading;
+      content.setAttribute("aria-busy", String(loading));
+    }
+  }
+
   const searchAutocomplete = attachAutocomplete(search, searchSuggestions, () => items
     .flatMap((item) => getAutocompleteCandidates([
       item.title, item.name, ...item.regions, ...(item.locationTerms || []),
@@ -240,7 +264,6 @@ if (listing) {
     const start = (currentPage - 1) * pageSize;
     const pageItems = matches.slice(start, start + pageSize);
     results.replaceChildren(...pageItems.map(renderCard));
-    results.setAttribute("aria-busy", "false");
     status.textContent = matches.length
       ? `Showing ${start + 1}-${Math.min(start + pageSize, matches.length)} of ${matches.length} current warnings. Sorted by ${sort.selectedOptions[0].textContent.toLowerCase()}.`
       : "No current warnings match your search or filters.";
@@ -280,6 +303,7 @@ if (listing) {
     render();
   });
 
+  setLoading(true);
   fetchMediaReleaseFeeds(
     fetch,
     (source) => isLocalPreview
@@ -294,10 +318,10 @@ if (listing) {
       render();
     })
     .catch((error) => {
-      results.setAttribute("aria-busy", "false");
       status.textContent = "Current warnings are temporarily unavailable. Please try again later.";
       feedNote.hidden = false;
       feedNote.textContent = "No source feeds could be loaded.";
       console.error("Unable to load current warnings", error);
-    });
+    })
+    .finally(() => setLoading(false));
 }
