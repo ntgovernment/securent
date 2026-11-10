@@ -1,7 +1,6 @@
 import "./homepage-news.js";
 import "./display-cards.js";
 import "../hero-banners/hero-banners.js";
-import { primaryNavigation } from "../data/navigation.js";
 import { guardQuickExit } from "./quick-exit.mjs";
 
 guardQuickExit(window);
@@ -29,144 +28,36 @@ guardQuickExit(window);
   const header = nav && nav.closest(".ntg-header");
   const menuList = nav && nav.querySelector(".ntg-main-nav__links");
   const headerTools = header && header.querySelector(".header-tools");
-  if (!nav || !header || !menuList || !headerTools) return;
+  if (!nav || !header || !menuList || !headerTools || !menuList.classList.contains("cms-main-nav")) return;
+  if (nav.dataset.navigationReady) return;
+  const navbar = header.querySelector(".navbar");
+  if (!navbar) return;
+  nav.dataset.navigationReady = "true";
 
   const menuId = "primary-navigation";
   nav.id = menuId;
   nav.classList.remove("d-none", "d-md-flex");
 
-  const descriptions = new Map();
-  menuList.querySelectorAll(":scope > li").forEach(function (item) {
-    const link = item.querySelector(":scope > a");
-    if (!link) return;
-    const description = (item.dataset.description ?? link.dataset.description ?? "").trim();
-    if (description) descriptions.set(link.href, description);
-  });
-
-  function renderItems(items, isRoot) {
-    const list = document.createElement("ul");
-    list.className = isRoot ? "ntg-main-nav__links" : "ntg-main-nav__submenu";
-
-    items.forEach(function (item) {
-      const listItem = document.createElement("li");
-      const link = document.createElement("a");
-      const label = document.createElement("span");
-      link.href = item.href;
-      label.className = "ntg-main-nav__label";
-      label.textContent = item.label;
-      link.append(label);
-      listItem.append(link);
-
-      if (item.children) {
-        listItem.classList.add("has-children");
-        listItem.append(renderItems(item.children, false));
-      }
-
-      list.append(listItem);
-    });
-
-    return list;
-  }
-
-  function makeLink(item) {
-    const link = document.createElement("a");
-    link.href = item.href;
-    link.textContent = item.label;
-    return link;
-  }
-
-  function renderDesktopMenu(items) {
-    const list = document.createElement("ul");
-    list.className = "desktop-main-nav";
-
-    items.forEach(function (item, index) {
-      const listItem = document.createElement("li");
-      if (!item.children || !item.children.length) {
-        listItem.append(makeLink(item));
-        list.append(listItem);
-        return;
-      }
-
-      const button = document.createElement("button");
-      const panel = document.createElement("div");
-      const overview = document.createElement("div");
-      const overviewTitle = document.createElement("div");
-      const columns = document.createElement("div");
-      button.type = "button";
-      button.textContent = item.label;
-      button.id = "desktop-navigation-trigger-" + index;
-      button.setAttribute("aria-controls", "desktop-navigation-panel-" + index);
-      button.setAttribute("aria-expanded", "false");
-      panel.id = "desktop-navigation-panel-" + index;
-      panel.className = "desktop-main-nav__panel";
-      panel.setAttribute("role", "region");
-      panel.setAttribute("aria-labelledby", button.id);
-      panel.hidden = true;
-      overview.className = "desktop-main-nav__overview";
-      overviewTitle.className = "desktop-main-nav__overview-title";
-      overviewTitle.textContent = item.label;
-      overview.append(overviewTitle);
-      const description = item.description || descriptions.get(new URL(item.href, document.baseURI).href);
-      if (description) {
-        const paragraph = document.createElement("p");
-        paragraph.textContent = description;
-        overview.append(paragraph);
-      }
-      const overviewLink = makeLink(item);
-      overviewLink.textContent = "Find out more";
-      overviewLink.setAttribute("aria-label", "Find out more about " + item.label);
-      overview.append(overviewLink);
-      columns.className = "desktop-main-nav__columns";
-      item.children.forEach(function (child) {
-        const group = document.createElement("section");
-        const groupTitle = document.createElement("div");
-        groupTitle.className = "desktop-main-nav__group-title";
-        groupTitle.append(makeLink(child));
-        group.append(groupTitle);
-        if (child.children && child.children.length) {
-          const childList = document.createElement("ul");
-          child.children.forEach(function (grandchild) {
-            const childItem = document.createElement("li");
-            childItem.append(makeLink(grandchild));
-            childList.append(childItem);
-          });
-          group.append(childList);
-        }
-        columns.append(group);
-      });
-      panel.append(overview, columns);
-      listItem.append(button, panel);
-      list.append(listItem);
-    });
-    return list;
-  }
-
-  const renderedMenu = renderItems(primaryNavigation, true);
+  const renderedMenu = menuList;
   renderedMenu.classList.add("mobile-main-nav");
-  const desktopMenu = renderDesktopMenu(primaryNavigation);
-  menuList.replaceWith(desktopMenu, renderedMenu);
+
+  function childContainer(item) {
+    return item.querySelector(":scope > .desktop-main-nav__panel, :scope > ul");
+  }
+
+  function isDesktop() {
+    return window.innerWidth >= 768;
+  }
 
   function closeDesktopMenu(returnFocus) {
-    const expanded = desktopMenu.querySelector('button[aria-expanded="true"]');
-    if (!expanded) return;
-    expanded.setAttribute("aria-expanded", "false");
-    document.getElementById(expanded.getAttribute("aria-controls")).hidden = true;
+    const expanded = renderedMenu.querySelector(':scope > li > button[aria-expanded="true"]');
+    if (!expanded || !isDesktop()) return;
+    setExpanded(expanded.parentElement, false);
     if (returnFocus) expanded.focus();
   }
 
-  desktopMenu.addEventListener("click", function (event) {
-    const button = event.target.closest("button[aria-controls]");
-    if (!button || !desktopMenu.contains(button)) return;
-    const opening = button.getAttribute("aria-expanded") !== "true";
-    closeDesktopMenu(false);
-    if (opening) {
-      button.setAttribute("aria-expanded", "true");
-      document.getElementById(button.getAttribute("aria-controls")).hidden = false;
-    }
-  });
-
-  desktopMenu.addEventListener("focusout", function (event) {
-    if (!desktopMenu.contains(event.relatedTarget)) closeDesktopMenu(false);
+  renderedMenu.addEventListener("focusout", function (event) {
+    if (!renderedMenu.contains(event.relatedTarget)) closeDesktopMenu(false);
   });
 
   const menuButton = document.createElement("button");
@@ -198,37 +89,35 @@ guardQuickExit(window);
   backdrop.tabIndex = -1;
   backdrop.setAttribute("aria-label", "Close navigation menu");
   backdrop.hidden = true;
-  const navbar = header.querySelector(".navbar");
   navbar.insertBefore(backdrop, navbar.querySelector(".header-navigation"));
 
-  const emergencyLink = headerTools.querySelector('a[href*="/emergency-contacts"]');
-  if (emergencyLink) {
-    const emergencyItem = document.createElement("li");
-    emergencyItem.className = "mobile-emergency-link";
-    emergencyItem.innerHTML = emergencyLink.outerHTML;
-    renderedMenu.append(emergencyItem);
-  }
-
   const parents = Array.from(renderedMenu.querySelectorAll("li")).filter(function (item) {
-    return item.querySelector(":scope > ul");
+    const child = childContainer(item);
+    const link = item.querySelector(":scope > a");
+    const toggle = item.querySelector(":scope > .mobile-submenu-toggle");
+    const hasChildren = child && child.querySelector("li > a");
+    if (!hasChildren && toggle) toggle.hidden = true;
+    if (child && !hasChildren) child.hidden = true;
+    return hasChildren && link && toggle;
   });
   let previousBodyOverflow = "";
 
   parents.forEach(function (item, index) {
-    const childList = item.querySelector(":scope > ul");
+    const childList = childContainer(item);
     const link = item.querySelector(":scope > a");
-    const toggle = document.createElement("button");
-    toggle.type = "button";
-    toggle.className = "mobile-submenu-toggle";
-    toggle.innerHTML = '<span class="fa-regular fa-chevron-right" aria-hidden="true"></span>';
+    const toggle = item.querySelector(":scope > .mobile-submenu-toggle");
     item.classList.add("has-children");
-    childList.id = "navigation-submenu-" + index;
-    childList.hidden = true;
+    childList.id = menuId + "-submenu-" + index;
+    toggle.id = menuId + "-toggle-" + index;
+    toggle.hidden = false;
     toggle.setAttribute("aria-controls", childList.id);
     toggle.setAttribute("aria-expanded", "false");
     toggle.setAttribute("aria-label", "Expand " + link.textContent.trim() + " submenu");
     toggle.title = toggle.getAttribute("aria-label");
-    link.after(toggle);
+    if (childList.classList.contains("desktop-main-nav__panel")) {
+      childList.setAttribute("role", "region");
+      childList.setAttribute("aria-labelledby", toggle.id);
+    }
   });
 
   let wrappedLabelFrame = 0;
@@ -252,11 +141,11 @@ guardQuickExit(window);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(updateWrappedLabels);
 
   function setExpanded(item, expanded) {
-    const childList = item.querySelector(":scope > ul");
+    const childList = childContainer(item);
     const link = item.querySelector(":scope > a");
     const toggle = item.querySelector(":scope > .mobile-submenu-toggle");
     item.classList.toggle("open", expanded);
-    childList.hidden = !expanded;
+    childList.hidden = isDesktop() && item.parentElement !== renderedMenu ? false : !expanded;
     toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
     toggle.setAttribute("aria-label", (expanded ? "Collapse " : "Expand ") + link.textContent.trim() + " submenu");
     toggle.title = toggle.getAttribute("aria-label");
@@ -275,8 +164,11 @@ guardQuickExit(window);
     });
   }
 
+  closeAll();
+  nav.classList.add("navigation-enhanced");
+
   function setMenuOpen(open, returnFocus) {
-    if (open) previousBodyOverflow = document.body.style.overflow;
+    if (open && !header.classList.contains("menu-open")) previousBodyOverflow = document.body.style.overflow;
     else closeAll();
     header.classList.toggle("menu-open", open);
     menuButton.setAttribute("aria-expanded", open ? "true" : "false");
@@ -318,6 +210,7 @@ guardQuickExit(window);
     if (!item || !renderedMenu.contains(item)) return;
 
     if (control.classList.contains("mobile-submenu-toggle")) {
+      if (!parents.includes(item) || (isDesktop() && item.parentElement !== renderedMenu)) return;
       const expanded = control.getAttribute("aria-expanded") === "true";
       const siblings = Array.from(item.parentElement.children).filter(function (sibling) {
         return sibling !== item && sibling.classList.contains("has-children");
@@ -332,6 +225,7 @@ guardQuickExit(window);
     }
 
     if (header.classList.contains("menu-open")) setMenuOpen(false, false);
+    else closeDesktopMenu(false);
   });
 
   document.addEventListener("keydown", function (event) {
@@ -369,11 +263,14 @@ guardQuickExit(window);
     }
   });
 
+  let wasDesktop = isDesktop();
   window.addEventListener("resize", function () {
     updateWrappedLabels();
-    if (window.innerWidth < 768) closeDesktopMenu(false);
-    if (window.innerWidth >= 768 && header.classList.contains("menu-open")) {
-      setMenuOpen(false, false);
+    const desktop = isDesktop();
+    if (desktop !== wasDesktop) {
+      if (header.classList.contains("menu-open")) setMenuOpen(false, false);
+      closeAll();
+      wasDesktop = desktop;
     }
   });
 })();

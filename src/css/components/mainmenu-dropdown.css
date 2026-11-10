@@ -349,6 +349,39 @@
   display: none;
 }
 
+.cms-main-nav .mobile-submenu-toggle[hidden],
+.cms-main-nav [hidden] {
+  display: none !important;
+}
+
+.cms-main-nav .mobile-submenu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.cms-main-nav .mobile-submenu-toggle:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -3px;
+}
+
+.cms-main-nav .mobile-submenu-toggle:hover,
+.cms-main-nav .mobile-submenu-toggle[aria-expanded="true"] {
+  background: #444855;
+}
+
+.cms-main-nav .desktop-main-nav__description:empty {
+  display: none;
+}
+
 @media (min-width: 768px) {
   header.ntg-header .header-navigation > .container-xl {
     position: relative;
@@ -689,6 +722,10 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-emergency-
     grid-column: 1 / -1;
   }
 
+  .cms-main-nav li.has-children > .desktop-main-nav__panel {
+    grid-column: 1 / -1;
+  }
+
   .mobile-main-nav .ntg-main-nav__submenu:not([hidden]) {
     display: block !important;
   }
@@ -853,4 +890,177 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-emergency-
 .ntg-main-nav__links a:focus-visible {
   outline: 2px solid #000000;
   outline-offset: -2px;
+}
+
+nav.nav-masthead .cms-main-nav li > a::after {
+  display: none !important;
+}
+
+.cms-main-nav .ntg-main-nav__groups {
+  display: block !important;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cms-main-nav .ntg-main-nav__groups > li {
+  list-style: none;
+}
+
+nav.nav-masthead .cms-main-nav a {
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 768px) {
+  header.ntg-header .header-navigation .cms-main-nav {
+    display: flex;
+    align-items: stretch;
+  }
+
+  nav.nav-masthead .cms-main-nav > li,
+  nav.nav-masthead .cms-main-nav > li.has-children {
+    position: static;
+    display: flex;
+    align-items: stretch;
+  }
+
+  nav.nav-masthead .cms-main-nav > li > a {
+    white-space: normal;
+  }
+
+  nav.nav-masthead .cms-main-nav > li.has-children > a {
+    padding-right: 0.25rem;
+  }
+
+  .cms-main-nav > li > .mobile-submenu-toggle {
+    height: auto;
+    min-height: 56px;
+  }
+
+  .cms-main-nav > li > .mobile-submenu-toggle span {
+    transform: rotate(90deg);
+  }
+
+  .cms-main-nav > li > .mobile-submenu-toggle[aria-expanded="true"] span {
+    transform: rotate(-90deg);
+  }
+
+  .cms-main-nav .ntg-main-nav__groups > li > .mobile-submenu-toggle {
+    display: none;
+  }
+
+  .cms-main-nav .desktop-main-nav__columns {
+    column-count: auto;
+  }
+
+  .cms-main-nav .ntg-main-nav__groups {
+    column-count: 3;
+    column-gap: 1.75rem;
+  }
+
+  .cms-main-nav .ntg-main-nav__groups > li {
+    break-inside: avoid;
+    margin: 0 0 1.75rem;
+  }
+
+  .cms-main-nav .ntg-main-nav__groups > li > a {
+    display: block;
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .cms-main-nav .ntg-main-nav__submenu {
+    position: static;
+    display: block !important;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .cms-main-nav .ntg-main-nav__submenu > li > a {
+    padding: 0;
+    font-weight: 400;
+    white-space: normal;
+  }
+
+  nav.nav-masthead .cms-main-nav .desktop-main-nav__panel a:focus-visible {
+    outline-color: #343741;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .cms-main-nav .ntg-main-nav__groups {
+    column-count: 2;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .cms-main-nav .desktop-main-nav__overview {
+    display: none;
+  }
+
+  .cms-main-nav .desktop-main-nav__panel,
+  .cms-main-nav .desktop-main-nav__columns {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .cms-main-nav .ntg-main-nav__groups > li > a {
+    padding-left: 36px;
+    font-weight: 400;
+  }
+
+  .cms-main-nav.mobile-main-nav .ntg-main-nav__submenu > li > a {
+    padding-left: 48px;
+  }
+}
+
+header.ntg-header .header-navigation .container-xl nav.nav-masthead:not(.navigation-enhanced) {
+  position: static;
+  display: block !important;
+  width: 100%;
+  height: auto;
+  max-height: none;
+  overflow: visible;
+  transform: none;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+nav.nav-masthead:not(.navigation-enhanced) .ntg-main-nav__links {
+  display: block;
+}
+
+nav.nav-masthead:not(.navigation-enhanced) .ntg-main-nav__links li > ul,
+nav.nav-masthead:not(.navigation-enhanced) .ntg-main-nav__links .desktop-main-nav__panel {
+  position: static;
+  display: block !important;
+  min-width: 0;
+  max-height: none;
+  margin: 0;
+  padding: 0 0 0 1rem;
+  border: 0;
+  background: #343741;
+  box-shadow: none;
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+nav.nav-masthead:not(.navigation-enhanced) .desktop-main-nav__overview {
+  display: none;
+}
+
+nav.nav-masthead:not(.navigation-enhanced) .ntg-main-nav__links li > a {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: #ffffff !important;
+  white-space: normal;
+}
+
+nav.nav-masthead:not(.navigation-enhanced) .ntg-main-nav__groups {
+  column-count: auto;
 }
