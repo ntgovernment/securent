@@ -396,6 +396,10 @@ Imported by `src/js/main.js` and bundled into `dist/theme.js` on build.
 
 The `deploy-to-dev.prompt.md` prompt targets the `dev` branch. The `securent` remote currently uses `main`; use the repository's configured branch when committing and pushing unless a `dev` deployment is intended.
 
+## Favicons
+
+The icon-only source is `assets/secure-nt-favicon.svg`. Its shield artwork keeps the white and orange mark over a Charcoal (`#343741`) fill. The PNG exports in `public/` are the 180×180 Apple touch icon and 32×32 and 16×16 favicons. `npm run build` copies them to `dist/`; publish those files at the site root with the updated page HTML so the root-relative icon links resolve.
+
 ## Brand colours
 
 Source: _Accessible Colours — Brand Guidelines, May 2025_
