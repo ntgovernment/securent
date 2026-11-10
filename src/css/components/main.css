@@ -6,6 +6,132 @@ main.ntg-body {
   margin-bottom: 0 !important;
 }
 
+.ntg-breadcrumbs .breadcrumb {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+  font-family: "Lato", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.ntg-breadcrumbs .breadcrumb-item {
+  min-width: 0;
+  padding: 0;
+  color: var(--clr-text-default, #1f1e27);
+  overflow-wrap: anywhere;
+}
+
+.ntg-breadcrumbs .breadcrumb-item.active {
+  color: var(--clr-text-default, #1f1e27) !important;
+}
+
+.ntg-breadcrumbs .breadcrumb-item + .breadcrumb-item::before {
+  content: "\f054";
+  display: inline-flex;
+  float: none;
+  justify-content: center;
+  align-items: center;
+  width: 12px;
+  height: 12px;
+  margin-right: 8px;
+  padding: 0;
+  color: var(--clr-text-emphasis, #c33826);
+  font-family: "Font Awesome 6 Pro";
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 12px;
+}
+
+.ntg-breadcrumbs .breadcrumb a {
+  color: #174c4e !important;
+  text-decoration: underline !important;
+}
+
+.ntg-breadcrumbs .breadcrumb a:focus-visible,
+.ntg-sidenav a:focus-visible {
+  outline: 2px solid #174c4e;
+  outline-offset: 3px;
+}
+
+.ntg-sidenav a,
+.ntg-sidenav a:visited,
+.ntg-sidenav a:hover,
+.ntg-sidenav a:focus,
+.ntg-sidenav a:active {
+  color: #174c4e;
+}
+
+.ntg-sidenav .list-group .list-group-item.active,
+.ntg-sidenav .list-group .list-group-item.active > a {
+  color: var(--clr-text-default, #1f1e27);
+}
+
+.ntg-sidenav__title::before,
+.ntg-sidenav .list-group .list-group-item::before {
+  color: var(--clr-text-emphasis, #c33826);
+}
+
+.ntg-sidenav > .list-group > .list-group-item.active {
+  border-left-color: var(--clr-text-emphasis, #c33826);
+}
+
+main#content :where(a[href]):not(:where(
+  .breadcrumb *,
+  .ntg-sidenav *,
+  nav *,
+  .pagination *,
+  .ntg-social-share *,
+  .btn,
+  [role="button"],
+  .intro-text-link,
+  .card *,
+  .outer-link,
+  .ntg-display-cards *,
+  .event-card *,
+  .alerts-listing *,
+  .media-releases *,
+  .alert *,
+  .feedback-band *,
+  .hero-banner *,
+  .homepage-news *
+)) {
+  color: #1f1e27;
+}
+
+main#content :where(ul > li):not(:where(
+  nav *,
+  .ntg-sidenav *,
+  .ntg-social-share *,
+  .hero-banner *,
+  .alert *,
+  .card *,
+  .ntg-display-cards *,
+  .event-card *,
+  .alerts-listing *,
+  .media-releases *,
+  .feedback-band *
+))::before,
+main#content :where(ul > li):not(:where(
+  nav *,
+  .ntg-sidenav *,
+  .ntg-social-share *,
+  .hero-banner *,
+  .alert *,
+  .card *,
+  .ntg-display-cards *,
+  .event-card *,
+  .alerts-listing *,
+  .media-releases *,
+  .feedback-band *
+))::marker {
+  color: #343741;
+}
+
 /* ==========================================================================
    Display cards – icon colour matches heading hover colour (#c84c01)
    ========================================================================== */

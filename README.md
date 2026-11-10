@@ -52,7 +52,7 @@ securent/
 │   │       ├── header-footer.css     # Header/footer brand colour overrides; background: Charcoal (#343741)
 │   │       ├── homepage-featured-content.css # CMS homepage feature cards: responsive image/text layout and CTA styling
 │   │       ├── statistics.css        # Statistics section styles
-│   │       └── main.css              # General page overrides: display-card icon colours, card-title colour + animated arrow; homepage-news section styles
+│   │       └── main.css              # Breadcrumbs, side-nav colours, editorial links/bullets, display cards and homepage-news overrides
 │   ├── data/
 │   │   └── navigation.js             # Legacy menu data; no longer imported by the shared theme
 │   ├── navigation/
@@ -113,7 +113,7 @@ npm run dev
 Vite starts a local dev server and opens `/`, serving the Alerts and warnings capture in `alerts-and-warnings.html`. The homepage capture remains available at `/SecureNT.html`, and the event capture remains available at `/Severe%20Storm%20%E2%80%93%20Alice%20Springs%20_%20SecureNT.html`. The development middleware in `vite.config.mjs` serves the Alerts and warnings and event captures through Vite's HTML transforms and serves saved `.js.download` dependencies as JavaScript. External navigation links still point to the CMS, and externally hosted fonts and favicons require network access. These captures are development snapshots, not live emergency feeds.
 The HTML captures link stylesheets and scripts from `dist/`. Run `npm run build` after source changes so the updated assets are available for local preview.
 
-Existing Vite servers and browser tabs can cache built assets even after rebuilding. Refresh the `?v=` references in each capture being verified, then check a normal reload without temporary test URLs. The migrated alerts capture uses `dist/theme.css?v=41` and `dist/theme.js?v=31`; older captures retain their existing references and need the Matrix navigation markup applied before testing the enhanced menu. The homepage's standalone `dist/local-conditions.js` reference is version `3`. Update equivalent CMS asset references separately when deploying. Publish the three listing templates and matching theme assets together. Keep the theme stylesheet in the document head; panels stay collapsed while JavaScript loads, and the expanded fallback applies only when browser scripting is disabled.
+Existing Vite servers and browser tabs can cache built assets even after rebuilding. Refresh the `?v=` references in each capture being verified, then check a normal reload without temporary test URLs. All local captures now reference `dist/theme.css?v=43`; the migrated alerts capture uses `dist/theme.js?v=31`. Older captures retain their existing script references and need the Matrix navigation markup applied before testing the enhanced menu. The homepage's standalone `dist/local-conditions.js` reference is version `3`. Update equivalent CMS asset references separately when deploying. Publish the three listing templates and matching theme assets together. Keep the theme stylesheet in the document head; panels stay collapsed while JavaScript loads, and the expanded fallback applies only when browser scripting is disabled.
 
 The shared theme guards the legacy `quickExit()` function through `src/js/quick-exit.mjs`: redirects run only while a `#quickexit` element exists on the page. Presence is checked on every invocation, including after component insertion or removal. A hidden component still counts as present. When present, Escape and component clicks retain the existing behavior: open `https://nt.gov.au` in a new tab and replace the current page with `https://www.google.com`. Other Escape handlers are unaffected; the guard does not remove keyboard listeners or modify the vendor bundle.
 
@@ -217,6 +217,21 @@ Outputs to `dist/`:
 The build excludes the captured homepage's reference to the previous `dist/theme.css` so generated styles are not imported back into the next bundle. The current source styles remain the authority.
 
 Theme CSS has an explicit `theme-styles` entry pointing to `src/css/main.css` in `vite.config.mjs`; the optional, gitignored homepage capture is not required to generate the theme bundle. Keep that capture and its local dependencies available when building or previewing the captured homepage. After building, confirm both theme assets exist before committing file-bridge updates.
+
+## Shared Theme Overrides
+
+[src/css/components/main.css](src/css/components/main.css) owns the shared breadcrumb, side-navigation and editorial colour overrides compiled into `dist/theme.css`:
+
+- Breadcrumbs under `.ntg-breadcrumbs` use Lato 14px/400 with a 20px line height, 8px spacing, underlined `#174C4E` links, and current-page text in `var(--clr-text-default, #1F1E27)`. Right chevrons use the existing Font Awesome 6 Pro font in 12px slots and `var(--clr-text-emphasis, #C33826)`. Trails wrap with automatic height. The landing-hero stylesheet retains positioning only; it shares these visual rules with standard pages.
+- `.ntg-sidenav` title and item links use `#174C4E`; active-item text uses `var(--clr-text-default, #1F1E27)`. Existing indicators and the active left border use `var(--clr-text-emphasis, #C33826)`. Typography, indentation and active-state structure are preserved. Breadcrumb and side-nav links have visible teal keyboard-focus outlines.
+- Ordinary editorial links under `main#content` use `#1F1E27`, including visited and interactive states, without changing their underline or focus treatment. Navigation, pagination, sharing controls, buttons, hero CTAs, cards, feedback and status-alert components retain their own styling and contrast requirements.
+- Editorial unordered-list bullets use `#343741`, including nested lists. The theme covers both the legacy `::before` icon bullets and native `::marker` bullets without changing list text or ordered-list numbering. Navigation and specialised components are excluded.
+
+Keep the CMS list/link markup and destinations unchanged; these are CSS overrides, not replacement templates. Do not replace the scoped rules with a global anchor or list-item colour rule. The current-page breadcrumb override deliberately beats the legacy stylesheet's `!important` colour.
+
+After changes, run `npm run build`, commit the rebuilt `dist/theme.css`, and refresh local and Matrix stylesheet cache references. Ignored homepage/content captures can be updated locally but should not be force-added to Git.
+
+Validate ordinary and hero breadcrumbs, side-nav title/active/nested links, editorial links, and nested bullets at desktop and mobile widths (1440px, 375px and 320px). Check hover, keyboard focus, wrapping, unchanged navigation/status colours, and a normal reload. The current changes were checked with headless Chrome against four saved captures and local legacy plus compiled CSS. Full integrated-browser preview and externally hosted font loading were not verified. Use a real browser for complex selector exclusions: the current happy-dom version does not reliably match ancestor selectors inside `:where()`.
 
 ## Adding new CSS component files
 
