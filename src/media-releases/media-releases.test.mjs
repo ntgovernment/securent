@@ -31,6 +31,8 @@ test("renders declaration-only cards with their accent colors and checkbox style
       { ...notice, CampaignID: "unknown-warning-level", Name: "Cyclone warning - Darwin", Subject: "Cyclone warning - Darwin" },
       { ...notice, CampaignID: "ordinary", Name: "Flood Advice - Daly River", Subject: "Flood Advice - Daly River" },
       { ...notice, CampaignID: "emergency", Name: "Emergency warning - Cyclone - Darwin", Subject: "Emergency warning - Cyclone - Darwin" },
+      { ...notice, CampaignID: "watch-act", Name: "Severe storm watch and act - Darwin", Subject: "Severe storm watch and act - Darwin" },
+      { ...notice, CampaignID: "decreasing-threat", Name: "Flood Advice - Decreasing threat - Katherine", Subject: "Flood Advice - Decreasing threat - Katherine" },
     ],
   });
 
@@ -45,11 +47,17 @@ test("renders declaration-only cards with their accent colors and checkbox style
     const boilWater = cards.find((card) => card.dataset.declaration === "boil-water-notice");
     const ordinary = cards.find((card) => card.dataset.declaration === "");
     const emergency = cards.find((card) => card.querySelector(".media-releases__title")?.textContent.includes("Emergency warning"));
+    const watchAct = cards.find((card) => card.dataset.warningLevel === "watch_act");
+    const decreasingThreat = cards.find((card) => card.querySelector(".media-releases__title")?.textContent.includes("Decreasing threat"));
+    const unknownWarning = cards.find((card) => card.dataset.warningLevel === "not-identified" && card.dataset.declaration === "");
     assert.ok(plannedBurn);
     assert.ok(fireBan);
     assert.ok(boilWater);
     assert.ok(ordinary);
     assert.ok(emergency);
+    assert.ok(watchAct);
+    assert.ok(decreasingThreat);
+    assert.ok(unknownWarning);
     for (const card of cards) {
       const cardLink = card.querySelector(":scope > .media-releases__link");
       assert.equal(cardLink.tagName, "A");
@@ -63,10 +71,21 @@ test("renders declaration-only cards with their accent colors and checkbox style
       assert.equal(card.querySelector(".media-releases__agency, .media-releases__source, .media-releases__hazard"), null);
     }
     assert.equal(emergency.querySelector(".media-releases__severity").textContent, "Emergency");
+    assert.equal(watchAct.querySelector(".media-releases__severity").textContent, "Watch and act");
+    assert.equal(decreasingThreat.dataset.warningLevel, "advice");
+    assert.equal(decreasingThreat.querySelector(".media-releases__severity").textContent, "Decreasing threat");
     assert.ok(emergency.querySelector(".media-releases__date-time"));
     assert.match(emergency.querySelector(".media-releases__region").textContent, /Region: Greater Darwin/);
     assert.ok(emergency.querySelector(".media-releases__hazard-icon"));
-    assert.equal(plannedBurn.querySelector(".media-releases__severity").textContent, "Planned burn advice");
+    assert.equal(plannedBurn.querySelector(".media-releases__severity").textContent, "Planned burn");
+    assert.equal(plannedBurn.querySelector(".media-releases__hazard-icon"), null);
+    assert.equal(fireBan.querySelector(".media-releases__severity").textContent, "General information");
+    assert.equal(fireBan.dataset.declaration, "fire-ban-declaration");
+    assert.equal(boilWater.querySelector(".media-releases__severity").textContent, "General information");
+    assert.equal(fireBan.dataset.generalInformation, "true");
+    assert.equal(boilWater.dataset.generalInformation, "true");
+    assert.equal(unknownWarning.querySelector(".media-releases__severity").textContent, "General information");
+    assert.equal(unknownWarning.dataset.generalInformation, "true");
     assert.ok([...listing.querySelectorAll('[data-declaration-filters] input')]
       .some((input) => input.value === "Planned burn advice"));
     assert.ok([...listing.querySelectorAll('[data-declaration-filters] input')]
@@ -99,8 +118,12 @@ test("renders declaration-only cards with their accent colors and checkbox style
     assert.match(alertsSelectBase, /background-color:#fff/);
 
     assert.match(css, /\.media-releases__item\[data-declaration~=planned-burn-advice\]\{--media-releases-accent:\s*#865aa5\}/);
-    assert.match(css, /\.media-releases__item\[data-declaration~=fire-ban-declaration\]\{--media-releases-accent:\s*#52565f\}/);
+    assert.match(css, /\.media-releases__item\[data-general-information=true\]\{--media-releases-accent:\s*#1f1f5f\}/);
+    assert.match(css, /\.media-releases__item\[data-general-information=true\] \.media-releases__severity\{color:#fff\}/);
+    assert.match(css, /\.media-releases__item\[data-warning-level=advice\]\{--media-releases-accent:\s*#fadf31\}/);
+    assert.match(css, /\.media-releases__item\[data-warning-level=advice\] \.media-releases__severity\{color:#716309\}/);
     assert.match(css, /\.media-releases__item\[data-declaration~=planned-burn-advice\] \.media-releases__severity/);
+    assert.match(css, /\.media-releases__item\[data-warning-level=watch_act\] \.media-releases__severity/);
     assert.doesNotMatch(css, /\.media-releases__item\[data-declaration\] \.media-releases__severity/);
     assert.match(css, /\.media-releases__item\{[^}]*border-left:4px solid var\(--media-releases-accent\)/);
     assert.match(css, /\.media-releases__link:hover \.media-releases__more-information-label\{text-decoration:underline\}/);

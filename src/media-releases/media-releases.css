@@ -210,7 +210,7 @@ section.media-releases__hero {
 }
 
 .media-releases__item[data-warning-level="advice"] {
-  --media-releases-accent: var(--clr-status-advice);
+  --media-releases-accent: #fadf31;
 }
 
 .media-releases__item[data-warning-level="watch_act"] {
@@ -225,8 +225,8 @@ section.media-releases__hero {
   --media-releases-accent: #865aa5;
 }
 
-.media-releases__item[data-declaration~="fire-ban-declaration"] {
-  --media-releases-accent: #52565f;
+.media-releases__item[data-general-information="true"] {
+  --media-releases-accent: #1f1f5f;
 }
 
 .media-releases__severity {
@@ -246,9 +246,14 @@ section.media-releases__hero {
 }
 
 .media-releases__item[data-warning-level="emergency_warning"] .media-releases__severity,
+.media-releases__item[data-warning-level="watch_act"] .media-releases__severity,
 .media-releases__item[data-declaration~="planned-burn-advice"] .media-releases__severity,
-.media-releases__item[data-declaration~="fire-ban-declaration"] .media-releases__severity {
+.media-releases__item[data-general-information="true"] .media-releases__severity {
   color: #fff;
+}
+
+.media-releases__item[data-warning-level="advice"] .media-releases__severity {
+  color: #716309;
 }
 
 .media-releases__content {

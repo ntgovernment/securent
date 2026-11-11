@@ -158,9 +158,17 @@ if (listing) {
 
     const severity = document.createElement("span");
     severity.className = "media-releases__severity";
+    const isDecreasingThreat = item.warningLevel === "Advice"
+      && /\bdecreasing[\s_-]+threats?\b/i.test([item.title, item.name].filter(Boolean).join(" "));
+    const isGeneralInformation = item.declarations.length
+      ? item.declarations.some((declaration) => declaration !== "Planned burn advice")
+      : !["Emergency warning", "Watch and act", "Advice"].includes(item.warningLevel) && !isDecreasingThreat;
+    if (isGeneralInformation) article.dataset.generalInformation = "true";
     severity.textContent = item.declarations.length
-      ? item.declarations.join(", ")
-      : item.warningLevel === "Emergency warning" ? "Emergency" : item.warningLevel;
+      ? item.declarations.map((declaration) => declaration === "Planned burn advice" ? "Planned burn" : "General information").join(", ")
+      : item.warningLevel === "Emergency warning" ? "Emergency"
+        : isDecreasingThreat ? "Decreasing threat"
+          : ["Advice", "Watch and act"].includes(item.warningLevel) ? item.warningLevel : "General information";
 
     const title = document.createElement("h2");
     title.className = "media-releases__title";
