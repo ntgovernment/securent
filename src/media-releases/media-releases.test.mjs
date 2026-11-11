@@ -122,6 +122,7 @@ test("renders declaration-only cards with their accent colors and checkbox style
     assert.match(css, /\.media-releases__item\[data-general-information=true\] \.media-releases__severity\{color:#fff\}/);
     assert.match(css, /\.media-releases__item\[data-warning-level=advice\]\{--media-releases-accent:\s*#fadf31\}/);
     assert.match(css, /\.media-releases__item\[data-warning-level=advice\] \.media-releases__severity\{color:#716309\}/);
+    assert.match(css, /\.media-releases__item:hover\{box-shadow:0 4px 16px #0f0f2f26\}/);
     assert.match(css, /\.media-releases__item\[data-declaration~=planned-burn-advice\] \.media-releases__severity/);
     assert.match(css, /\.media-releases__item\[data-warning-level=watch_act\] \.media-releases__severity/);
     assert.doesNotMatch(css, /\.media-releases__item\[data-declaration\] \.media-releases__severity/);

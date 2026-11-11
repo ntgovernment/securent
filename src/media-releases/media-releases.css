@@ -200,6 +200,10 @@ section.media-releases__hero {
   grid-template-columns: 79px minmax(0, 1fr);
 }
 
+.media-releases__item:hover {
+  box-shadow: 0 4px 16px rgba(15, 15, 47, 0.15);
+}
+
 .media-releases__item > .media-releases__link:hover {
   padding-bottom: 24px;
 }
