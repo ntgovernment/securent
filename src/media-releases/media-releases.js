@@ -1,7 +1,7 @@
 import "./media-releases.css";
 import { attachAutocomplete, getAutocompleteCandidates } from "../search/autocomplete.mjs";
 import { curateFeeds, filterAndSortNotices, warningLevelOrder } from "./curation.mjs";
-import { fetchMediaReleaseFeeds, mediaReleaseSources, resolveMediaReleaseEndpoint } from "./feeds.mjs";
+import { fetchMediaReleaseFeeds, mediaReleaseSources } from "./feeds.mjs";
 import { updatedTimestamp } from "../alerts-listing/sorting.mjs";
 import { getPageWindow } from "../pagination/page-window.mjs";
 import { awsHazardIconFilename, warningLevelSlug } from "./aws-icons.mjs";
@@ -145,17 +145,26 @@ if (listing) {
     article.className = "media-releases__item";
     article.dataset.warningLevel = warningLevelSlug(item.warningLevel);
     article.dataset.declaration = item.declarations.map((declaration) => declaration.toLowerCase().replace(/\s+/g, "-")).join(" ");
+    const url = safeLink(item.url);
+    const cardLink = document.createElement(url ? "a" : "div");
+    cardLink.className = "media-releases__link";
+    if (url) {
+      cardLink.href = url;
+      cardLink.target = "_blank";
+      cardLink.rel = "noopener noreferrer";
+    }
     const content = document.createElement("div");
     content.className = "media-releases__content";
-    const link = safeLink(item.url);
-    const title = document.createElement(link ? "a" : "h2");
+
+    const severity = document.createElement("span");
+    severity.className = "media-releases__severity";
+    severity.textContent = item.declarations.length
+      ? item.declarations.join(", ")
+      : item.warningLevel === "Emergency warning" ? "Emergency" : item.warningLevel;
+
+    const title = document.createElement("h2");
     title.className = "media-releases__title";
     title.textContent = item.title;
-    if (link) {
-      title.href = link;
-      title.target = "_blank";
-      title.rel = "noopener noreferrer";
-    }
 
     const meta = document.createElement("p");
     meta.className = "media-releases__meta";
@@ -169,21 +178,6 @@ if (listing) {
       dateTime.append(clock, document.createTextNode(publishedAt));
       meta.append(dateTime);
     }
-    if (item.fromName) {
-      const agency = document.createElement("span");
-      agency.className = "media-releases__agency";
-      const megaphone = document.createElement("i");
-      megaphone.className = "fa-light fa-bullhorn";
-      megaphone.setAttribute("aria-hidden", "true");
-      const agencyName = document.createElement("span");
-      agencyName.textContent = item.fromName;
-      agency.append(megaphone, agencyName);
-      meta.append(agency);
-    }
-
-    const source = document.createElement("p");
-    source.className = "media-releases__source";
-    source.textContent = `Source${item.sources.length > 1 ? "s" : ""}: ${item.sources.join(", ")}`;
 
     const region = document.createElement("p");
     region.className = "media-releases__classification media-releases__region";
@@ -194,9 +188,6 @@ if (listing) {
     regionLabel.textContent = `Region: ${item.regions.join(", ")}`;
     region.append(mapPin, regionLabel);
 
-    const hazardDetails = document.createElement("p");
-    hazardDetails.className = "media-releases__classification media-releases__hazard";
-    hazardDetails.title = "Best-effort classification from the notice title and subject";
     const iconUrl = hazardIconFor(item);
     if (iconUrl) {
       const icon = document.createElement("img");
@@ -204,18 +195,26 @@ if (listing) {
       icon.src = iconUrl;
       icon.alt = "";
       article.classList.add("media-releases__item--with-icon");
-      article.append(icon);
+      cardLink.append(icon);
     }
-    const hazardLabel = document.createElement("span");
-    hazardLabel.textContent = `Emergency type: ${item.emergencyTypes.join(", ")} | Warning level: ${item.warningLevel}`;
-    hazardDetails.append(hazardLabel);
 
-    content.append(title);
+    content.append(severity, title);
     if (meta.hasChildNodes()) content.append(meta);
     content.append(region);
-    if (!item.declarations.length) content.append(hazardDetails);
-    content.append(source);
-    article.append(content);
+    if (url) {
+      const moreInformation = document.createElement("span");
+      moreInformation.className = "media-releases__more-information";
+      const label = document.createElement("span");
+      label.className = "media-releases__more-information-label";
+      label.textContent = "More information";
+      const arrow = document.createElement("i");
+      arrow.className = "fa-light fa-arrow-right";
+      arrow.setAttribute("aria-hidden", "true");
+      moreInformation.append(label, arrow);
+      content.append(moreInformation);
+    }
+    cardLink.append(content);
+    article.append(cardLink);
     return article;
   }
 
@@ -309,8 +308,8 @@ if (listing) {
   fetchMediaReleaseFeeds(
     fetch,
     (source) => isLocalPreview
-      ? `/api/media-releases/${source.id}`
-      : resolveMediaReleaseEndpoint(source, window.location.href),
+      ? `/${source.id}.json`
+      : source.endpoint,
   )
     .then(({ feeds, failedSources }) => {
       items = curateFeeds(feeds);

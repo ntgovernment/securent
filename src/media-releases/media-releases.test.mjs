@@ -30,6 +30,7 @@ test("renders declaration-only cards with their accent colors and checkbox style
       { ...notice, CampaignID: "boil-water", Name: "Boil water notice - East Arnhem", Subject: "Boil water notice - East Arnhem" },
       { ...notice, CampaignID: "unknown-warning-level", Name: "Cyclone warning - Darwin", Subject: "Cyclone warning - Darwin" },
       { ...notice, CampaignID: "ordinary", Name: "Flood Advice - Daly River", Subject: "Flood Advice - Daly River" },
+      { ...notice, CampaignID: "emergency", Name: "Emergency warning - Cyclone - Darwin", Subject: "Emergency warning - Cyclone - Darwin" },
     ],
   });
 
@@ -43,14 +44,29 @@ test("renders declaration-only cards with their accent colors and checkbox style
     const fireBan = cards.find((card) => card.dataset.declaration === "fire-ban-declaration");
     const boilWater = cards.find((card) => card.dataset.declaration === "boil-water-notice");
     const ordinary = cards.find((card) => card.dataset.declaration === "");
+    const emergency = cards.find((card) => card.querySelector(".media-releases__title")?.textContent.includes("Emergency warning"));
     assert.ok(plannedBurn);
     assert.ok(fireBan);
     assert.ok(boilWater);
     assert.ok(ordinary);
-    assert.equal(plannedBurn.querySelector(".media-releases__hazard"), null);
-    assert.equal(fireBan.querySelector(".media-releases__hazard"), null);
-    assert.equal(boilWater.querySelector(".media-releases__hazard"), null);
-    assert.ok(ordinary.querySelector(".media-releases__hazard"));
+    assert.ok(emergency);
+    for (const card of cards) {
+      const cardLink = card.querySelector(":scope > .media-releases__link");
+      assert.equal(cardLink.tagName, "A");
+      assert.equal(card.querySelectorAll("a").length, 1);
+      assert.equal(cardLink.target, "_blank");
+      assert.equal(cardLink.rel, "noopener noreferrer");
+      assert.equal(cardLink.querySelector(".media-releases__more-information").textContent, "More information");
+      assert.equal(cardLink.querySelector(".media-releases__more-information-label").textContent, "More information");
+      assert.equal(cardLink.querySelector(".media-releases__more-information i").getAttribute("aria-hidden"), "true");
+      assert.ok(cardLink.contains(cardLink.querySelector(".media-releases__title")));
+      assert.equal(card.querySelector(".media-releases__agency, .media-releases__source, .media-releases__hazard"), null);
+    }
+    assert.equal(emergency.querySelector(".media-releases__severity").textContent, "Emergency");
+    assert.ok(emergency.querySelector(".media-releases__date-time"));
+    assert.match(emergency.querySelector(".media-releases__region").textContent, /Region: Greater Darwin/);
+    assert.ok(emergency.querySelector(".media-releases__hazard-icon"));
+    assert.equal(plannedBurn.querySelector(".media-releases__severity").textContent, "Planned burn advice");
     assert.ok([...listing.querySelectorAll('[data-declaration-filters] input')]
       .some((input) => input.value === "Planned burn advice"));
     assert.ok([...listing.querySelectorAll('[data-declaration-filters] input')]
@@ -84,6 +100,16 @@ test("renders declaration-only cards with their accent colors and checkbox style
 
     assert.match(css, /\.media-releases__item\[data-declaration~=planned-burn-advice\]\{--media-releases-accent:\s*#865aa5\}/);
     assert.match(css, /\.media-releases__item\[data-declaration~=fire-ban-declaration\]\{--media-releases-accent:\s*#52565f\}/);
+    assert.match(css, /\.media-releases__item\[data-declaration~=planned-burn-advice\] \.media-releases__severity/);
+    assert.doesNotMatch(css, /\.media-releases__item\[data-declaration\] \.media-releases__severity/);
+    assert.match(css, /\.media-releases__item\{[^}]*border-left:4px solid var\(--media-releases-accent\)/);
+    assert.match(css, /\.media-releases__link:hover \.media-releases__more-information-label\{text-decoration:underline\}/);
+    assert.match(css, /\.media-releases__link:hover \.media-releases__more-information i\{transform:translate(?:X\(3px\)|\(3px\))\}/);
+    assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
+    assert.match(css, /\.media-releases__item,\.media-releases__item \*\{transition:none\}/);
+    assert.match(css, /\.media-releases__item>\.media-releases__link:hover\{padding-bottom:24px\}/);
+    assert.match(css, /\.media-releases__link:focus-visible\{outline:3px solid #267e82/);
+    assert.match(css, /\.media-releases__item--with-icon \.media-releases__link\{grid-template-columns:79px minmax\(0,1fr\)\}/);
     const checkboxBoxStyle = css.match(/\.media-releases__filter input:before\{([^}]*)\}/)?.[1];
     assert.ok(checkboxBoxStyle);
     assert.match(checkboxBoxStyle, /border:2px solid #1f1e27/);

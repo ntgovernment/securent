@@ -1,19 +1,19 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { fetchMediaReleaseFeeds, mediaReleaseSources, parseFeedPayload, resolveMediaReleaseEndpoint } from "./feeds.mjs";
+import { fetchMediaReleaseFeeds, mediaReleaseSources, parseFeedPayload } from "./feeds.mjs";
 
 const source = { name: "NTG agencies" };
 
-test("uses the three integration paths and supports localhost proxy overrides", async () => {
+test("uses the configured integration URLs and supports localhost proxy overrides", async () => {
   const requested = [];
   const fetcher = async (url) => {
     requested.push(url);
     return { ok: true, json: async () => [] };
   };
   const expected = [
-    "/_design/integrations/campaign-monitor-bushfires-nt",
-    "/_design/integrations/campaign-monitor-ntes",
-    "/_design/integrations/campaign-monitor-ntg-agencies",
+    "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor-bushfires-nt",
+    "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor-ntes",
+    "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor-ntg-agencies",
   ];
   assert.deepEqual(mediaReleaseSources.map((item) => item.endpoint), expected);
   assert.equal(new Set(expected).size, 3);
@@ -25,20 +25,6 @@ test("uses the three integration paths and supports localhost proxy overrides", 
     "/api/media-releases/bushfires-nt", "/api/media-releases/ntes",
     "/api/media-releases/ntg-agencies",
   ]);
-});
-
-test("resolves all feeds on the temporary host with the securent prefix", () => {
-  for (const page of ["https://cmsexternal.nt.gov.au", "https://cmsexternal.nt.gov.au/securent/media-releases", "https://cmsexternal.nt.gov.au/securent/news/releases/?a=123"]) {
-    assert.deepEqual(mediaReleaseSources.map((item) => resolveMediaReleaseEndpoint(item, page)),
-      mediaReleaseSources.map((item) => `https://cmsexternal.nt.gov.au/securent${item.endpoint}`));
-  }
-});
-
-test("resolves all feeds on the final host without the temporary site prefix", () => {
-  for (const page of ["https://securent.nt.gov.au", "https://securent.nt.gov.au/media-releases", "https://securent.nt.gov.au/news/releases/?a=123"]) {
-    assert.deepEqual(mediaReleaseSources.map((item) => resolveMediaReleaseEndpoint(item, page)),
-      mediaReleaseSources.map((item) => `https://securent.nt.gov.au${item.endpoint}`));
-  }
 });
 
 test("never fetches missing URLs and preserves per-source failures", async () => {

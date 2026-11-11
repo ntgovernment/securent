@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { fetchAirQuality, fetchAirQualityStations } from "./src/local-conditions/air-quality.mjs";
-import { mediaReleaseSources, resolveMediaReleaseEndpoint } from "./src/media-releases/feeds.mjs";
+import { mediaReleaseSources } from "./src/media-releases/feeds.mjs";
 
 const sourceThemeOnly = {
   name: "source-theme-only",
@@ -40,7 +40,7 @@ const eventPreview = {
       const eventCapture = "Severe Storm \u2013 Alice Springs _ SecureNT.html";
       const capture =
         url.pathname === "/"
-            ? "alerts-and-warnings.html"
+            ? "Current warnings _ SecureNT.html"
           : url.pathname === "/" + encodeURIComponent(eventCapture)
             ? eventCapture
             : null;
@@ -59,9 +59,6 @@ const eventPreview = {
           next(error);
         }
         return;
-      }
-      if (url.pathname.endsWith(".js.download")) {
-        res.setHeader("Content-Type", "text/javascript");
       }
       next();
     });
@@ -110,8 +107,7 @@ const localConditionsMock = {
 const mediaReleaseFeedProxy = {
   name: "media-release-feed-proxy",
   configureServer(server) {
-    const origin = process.env.SECURENT_MEDIA_FEED_ORIGIN || "https://cmsexternal.nt.gov.au";
-    const feeds = new Map(mediaReleaseSources.map((source) => [source.id, resolveMediaReleaseEndpoint(source, origin)]));
+    const feeds = new Map(mediaReleaseSources.map((source) => [source.id, source.endpoint]));
 
     server.middlewares.use("/api/media-releases", async (req, res) => {
       const sourceId = new URL(req.url, "http://localhost").pathname.replace(/^\//, "");

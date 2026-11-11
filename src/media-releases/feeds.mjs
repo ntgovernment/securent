@@ -2,25 +2,19 @@ export const mediaReleaseSources = [
   {
     id: "bushfires-nt",
     name: "Bushfires NT",
-    endpoint: "/_design/integrations/campaign-monitor-bushfires-nt",
+    endpoint: "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor-bushfires-nt",
   },
   {
     id: "ntes",
     name: "NTES",
-    endpoint: "/_design/integrations/campaign-monitor-ntes",
+    endpoint: "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor-ntes",
   },
   {
     id: "ntg-agencies",
     name: "NTG agencies",
-    endpoint: "/_design/integrations/campaign-monitor-ntg-agencies",
+    endpoint: "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor-ntg-agencies",
   },
 ];
-
-export function resolveMediaReleaseEndpoint(source, pageUrl) {
-  const page = new URL(pageUrl);
-  const prefix = page.hostname === "cmsexternal.nt.gov.au" ? "/securent" : "";
-  return new URL(`${prefix}${source.endpoint}`, page.origin).href;
-}
 
 export function parseFeedPayload(payload, source) {
   if (Array.isArray(payload)) return { source: source.name, items: payload };
