@@ -22,7 +22,9 @@ securent/
 │   │   ├── aws-icons.mjs               # AWS hazard and warning-level icon mapping
 │   │   ├── aws-icons.test.mjs          # AWS icon mapping and fallback tests
 │   │   ├── media-releases.js          # Search, filters, cards and result pagination
-│   │   ├── media-releases.test.mjs    # Built-bundle loading overlay and cleanup regression tests
+│   │   ├── latest-media-releases.js   # Standalone latest-three warnings listing
+│   │   ├── media-release-card.js      # Shared full and compact warning card renderer
+│   │   ├── media-releases.test.mjs    # Built-bundle listing and loading regression tests
 │   │   └── media-releases.css         # Standalone listing styles
 │   ├── pagination/
 │   │   ├── pagination.css             # Shared Alerts and Current warnings pagination styles
@@ -69,7 +71,10 @@ securent/
 │   ├── pagination.css
 │   ├── media-releases.css
 │   ├── media-releases.js
-│   ├── SecureNT_files/autocomplete.js # Shared search, sorting, date and pagination dependency
+│   ├── latest-media-releases.js
+│   ├── SecureNT_files/autocomplete.js # Shared search, sorting and date dependency
+│   ├── SecureNT_files/media-release-card.js # Shared warning cards, feeds and curation
+│   ├── SecureNT_files/page-window.js  # Shared pagination dependency
 │   ├── SecureNT_files/*.webp          # Generated AWS hazard pictograms for media-release cards
 │   ├── more-updates-cards.css
 │   ├── event.css
@@ -144,6 +149,8 @@ Region inference uses [nt-suburbs-by-government-region.json](src/media-releases/
 
 The standalone **Current warnings** page ([media-releases.html](media-releases.html)) combines the NTES, Bushfires NT and NTG agencies Campaign Monitor feeds defined in [feeds.mjs](src/media-releases/feeds.mjs). It curates operational emergency notices rather than showing all government news. Matching `CampaignID` values are deduplicated with Bushfires NT > NTES > NTG agencies precedence; source labels remain available for filtering and curation. Warning/action language and the approved NTES duty-officer email in `FromName` identify operational items. General awards, recruitment, ceremonies, outlooks and corporate announcements are excluded unless operational warning language takes precedence. [curation.mjs](src/media-releases/curation.mjs) owns these rules.
 
+The separate latest-three listing displays up to three of those curated warnings, newest first, in responsive cards without search or filters. See [the media-releases guide](src/media-releases/README.md) for its embed markup, assets, and feed behavior. It does not replace the full listing or automatically add itself to a page.
+
 Run `npm run build` and start `npm run dev` to preview the captured Current warnings page at `/`. The standalone shell at `/media-releases.html` remains available and may normalize to `/media-releases`. The page heading is **Current warnings** and the search placeholder is **Search current warnings**. Suggestions include terms from notice titles and available town, street, suburb, locality, and address fields, as well as inferred regions; each option shows a decorative magnifying-glass icon. Selecting a suggestion filters the listing. Generated styles, scripts, and hazard icons load from `dist/`; captured vendor dependencies and static assets load from shared, gitignored `SecureNT_files/`. Refresh versioned asset references after rebuilding: the root capture currently uses media-release CSS `33` and JavaScript `48`; the standalone shell uses CSS `32` and JavaScript `48`.
 Original notice titles remain unchanged. This mapping applies only to Current warnings, not the existing Alerts and warnings listing.
 
@@ -177,7 +184,7 @@ Matrix keyword attributes are no longer required or read. Remove the old `data-f
 
 Each integration URL must return raw JSON (an array or an object containing a `Results` array), not a site-wrapped page or login response. Production requests stay on the page's origin; redirects to another origin may still require CORS permission. Available sources still render if another source fails, with a partial-feed notice; total feed failure shows an unavailable state and logs an `AggregateError` containing the underlying failures. Expand its `errors` list in DevTools to distinguish HTTP failures and invalid JSON. Feed page metadata is ignored; the page status reports the number of curated media releases available in the loaded results.
 
-This HTML is a local preview shell, not a Vite production HTML entry. For Matrix integration, use the listing markup and built media-release CSS/JS alongside the shared theme and pagination CSS. Include the listing script once with `type="module"`. Publish `dist/SecureNT_files/autocomplete.js` with both listing bundles, preserving its relative path: both bundles import it. Also publish all generated `dist/SecureNT_files/*.webp` AWS pictograms with the media-release bundle; the icon URLs are relative to that bundle. The ignore rules keep captured assets excluded while allowing these generated dependencies to be tracked. Rebuild and refresh the page and CMS asset versions together when shipping changes.
+This HTML is a local preview shell, not a Vite production HTML entry. For Matrix integration, use the listing markup and built media-release CSS/JS alongside the shared theme and pagination CSS. Include the listing script once with `type="module"`. Publish `dist/SecureNT_files/autocomplete.js` and `dist/SecureNT_files/page-window.js` with both full listing bundles. Publish `dist/SecureNT_files/media-release-card.js` and all generated `dist/SecureNT_files/*.webp` AWS pictograms with the current-warnings and latest-three bundles. Preserve the relative paths of these shared assets. The ignore rules keep captured assets excluded while allowing these generated dependencies to be tracked. Rebuild and refresh the page and CMS asset versions together when shipping changes.
 
 Validation checklist:
 
@@ -201,7 +208,10 @@ Outputs to `dist/`:
 - `theme.js` — compiled JS imported by `src/js/main.js`, including the landing hero initializer
 - `alerts-listing.css` and `alerts-listing.js` — standalone assets for the Alerts and warnings page
 - `media-releases.css` and `media-releases.js` — standalone assets for the Current warnings page
-- `SecureNT_files/autocomplete.js` — shared autocomplete and listing sorting/pagination dependency imported by both listing bundles; preserve its relative URL when publishing
+- `latest-media-releases.js` — standalone latest-three warnings listing, using `media-releases.css`
+- `SecureNT_files/autocomplete.js` — shared autocomplete, sorting and date dependency
+- `SecureNT_files/media-release-card.js` — shared warning-card rendering, feeds and curation dependency
+- `SecureNT_files/page-window.js` — shared pagination dependency for the full listing bundles
 - `SecureNT_files/*.webp` — generated AWS hazard pictograms imported by the Media releases bundle
 - `pagination.css` — shared pagination styling and list-marker overrides for both listing pages
 - `more-updates-cards.css` — styles for the bottom update cards on the Alerts and warnings page

@@ -171,6 +171,7 @@ export default defineConfig({
         ...(includeLocalCapture ? { page: "./SecureNT.html" } : {}),
         "alerts-listing": "./src/alerts-listing/alerts-listing.js",
         "media-releases": "./src/media-releases/media-releases.js",
+        "latest-media-releases": "./src/media-releases/latest-media-releases.js",
         pagination: "./src/pagination/pagination.css",
         "more-updates-cards": "./src/alerts-listing/more-updates-cards.css",
         "theme-styles": "./src/css/main.css",
@@ -186,6 +187,7 @@ export default defineConfig({
           chunk.name === "theme" ||
           chunk.name === "alerts-listing" ||
           chunk.name === "media-releases" ||
+          chunk.name === "latest-media-releases" ||
           chunk.name === "social-share" ||
           chunk.name === "local-conditions"
             ? "[name].js"

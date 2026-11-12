@@ -175,6 +175,53 @@ section.media-releases__hero {
   gap: 12px;
 }
 
+[data-latest-media-releases] .media-releases__results {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+[data-latest-media-releases] .media-releases__link,
+[data-latest-media-releases] .media-releases__item--with-icon .media-releases__link {
+  display: block;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+[data-latest-media-releases] .media-releases__content {
+  height: 100%;
+  gap: 12px;
+}
+
+[data-latest-media-releases] .media-releases__card-heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 32px;
+}
+
+[data-latest-media-releases] .media-releases__hazard-icon {
+  width: 32px;
+  height: 32px;
+}
+
+[data-latest-media-releases] .media-releases__more-information {
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+@media (max-width: 900px) {
+  [data-latest-media-releases] .media-releases__results {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  [data-latest-media-releases] .media-releases__results {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .media-releases__item {
   --media-releases-accent: var(--clr-status-neutral);
 

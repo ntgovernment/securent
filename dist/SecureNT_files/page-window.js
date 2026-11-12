@@ -1,0 +1,1 @@
+function a(e,s){if(s<=5)return Array.from({length:s},(t,r)=>r+1);const i=new Set([1,s]),l=Math.max(2,e-1),o=Math.min(s-1,e+1);for(let t=l;t<=o;t+=1)i.add(t);const n=[...i].sort((t,r)=>t-r);return n.flatMap((t,r)=>r>0&&t-n[r-1]>1?["ellipsis",t]:[t])}export{a as g};

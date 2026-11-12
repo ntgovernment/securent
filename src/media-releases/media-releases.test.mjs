@@ -248,3 +248,71 @@ for (const scenario of ["populated", "empty", "partial failure", "total failure"
     }
   });
 }
+
+for (const scenario of ["latest three", "fewer than three", "missing icon", "empty", "partial failure", "total failure"]) {
+  test(`compact listing handles ${scenario}`, async () => {
+    const window = new Window({ url: "http://localhost/" });
+    window.document.write(`<section data-latest-media-releases>
+      <p data-results-status role="status"></p>
+      <p data-feed-note hidden></p>
+      <div class="media-releases__results" data-results></div>
+    </section>`);
+    const originals = { window: globalThis.window, document: globalThis.document, fetch: globalThis.fetch };
+    const originalConsoleError = console.error;
+    globalThis.window = window;
+    globalThis.document = window.document;
+    const requests = [];
+    globalThis.fetch = () => new Promise((resolve, reject) => requests.push({ resolve, reject }));
+    console.error = () => {};
+
+    try {
+      await import(`../../dist/latest-media-releases.js?test=${encodeURIComponent(scenario)}`);
+      const listing = window.document.querySelector("[data-latest-media-releases]");
+      const results = listing.querySelector("[data-results]");
+      assert.equal(results.getAttribute("aria-busy"), "true");
+      assert.equal(requests.length, 3);
+      const records = [1, 4, 2, 3].map((day) => ({
+        ...notice,
+        CampaignID: `campaign-${day}`,
+        Subject: `Flood Advice - Daly River - ${day}`,
+        SentDate: `2026-11-0${day} 09:00:00`,
+      }));
+      requests.forEach((request, index) => {
+        if (scenario === "total failure" || (scenario === "partial failure" && index === 0)) {
+          request.reject(new Error("Feed offline"));
+        } else {
+          const items = scenario === "empty" ? [{ ...notice, Name: "Awards ceremony", Subject: "Awards ceremony" }]
+            : scenario === "fewer than three" ? records.slice(0, 2)
+            : scenario === "missing icon" ? [{ ...notice, Subject: "Fire ban declaration - Darwin" }] : records;
+          request.resolve({ ok: true, json: async () => items });
+        }
+      });
+      await new Promise((resolve) => setImmediate(resolve));
+
+      const cards = [...results.querySelectorAll(".media-releases__item")];
+      const expected = scenario === "empty" || scenario === "total failure" ? 0
+        : scenario === "missing icon" ? 1 : scenario === "fewer than three" ? 2 : 3;
+      assert.equal(cards.length, expected);
+      assert.equal(results.getAttribute("aria-busy"), "false");
+      assert.equal(listing.querySelector("[data-feed-note]").hidden, !["partial failure", "total failure"].includes(scenario));
+      if (expected === 3) {
+        assert.deepEqual(cards.map((card) => card.querySelector("h2").textContent), [
+          "Flood Advice - Daly River - 4", "Flood Advice - Daly River - 3", "Flood Advice - Daly River - 2",
+        ]);
+      }
+      if (cards.length) {
+        const heading = cards[0].querySelector(".media-releases__card-heading");
+        assert.ok(heading.querySelector(".media-releases__severity"));
+        if (scenario === "missing icon") assert.equal(heading.querySelector("img"), null);
+        else assert.match(heading.querySelector("img").src, /\/SecureNT_files\/flood-advice\.webp$/);
+        assert.equal(cards[0].querySelector(".media-releases__link").rel, "noopener noreferrer");
+      }
+      if (scenario === "empty") assert.match(listing.querySelector("[data-results-status]").textContent, /no current warnings/i);
+      if (scenario === "total failure") assert.match(listing.querySelector("[data-results-status]").textContent, /temporarily unavailable/i);
+    } finally {
+      Object.assign(globalThis, originals);
+      console.error = originalConsoleError;
+      await window.happyDOM.close();
+    }
+  });
+}
