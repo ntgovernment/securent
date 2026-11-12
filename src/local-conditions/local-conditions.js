@@ -74,16 +74,9 @@
     return c;
   }
 
-  function unavailable(c) {
-    c.appendChild(
-      el("p", "lc-card__none", "Data is currently unavailable. Try again later."),
-    );
-    return c;
-  }
-
   function fireCard(data) {
     var c = card("Bushfire danger rating", "fa-fire-flame-curved");
-    if (!data) return unavailable(c);
+    if (!data) return null;
 
     var bar = el("div", "lc-fire");
     FIRE_COLOURS.forEach(function (colour) {
@@ -105,7 +98,7 @@
 
   function airCard(data) {
     var c = card("Air quality monitor", "fa-fan");
-    if (!data || !Number.isFinite(data.index)) return unavailable(c);
+    if (!data || !Number.isFinite(data.index)) return null;
 
     var row = el("div", "lc-card__row");
     var value = el("span", "lc-card__value", String(data.index));
@@ -127,7 +120,7 @@
 
   function tempCard(data) {
     var c = card("Temperature", "fa-temperature-half");
-    if (!data || (data.min == null && data.max == null)) return unavailable(c);
+    if (!data || (data.min == null && data.max == null)) return null;
 
     function part(arrow, label, v) {
       var p = el("span", "lc-temp");
@@ -179,12 +172,15 @@
   }
 
   function render(data, pending) {
-    cards.replaceChildren(
-      cardWithSource(fireCard(data.fireDanger), "Bushfires NT", "https://www.pfes.nt.gov.au/incidentmap"),
-      cardWithSource(airCard(data.airQuality), "NTEPA", "https://ntepa.nt.gov.au/", data.airQuality),
-      cardWithSource(tempCard(data.temperature), "Bureau of Meteorology",
-        "https://www.bom.gov.au/location/australia/northern-territory#observations"),
-    );
+    var groups = [];
+    var fire = fireCard(data.fireDanger);
+    var air = airCard(data.airQuality);
+    var temperature = tempCard(data.temperature);
+    if (fire) groups.push(cardWithSource(fire, "Bushfires NT", "https://www.pfes.nt.gov.au/incidentmap"));
+    if (air) groups.push(cardWithSource(air, "NTEPA", "https://ntepa.nt.gov.au/", data.airQuality));
+    if (temperature) groups.push(cardWithSource(temperature, "Bureau of Meteorology",
+      "https://www.bom.gov.au/location/australia/northern-territory#observations"));
+    cards.replaceChildren.apply(cards, groups);
     if (pending) cards.setAttribute("aria-busy", "true");
     else cards.removeAttribute("aria-busy");
     status.textContent = pending ? "Loading local conditions…" : "";
