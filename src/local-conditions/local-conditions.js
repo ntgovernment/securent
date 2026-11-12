@@ -39,7 +39,7 @@
   var fireDangerUrl = "https://cmsexternal.nt.gov.au/securent/_design/integrations/fire-danger-ratings";
   var locations = [];
 
-  var FIRE_COLOURS = ["#5fb830", "#f4d63a", "#f28100", "#a80a0a"];
+  var FIRE_COLOURS = ["#999999", "#5fb830", "#f4d63a", "#f28100", "#a80a0a"];
 
   var select = root.querySelector(".lc-select");
   var useBtn = root.querySelector(".lc-use-location");
@@ -93,18 +93,18 @@
     if (!data) return null;
 
     var bar = el("div", "lc-fire");
-    FIRE_COLOURS.forEach(function (colour) {
+    bar.setAttribute("role", "img");
+    bar.setAttribute("aria-label", "Fire danger rating: " + data.label);
+    FIRE_COLOURS.forEach(function (colour, index) {
       var seg = el("span", "lc-fire__seg");
       seg.style.background = colour;
+      seg.style.flexGrow = index === data.level ? "2" : "1";
       bar.appendChild(seg);
     });
-    if (data.level > 0) {
-      var marker = el("span", "lc-fire__marker");
-      // Centre the marker in the segment for the current level (levels 1-4).
-      var idx = Math.min(Math.max(data.level - 1, 0), 3);
-      marker.style.left = idx * 25 + 12.5 + "%";
-      bar.appendChild(marker);
-    }
+    var marker = el("span", "lc-fire__marker");
+    marker.setAttribute("aria-hidden", "true");
+    marker.style.left = (data.level + 1) / 6 * 100 + "%";
+    bar.appendChild(marker);
     c.appendChild(bar);
     c.appendChild(el("p", "lc-card__label", data.label));
     if (typeof data.issuedAt === "string") {

@@ -546,6 +546,25 @@ test("production reads mapped fire ratings from the CMS integration directly", a
   assert.match(card.textContent, new RegExp("Issue date: " + issuedDate));
 });
 
+test("fire danger gauge has six units with the selected rating doubled", async () => {
+  const labels = ["No Rating", "Moderate", "High", "Extreme", "Catastrophic"];
+  for (const [level, label] of labels.entries()) {
+    const context = await widget({
+      worker: () => Promise.resolve(response({ fireDanger: { label, level } })),
+    });
+    const card = cardFor(context, "Bushfire danger rating");
+    const bar = card.querySelector(".lc-fire");
+    const segments = Array.from(bar.querySelectorAll(".lc-fire__seg"));
+    assert.equal(segments.length, 5);
+    assert.equal(segments[0].style.background, "#999999");
+    assert.deepEqual(segments.map((segment) => segment.style.flexGrow),
+      labels.map((_, index) => index === level ? "2" : "1"));
+    assert.equal(bar.querySelector(".lc-fire__marker").style.left, (level + 1) / 6 * 100 + "%");
+    assert.equal(bar.getAttribute("role"), "img");
+    assert.equal(bar.getAttribute("aria-label"), "Fire danger rating: " + label);
+  }
+});
+
 test("worker failures cannot hide BOM temperatures or replace them with worker data", async () => {
   const failed = await widget({ worker: () => Promise.reject(new Error("unavailable")) });
   assert.match(failed.window.document.querySelector(".lc-cards").textContent, /36 °C/);
