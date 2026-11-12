@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { fetchAirQuality, fetchAirQualityStations } from "./src/local-conditions/air-quality.mjs";
 import { FIRE_AREA_CODES, readFireDanger } from "./src/local-conditions/fire-danger.mjs";
-import { mediaReleaseSources } from "./src/media-releases/feeds.mjs";
+import { latestMediaReleaseEndpoint, mediaReleaseSources } from "./src/media-releases/feeds.mjs";
 
 const sourceThemeOnly = {
   name: "source-theme-only",
@@ -123,6 +123,7 @@ const mediaReleaseFeedProxy = {
   name: "media-release-feed-proxy",
   configureServer(server) {
     const feeds = new Map(mediaReleaseSources.map((source) => [source.id, source.endpoint]));
+    feeds.set("latest", latestMediaReleaseEndpoint);
 
     server.middlewares.use("/api/media-releases", async (req, res) => {
       const sourceId = new URL(req.url, "http://localhost").pathname.replace(/^\//, "");

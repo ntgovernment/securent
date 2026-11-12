@@ -1,3 +1,5 @@
+export const latestMediaReleaseEndpoint = "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor";
+
 export const mediaReleaseSources = [
   {
     id: "bushfires-nt",

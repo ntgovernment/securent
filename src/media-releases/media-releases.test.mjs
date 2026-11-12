@@ -249,9 +249,9 @@ for (const scenario of ["populated", "empty", "partial failure", "total failure"
   });
 }
 
-for (const scenario of ["latest three", "fewer than three", "missing icon", "empty", "partial failure", "total failure"]) {
+for (const scenario of ["latest three", "production endpoint", "fewer than three", "missing icon", "empty", "invalid response", "http failure", "total failure"]) {
   test(`compact listing handles ${scenario}`, async () => {
-    const window = new Window({ url: "http://localhost/" });
+    const window = new Window({ url: scenario === "production endpoint" ? "https://cmsexternal.nt.gov.au/" : "http://localhost/" });
     window.document.write(`<section data-latest-media-releases>
       <p data-results-status role="status"></p>
       <p data-feed-note hidden></p>
@@ -262,7 +262,7 @@ for (const scenario of ["latest three", "fewer than three", "missing icon", "emp
     globalThis.window = window;
     globalThis.document = window.document;
     const requests = [];
-    globalThis.fetch = () => new Promise((resolve, reject) => requests.push({ resolve, reject }));
+    globalThis.fetch = (url, options) => new Promise((resolve, reject) => requests.push({ url, options, resolve, reject }));
     console.error = () => {};
 
     try {
@@ -274,33 +274,40 @@ for (const scenario of ["latest three", "fewer than three", "missing icon", "emp
       assert.equal(results.querySelectorAll(".media-releases__skeleton-block").length, 21);
       assert.equal(listing.querySelector("[data-results-status]").textContent, "Loading current warnings...");
       assert.ok(listing.querySelector("[data-results-status]").classList.contains("media-releases__status--loading"));
-      assert.equal(requests.length, 3);
+      assert.equal(requests.length, 1);
+      assert.equal(requests[0].url, scenario === "production endpoint"
+        ? "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor"
+        : "/api/media-releases/latest");
       const records = [1, 4, 2, 3].map((day) => ({
         ...notice,
         CampaignID: `campaign-${day}`,
         Subject: `Flood Advice - Daly River - ${day}`,
         SentDate: `2026-11-0${day} 09:00:00`,
       }));
-      requests.forEach((request, index) => {
-        if (scenario === "total failure" || (scenario === "partial failure" && index === 0)) {
+      requests.forEach((request) => {
+        if (scenario === "total failure") {
           request.reject(new Error("Feed offline"));
+        } else if (scenario === "http failure") {
+          request.resolve({ ok: false, status: 503 });
         } else {
           const items = scenario === "empty" ? [{ ...notice, Name: "Awards ceremony", Subject: "Awards ceremony" }]
             : scenario === "fewer than three" ? records.slice(0, 2)
-            : scenario === "missing icon" ? [{ ...notice, Subject: "Fire ban declaration - Darwin" }] : records;
+            : scenario === "missing icon" ? [{ ...notice, Subject: "Fire ban declaration - Darwin" }]
+            : scenario === "invalid response" ? { error: "Invalid feed" }
+            : [...records, records[1], { ...notice, CampaignID: "news", Name: "Awards ceremony", Subject: "Awards ceremony" }];
           request.resolve({ ok: true, json: async () => items });
         }
       });
       await new Promise((resolve) => setImmediate(resolve));
 
       const cards = [...results.querySelectorAll(".media-releases__item")];
-      const expected = scenario === "empty" || scenario === "total failure" ? 0
+      const expected = ["empty", "total failure", "http failure", "invalid response"].includes(scenario) ? 0
         : scenario === "missing icon" ? 1 : scenario === "fewer than three" ? 2 : 3;
       assert.equal(cards.length, expected);
       assert.equal(results.getAttribute("aria-busy"), "false");
       assert.equal(results.querySelectorAll(".media-releases__skeleton").length, 0);
       assert.equal(listing.querySelector("[data-results-status]").classList.contains("media-releases__status--loading"), false);
-      assert.equal(listing.querySelector("[data-feed-note]").hidden, !["partial failure", "total failure"].includes(scenario));
+      assert.equal(listing.querySelector("[data-feed-note]").hidden, !["invalid response", "http failure", "total failure"].includes(scenario));
       if (expected === 3) {
         assert.deepEqual(cards.map((card) => card.querySelector("h2").textContent), [
           "Flood Advice - Daly River - 4", "Flood Advice - Daly River - 3", "Flood Advice - Daly River - 2",
@@ -314,7 +321,7 @@ for (const scenario of ["latest three", "fewer than three", "missing icon", "emp
         assert.equal(cards[0].querySelector(".media-releases__link").rel, "noopener noreferrer");
       }
       if (scenario === "empty") assert.match(listing.querySelector("[data-results-status]").textContent, /no current warnings/i);
-      if (scenario === "total failure") assert.match(listing.querySelector("[data-results-status]").textContent, /temporarily unavailable/i);
+      if (["invalid response", "http failure", "total failure"].includes(scenario)) assert.match(listing.querySelector("[data-results-status]").textContent, /temporarily unavailable/i);
     } finally {
       Object.assign(globalThis, originals);
       console.error = originalConsoleError;

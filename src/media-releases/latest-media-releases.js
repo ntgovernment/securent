@@ -1,5 +1,5 @@
 import { curateFeeds } from "./curation.mjs";
-import { fetchMediaReleaseFeeds } from "./feeds.mjs";
+import { latestMediaReleaseEndpoint } from "./feeds.mjs";
 import { renderCard } from "./media-release-card.js";
 
 const listing = document.querySelector("[data-latest-media-releases]");
@@ -9,7 +9,6 @@ if (listing) {
   const status = listing.querySelector("[data-results-status]");
   const feedNote = listing.querySelector("[data-feed-note]");
   const isLocalPreview = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
-
   results.setAttribute("aria-busy", "true");
   status.classList.add("media-releases__status--loading");
   status.textContent = "Loading current warnings...";
@@ -28,19 +27,25 @@ if (listing) {
     <span class="media-releases__skeleton-block media-releases__skeleton-action"></span>`;
     return placeholder;
   }));
-  fetchMediaReleaseFeeds(fetch, (source) => isLocalPreview ? `/${source.id}.json` : source.endpoint)
-    .then(({ feeds, failedSources }) => {
-      const items = curateFeeds(feeds).slice(0, 3);
+  fetch(isLocalPreview ? "/api/media-releases/latest" : latestMediaReleaseEndpoint,
+    { headers: { Accept: "application/json" }, credentials: "same-origin" })
+    .then((response) => {
+      if (!response.ok) throw new Error(`Request failed (${response.status})`);
+      return response.json();
+    })
+    .then((records) => {
+      if (!Array.isArray(records)) throw new TypeError("Warnings endpoint returned an unsupported response shape");
+      const items = curateFeeds([{ source: "Merged", items: records }]).slice(0, 3);
       results.replaceChildren(...items.map((item) => renderCard(item, { compact: true })));
       status.textContent = items.length ? "" : "There are no current warnings.";
-      feedNote.hidden = failedSources.length === 0;
-      feedNote.textContent = failedSources.length ? `Some feeds are unavailable: ${failedSources.join(", ")}.` : "";
+      feedNote.hidden = true;
+      feedNote.textContent = "";
     })
     .catch((error) => {
       results.replaceChildren();
       status.textContent = "Current warnings are temporarily unavailable. Please try again later.";
       feedNote.hidden = false;
-      feedNote.textContent = "No source feeds could be loaded.";
+      feedNote.textContent = "The warnings feed could not be loaded.";
       console.error("Unable to load current warnings", error);
     })
     .finally(() => {

@@ -2,10 +2,12 @@
 
 ## Latest Three Warnings
 
-The compact listing uses the same operational-warning feeds, deduplication,
-and newest-first ordering as the full listing. It displays up to three cards
-and reports unavailable sources. It does not require the full listing's
-search, filters, or pagination.
+The compact listing requests the merged `campaign-monitor` endpoint and
+applies the existing operational-warning filtering, deduplication, and
+newest-first ordering to its JSON array. It displays up to three cards and
+does not require the full listing's search, filters, or pagination. The
+endpoint does not identify individual source failures or preserve source
+precedence for duplicate campaigns.
 
 Include the existing site theme and icon fonts, `media-releases.css`, and the
 standalone module. Deploy `dist/SecureNT_files/media-release-card.js`,
@@ -25,11 +27,13 @@ relative paths. The full listings additionally require
 <script type="module" src="./dist/latest-media-releases.js"></script>
 ```
 
-Localhost uses the JSON fixtures in `public`; other hosts use the configured
-feed endpoints. The existing site icon font supplies the clock, location, and
+On localhost, the Vite development server proxies `/api/media-releases/latest`
+to `https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor`;
+other hosts request that URL directly and require CORS permission if they are
+on a different origin. The existing site icon font supplies the clock, location, and
 arrow icons. The cards use three columns on wide screens, two below 900px,
 and one below 600px. The component shows an empty message when no eligible
-notices are available and reports partial or total feed failures.
+notices are available and reports when the endpoint is unavailable or invalid.
 During loading, three placeholder cards shimmer in the results grid while an
 accessible loading status is announced. Reduced-motion preferences disable
 the shimmer. The placeholders are replaced when loading succeeds or fails.
