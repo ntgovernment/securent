@@ -48,7 +48,7 @@
   var requestId = 0;
   var activeLocation = null;
   var activeData = null;
-  var activePending = 0;
+  var activePendingFields = [];
   var userSelected = false;
 
   var oldAttribution = root.querySelector(".lc-attribution");
@@ -74,6 +74,20 @@
     return c;
   }
 
+  function skeletonGroup() {
+    var group = el("div", "lc-card-group lc-skeleton-group");
+    group.setAttribute("aria-hidden", "true");
+    var placeholder = el("div", "lc-card lc-skeleton");
+    placeholder.appendChild(el("span", "lc-skeleton-block lc-skeleton-block--title"));
+    placeholder.appendChild(el("span", "lc-skeleton-block lc-skeleton-block--value"));
+    placeholder.appendChild(el("span", "lc-skeleton-block lc-skeleton-block--meta"));
+    var source = el("p", "lc-attribution lc-skeleton-source");
+    source.appendChild(el("span", "lc-skeleton-block lc-skeleton-block--source"));
+    group.appendChild(placeholder);
+    group.appendChild(source);
+    return group;
+  }
+
   function fireCard(data) {
     var c = card("Bushfire danger rating", "fa-fire-flame-curved");
     if (!data) return null;
@@ -93,6 +107,14 @@
     }
     c.appendChild(bar);
     c.appendChild(el("p", "lc-card__label", data.label));
+    if (typeof data.issuedAt === "string") {
+      var issueDate = new Date(data.issuedAt);
+      if (Number.isFinite(issueDate.getTime())) {
+        c.appendChild(el("p", "lc-card__issue-date", "Issue date: " + new Intl.DateTimeFormat("en-AU", {
+          timeZone: "Australia/Darwin", day: "2-digit", month: "2-digit", year: "numeric",
+        }).format(issueDate)));
+      }
+    }
     return c;
   }
 
@@ -171,19 +193,22 @@
     return group;
   }
 
-  function render(data, pending) {
+  function render(data, pendingFields) {
+    var waiting = pendingFields || [];
     var groups = [];
     var fire = fireCard(data.fireDanger);
     var air = airCard(data.airQuality);
     var temperature = tempCard(data.temperature);
     if (fire) groups.push(cardWithSource(fire, "Bushfires NT", "https://www.pfes.nt.gov.au/incidentmap"));
+    else if (waiting.indexOf("fireDanger") >= 0) groups.push(skeletonGroup());
     if (air) groups.push(cardWithSource(air, "NTEPA", "https://ntepa.nt.gov.au/", data.airQuality));
+    else if (waiting.indexOf("airQuality") >= 0) groups.push(skeletonGroup());
     if (temperature) groups.push(cardWithSource(temperature, "Bureau of Meteorology",
       "https://www.bom.gov.au/location/australia/northern-territory#observations"));
     cards.replaceChildren.apply(cards, groups);
-    if (pending) cards.setAttribute("aria-busy", "true");
+    if (waiting.length) cards.setAttribute("aria-busy", "true");
     else cards.removeAttribute("aria-busy");
-    status.textContent = pending ? "Loading local conditions…" : "";
+    status.textContent = "";
   }
 
   function readFireDanger(feed, areaCode) {
@@ -194,24 +219,30 @@
     var level = fireLevels.findIndex(function (value) {
       return typeof severity === "string" && severity.toLowerCase() === value.toLowerCase();
     });
-    return level < 0 ? null : { label: fireLevels[level], level: level };
+    var issuedAt = typeof warning.issuetime === "string" && Number.isFinite(Date.parse(warning.issuetime))
+      ? warning.issuetime : null;
+    return level < 0 ? null : { label: fireLevels[level], level: level, issuedAt: issuedAt };
   }
 
   function load(location) {
     var id = ++requestId;
     var data = { temperature: location.temperature };
     var fireAreaCode = fireAreaCodes[location.workerKey];
-    var pending = Number(Boolean(fireAreaCode)) + Number(Boolean(location.epaStation));
+    var pendingFields = [];
+    if (fireAreaCode) pendingFields.push("fireDanger");
+    if (location.epaStation) pendingFields.push("airQuality");
     activeLocation = location;
     activeData = data;
-    activePending = pending;
-    render(data, pending);
+    activePendingFields = pendingFields.slice();
+    render(data, pendingFields);
 
     function complete(field, value) {
       if (id !== requestId) return;
       data[field] = value;
-      activePending = --pending;
-      render(data, pending);
+      var index = pendingFields.indexOf(field);
+      if (index >= 0) pendingFields.splice(index, 1);
+      activePendingFields = pendingFields.slice();
+      render(data, pendingFields);
     }
 
     if (fireAreaCode) {
@@ -479,7 +510,7 @@
         } catch (e) {
           /* ignore */
         }
-        render(activeData, activePending);
+        render(activeData, activePendingFields);
       } else {
         setLocation(initial.key);
       }
@@ -490,8 +521,9 @@
     updateCatalog();
   }
 
-  status.textContent = "Loading local conditions…";
+  status.textContent = "";
   cards.setAttribute("aria-busy", "true");
+  cards.replaceChildren(skeletonGroup(), skeletonGroup(), skeletonGroup());
   fetchCatalog(observationsUrl, "text", readLocations)
     .then(function (result) { bomLocations = result; })
     .catch(function () {})

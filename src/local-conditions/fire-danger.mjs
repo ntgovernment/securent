@@ -23,5 +23,8 @@ export function readFireDanger(feed, areaCode) {
   );
   if (level < 0) return null;
 
-  return { label: FIRE_LEVELS[level], level };
+  const issuedAt = typeof warning.issuetime === "string" && Number.isFinite(Date.parse(warning.issuetime))
+    ? warning.issuetime
+    : null;
+  return { label: FIRE_LEVELS[level], level, issuedAt };
 }

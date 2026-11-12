@@ -48,15 +48,19 @@ test("fire-danger feed selects the mapped area and normalizes its severity", () 
     nhulunbuy: "NT_FW006",
     yulara: "NT_FW018",
   });
-  assert.deepEqual(readFireDanger(fireDangerFixture, FIRE_AREA_CODES.darwin), { label: "Moderate", level: 1 });
-  assert.deepEqual(readFireDanger(fireDangerFixture, FIRE_AREA_CODES["alice-springs"]), { label: "No Rating", level: 0 });
+  const darwinWarning = fireDangerFixture.warnings.find((item) => item.area_code === FIRE_AREA_CODES.darwin);
+  const aliceWarning = fireDangerFixture.warnings.find((item) => item.area_code === FIRE_AREA_CODES["alice-springs"]);
+  assert.deepEqual(readFireDanger(fireDangerFixture, FIRE_AREA_CODES.darwin),
+    { label: "Moderate", level: 1, issuedAt: darwinWarning.issuetime });
+  assert.deepEqual(readFireDanger(fireDangerFixture, FIRE_AREA_CODES["alice-springs"]),
+    { label: "No Rating", level: 0, issuedAt: aliceWarning.issuetime });
   assert.equal(readFireDanger(fireDangerFixture, "NT_FW999"), null);
   assert.equal(readFireDanger({}, "NT_FW001"), null);
 
   const levels = ["No Rating", "Moderate", "High", "Extreme", "Catastrophic"];
   for (const [level, severity] of levels.entries()) {
     assert.deepEqual(readFireDanger({ warnings: [{ area_code: "NT_FW001", severity_code: severity }] }, "NT_FW001"),
-      { label: severity, level });
+      { label: severity, level, issuedAt: null });
   }
 });
 
@@ -81,7 +85,7 @@ test("production worker gets fire danger from the CMS feed independently of BOM 
   try {
     const response = await worker.fetch(new Request("https://worker.example/?location=darwin"));
     const body = await response.json();
-    assert.deepEqual(body.fireDanger, { label: "Moderate", level: 1 });
+    assert.deepEqual(body.fireDanger, readFireDanger(fireDangerFixture, FIRE_AREA_CODES.darwin));
     assert.deepEqual(body.temperature, { min: 25, max: 34 });
     assert.ok(requestedUrls.includes(FIRE_DANGER_URL));
     assert.ok(requestedUrls.some((url) => url.includes("/forecasts/daily")));
@@ -195,9 +199,27 @@ function selectLocation(context, key) {
   context.select.dispatchEvent(new context.window.Event("change"));
 }
 
+test("catalog loading uses skeleton cards without a loading message", async () => {
+  let resolveObservations;
+  let resolveCatalog;
+  const context = await widget({
+    observations: () => new Promise((resolve) => { resolveObservations = resolve; }),
+    catalog: () => new Promise((resolve) => { resolveCatalog = resolve; }),
+  });
+  const cards = context.window.document.querySelector(".lc-cards");
+  assert.equal(cards.getAttribute("aria-busy"), "true");
+  assert.equal(cards.querySelectorAll(".lc-skeleton-group").length, 3);
+  assert.equal(cards.querySelectorAll('.lc-skeleton-group[aria-hidden="true"]').length, 3);
+  assert.equal(context.window.document.querySelector(".lc-status").textContent, "");
+  resolveObservations(response(fixture));
+  resolveCatalog(response({ stations: parseAirQualityStations(epaFixture) }));
+  await settle();
+  assert.equal(cards.querySelectorAll(".lc-skeleton-group").length, 0);
+});
+
 function cardFor(context, title) {
   return Array.from(context.window.document.querySelectorAll(".lc-card")).find((card) =>
-    card.querySelector(".lc-card__title").textContent === title) || null;
+    card.querySelector(".lc-card__title")?.textContent === title) || null;
 }
 
 function groupFor(context, title) {
@@ -391,11 +413,13 @@ test("air quality loads independently while fire danger is pending or failed", a
   assert.match(cards.textContent, /0 Index/);
   assert.equal(cardFor(context, "Bushfire danger rating"), null);
   assert.equal(groupFor(context, "Bushfire danger rating"), null);
+  assert.equal(cards.querySelectorAll(".lc-skeleton-group").length, 1);
   assert.equal(cards.getAttribute("aria-busy"), "true");
   resolveWorker(response("", false));
   await settle();
   assert.match(cards.textContent, /0 Index/);
   assert.equal(groupFor(context, "Bushfire danger rating"), null);
+  assert.equal(cards.querySelectorAll(".lc-skeleton-group").length, 0);
   assert.equal(cards.hasAttribute("aria-busy"), false);
   assert.equal(context.window.document.querySelector(".lc-status").textContent, "");
 });
@@ -513,7 +537,13 @@ test("production reads mapped fire ratings from the CMS integration directly", a
   const context = await widget({ url: "https://cmsexternal.nt.gov.au/securent/home", saved: "015590" });
   assert.ok(context.requests.includes(FIRE_DANGER_URL));
   assert.equal(context.requests.some((url) => url.includes("/api/local-conditions")), false);
-  assert.match(cardFor(context, "Bushfire danger rating").textContent, /No Rating/);
+  const card = cardFor(context, "Bushfire danger rating");
+  assert.match(card.textContent, /No Rating/);
+  const warning = fireDangerFixture.warnings.find((item) => item.area_code === FIRE_AREA_CODES["alice-springs"]);
+  const issuedDate = new Intl.DateTimeFormat("en-AU", {
+    timeZone: "Australia/Darwin", day: "2-digit", month: "2-digit", year: "numeric",
+  }).format(new Date(warning.issuetime));
+  assert.match(card.textContent, new RegExp("Issue date: " + issuedDate));
 });
 
 test("worker failures cannot hide BOM temperatures or replace them with worker data", async () => {

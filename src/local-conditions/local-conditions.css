@@ -136,6 +136,44 @@ main.ntg-body--homepage #current-conditions > #local-conditions > .container-xl 
   color: #4a4a57;
 }
 
+.lc-card__issue-date {
+  margin: 0.25rem 0 0;
+  text-align: right;
+  font-size: 0.875rem;
+  color: #4a4a57;
+}
+
+.lc-skeleton-group .lc-card {
+  gap: 1.25rem;
+}
+
+.lc-skeleton-block {
+  display: block;
+  flex: none;
+  height: 1rem;
+  max-width: 100%;
+  background: linear-gradient(90deg, #e8e9eb 25%, #f5f5f6 50%, #e8e9eb 75%);
+  background-size: 200% 100%;
+  animation: lc-skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+.lc-skeleton-block--title { width: 64%; height: 1.25rem; }
+.lc-skeleton-block--value { width: 48%; height: 2.5rem; margin-top: auto; }
+.lc-skeleton-block--meta { width: 36%; align-self: flex-end; }
+.lc-skeleton-block--source { width: 42%; height: 0.75rem; }
+
+@keyframes lc-skeleton-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lc-skeleton-block {
+    background: #e8e9eb;
+    animation: none;
+  }
+}
+
 .lc-fire {
   position: relative;
   display: flex;

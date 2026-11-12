@@ -366,7 +366,7 @@ The latest warning banner uses `.warning-banner` markup with `role="alert"`, `da
 
 ### Local conditions
 
-The local-conditions widget renders cards for fire danger, air quality, and temperature when usable data is available. Its styles live in `src/local-conditions/local-conditions.css`, imported by `src/css/main.css` into the shared `dist/theme.css` bundle. Below 576px, location controls stack at full width and condition cards use outlined panels with 32px separation. A card and its source line are omitted while its request is pending or when its value is unavailable; other available cards remain visible. The page-level status and busy indicator remain available for loading and location messages.
+The local-conditions widget renders cards for fire danger, air quality, and temperature when usable data is available. Its styles live in `src/local-conditions/local-conditions.css`, imported by `src/css/main.css` into the shared `dist/theme.css` bundle. Below 576px, location controls stack at full width and condition cards use outlined panels with 32px separation. A card and its source line are omitted when its value is unavailable; pending requests use skeleton placeholders, while other available cards remain visible. The bushfire card includes the feed's issue date when valid. Loading is communicated with the busy state rather than a loading message.
 
 On the homepage, Local conditions forms a separate lower panel immediately after Latest events within the current-conditions frame. A full-width top border separates the sections, with 40px spacing on either side of the divider and content aligned to the frame's responsive gutters.
 
