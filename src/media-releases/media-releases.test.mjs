@@ -270,6 +270,10 @@ for (const scenario of ["latest three", "fewer than three", "missing icon", "emp
       const listing = window.document.querySelector("[data-latest-media-releases]");
       const results = listing.querySelector("[data-results]");
       assert.equal(results.getAttribute("aria-busy"), "true");
+      assert.equal(results.querySelectorAll('.media-releases__skeleton[aria-hidden="true"]').length, 3);
+      assert.equal(results.querySelectorAll(".media-releases__skeleton-block").length, 21);
+      assert.equal(listing.querySelector("[data-results-status]").textContent, "Loading current warnings...");
+      assert.ok(listing.querySelector("[data-results-status]").classList.contains("media-releases__status--loading"));
       assert.equal(requests.length, 3);
       const records = [1, 4, 2, 3].map((day) => ({
         ...notice,
@@ -294,6 +298,8 @@ for (const scenario of ["latest three", "fewer than three", "missing icon", "emp
         : scenario === "missing icon" ? 1 : scenario === "fewer than three" ? 2 : 3;
       assert.equal(cards.length, expected);
       assert.equal(results.getAttribute("aria-busy"), "false");
+      assert.equal(results.querySelectorAll(".media-releases__skeleton").length, 0);
+      assert.equal(listing.querySelector("[data-results-status]").classList.contains("media-releases__status--loading"), false);
       assert.equal(listing.querySelector("[data-feed-note]").hidden, !["partial failure", "total failure"].includes(scenario));
       if (expected === 3) {
         assert.deepEqual(cards.map((card) => card.querySelector("h2").textContent), [

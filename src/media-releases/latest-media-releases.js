@@ -11,7 +11,23 @@ if (listing) {
   const isLocalPreview = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
 
   results.setAttribute("aria-busy", "true");
+  status.classList.add("media-releases__status--loading");
   status.textContent = "Loading current warnings...";
+  results.replaceChildren(...Array.from({ length: 3 }, () => {
+    const placeholder = document.createElement("div");
+    placeholder.className = "media-releases__skeleton";
+    placeholder.setAttribute("aria-hidden", "true");
+    placeholder.innerHTML = `<div class="media-releases__skeleton-heading">
+      <span class="media-releases__skeleton-block media-releases__skeleton-icon"></span>
+      <span class="media-releases__skeleton-block media-releases__skeleton-badge"></span>
+    </div>
+    <span class="media-releases__skeleton-block media-releases__skeleton-title"></span>
+    <span class="media-releases__skeleton-block media-releases__skeleton-title-short"></span>
+    <span class="media-releases__skeleton-block media-releases__skeleton-meta"></span>
+    <span class="media-releases__skeleton-block media-releases__skeleton-meta-short"></span>
+    <span class="media-releases__skeleton-block media-releases__skeleton-action"></span>`;
+    return placeholder;
+  }));
   fetchMediaReleaseFeeds(fetch, (source) => isLocalPreview ? `/${source.id}.json` : source.endpoint)
     .then(({ feeds, failedSources }) => {
       const items = curateFeeds(feeds).slice(0, 3);
@@ -27,5 +43,8 @@ if (listing) {
       feedNote.textContent = "No source feeds could be loaded.";
       console.error("Unable to load current warnings", error);
     })
-    .finally(() => results.setAttribute("aria-busy", "false"));
+    .finally(() => {
+      results.setAttribute("aria-busy", "false");
+      status.classList.remove("media-releases__status--loading");
+    });
 }

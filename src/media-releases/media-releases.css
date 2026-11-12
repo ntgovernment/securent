@@ -180,6 +180,66 @@ section.media-releases__hero {
   gap: 24px;
 }
 
+[data-latest-media-releases] .media-releases__status--loading {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  min-height: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+[data-latest-media-releases] .media-releases__skeleton {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  min-height: 214px;
+  padding: 24px;
+  border: 1px solid #d3d3d7;
+  border-left: 4px solid #d3d3d7;
+  background: #fff;
+}
+
+[data-latest-media-releases] .media-releases__skeleton-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+[data-latest-media-releases] .media-releases__skeleton-block {
+  display: block;
+  flex: none;
+  height: 16px;
+  max-width: 100%;
+  background: linear-gradient(90deg, #e8e9eb 25%, #f5f5f6 50%, #e8e9eb 75%);
+  background-size: 200% 100%;
+  animation: media-releases-shimmer 1.6s ease-in-out infinite;
+}
+
+[data-latest-media-releases] .media-releases__skeleton-icon { width: 32px; height: 32px; }
+[data-latest-media-releases] .media-releases__skeleton-badge { width: 100px; height: 24px; }
+[data-latest-media-releases] .media-releases__skeleton-title { width: 95%; height: 20px; }
+[data-latest-media-releases] .media-releases__skeleton-title-short { width: 58%; height: 20px; }
+[data-latest-media-releases] .media-releases__skeleton-meta { width: 70%; }
+[data-latest-media-releases] .media-releases__skeleton-meta-short { width: 48%; }
+[data-latest-media-releases] .media-releases__skeleton-action { width: 42%; margin-top: 8px; }
+
+@keyframes media-releases-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-latest-media-releases] .media-releases__skeleton-block {
+    background: #e8e9eb;
+    animation: none;
+  }
+}
+
 [data-latest-media-releases] .media-releases__link,
 [data-latest-media-releases] .media-releases__item--with-icon .media-releases__link {
   display: block;

@@ -30,6 +30,9 @@ feed endpoints. The existing site icon font supplies the clock, location, and
 arrow icons. The cards use three columns on wide screens, two below 900px,
 and one below 600px. The component shows an empty message when no eligible
 notices are available and reports partial or total feed failures.
+During loading, three placeholder cards shimmer in the results grid while an
+accessible loading status is announced. Reduced-motion preferences disable
+the shimmer. The placeholders are replaced when loading succeeds or fails.
 
 The Current Warnings page combines emergency types and declarations in one
 **Incident or notice type** filter. Filter groups appear in this order:

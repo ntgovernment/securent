@@ -194,6 +194,7 @@ Validation checklist:
 - Check that **Clear all filters** unchecks Warning level, Incident or notice type, Region and Source, resets pagination to page 1, and preserves search text and sort order. Confirm that the text-only button and Filters heading fit on desktop/mobile and no fieldset divider lines remain.
 - Manually inspect excluded candidates after curation changes, especially borderline operational announcements. Keep this review in validation; do not add a public exclusions section or generated review report.
 - Check desktop/mobile search, combined filters, sidebar sorting, page resets, collapsed filter accessibility, and partial/all-source failures. Live feeds may stall; controlled browser fixtures can isolate UI checks without changing production feed configuration.
+- For the latest-three listing, delay feed responses and verify that three responsive skeleton cards appear, the loading status remains accessible, reduced-motion disables the shimmer, and placeholders clear for successful, empty, partial-failure, and total-failure responses.
 - Delay feed responses and check the listing-only dimming, 100px spinner, blocked listing controls, usable header/footer and reduced-motion behavior at desktop/mobile widths. Confirm cleanup after populated or empty results, partial/total feed failure and rendering errors. The automated DOM checks cover these cleanup paths; visual browser verification of this overlay remains outstanding because the shared-browser connection timed out.
 
 ## Build
