@@ -165,6 +165,7 @@ export default defineConfig({
     cloudflare(),
   ],
   build: {
+    assetsInlineLimit: 0,
     rollupOptions: {
       input: {
         ...(includeLocalCapture ? { page: "./SecureNT.html" } : {}),

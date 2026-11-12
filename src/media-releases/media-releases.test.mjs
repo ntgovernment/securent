@@ -116,6 +116,7 @@ test("renders declaration-only cards with their accent colors and checkbox style
     assert.ok(alertsSelectBase);
     assert.match(mediaSelectBase, /background-color:#fff/);
     assert.match(alertsSelectBase, /background-color:#fff/);
+    assert.match(css, /\.media-releases__search input:hover:not\(:focus\):not\(:active\):placeholder-shown,\.media-releases__sort select:hover:not\(:focus\):not\(:active\)\{background-color:#ecf0f0\}/);
 
     assert.match(css, /\.media-releases__item\[data-declaration~=planned-burn-advice\]\{--media-releases-accent:\s*#865aa5\}/);
     assert.match(css, /\.media-releases__item\[data-general-information=true\]\{--media-releases-accent:\s*#1f1f5f\}/);

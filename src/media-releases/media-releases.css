@@ -98,6 +98,11 @@ section.media-releases__hero {
   padding-right: 48px;
 }
 
+.media-releases__search input:hover:not(:focus):not(:active):placeholder-shown,
+.media-releases__sort select:hover:not(:focus):not(:active) {
+  background-color: #ecf0f0;
+}
+
 .media-releases__search-icon {
   position: absolute;
   top: 0;
