@@ -171,6 +171,7 @@ async function widget({ url = "http://localhost:5173/", saved, feed = fixture, o
     if (request.includes("IDD60920.xml") || request.includes("1657184")) {
       return observations ? observations(options) : Promise.resolve(response(feed));
     }
+    if (request === FIRE_DANGER_URL) return Promise.resolve(response(fireDangerFixture));
     if (request === "/api/air-quality") {
       return catalog ? catalog(options) : Promise.resolve(response({ stations: parseAirQualityStations(epaFixture) }));
     }
@@ -465,9 +466,16 @@ test("production uses the Matrix asset and restores saved or legacy selections",
   assert.equal(context.requests[0], "./?a=1657184");
   assert.equal(context.select.value, "015590");
   assert.equal(context.window.localStorage.getItem("securent.localConditions.location"), "015590");
-  assert.match(context.requests[2], /location=alice-springs/);
+  assert.ok(context.requests.includes(FIRE_DANGER_URL));
   const saved = await widget({ saved: "014253" });
   assert.equal(saved.select.value, "014253");
+});
+
+test("production reads mapped fire ratings from the CMS integration directly", async () => {
+  const context = await widget({ url: "https://cmsexternal.nt.gov.au/securent/home", saved: "015590" });
+  assert.ok(context.requests.includes(FIRE_DANGER_URL));
+  assert.equal(context.requests.some((url) => url.includes("/api/local-conditions")), false);
+  assert.match(context.window.document.querySelectorAll(".lc-card")[0].textContent, /No Rating/);
 });
 
 test("worker failures cannot hide BOM temperatures or replace them with worker data", async () => {

@@ -26,6 +26,17 @@
     "Darwin Airport": 2,
     "Darwin Harbour": 3,
   };
+  var fireAreaCodes = {
+    darwin: "NT_FW001",
+    palmerston: "NT_FW001",
+    "alice-springs": "NT_FW014",
+    katherine: "NT_FW007",
+    "tennant-creek": "NT_FW012",
+    nhulunbuy: "NT_FW006",
+    yulara: "NT_FW018",
+  };
+  var fireLevels = ["No Rating", "Moderate", "High", "Extreme", "Catastrophic"];
+  var fireDangerUrl = "https://cmsexternal.nt.gov.au/securent/_design/integrations/fire-danger-ratings";
   var locations = [];
 
   var FIRE_COLOURS = ["#5fb830", "#f4d63a", "#f28100", "#a80a0a"];
@@ -179,10 +190,22 @@
     status.textContent = pending ? "Loading local conditions…" : "";
   }
 
+  function readFireDanger(feed, areaCode) {
+    if (!feed || !Array.isArray(feed.warnings)) return null;
+    var warning = feed.warnings.find(function (item) { return item && item.area_code === areaCode; });
+    if (!warning) return null;
+    var severity = warning.severity_code || warning.severity_name;
+    var level = fireLevels.findIndex(function (value) {
+      return typeof severity === "string" && severity.toLowerCase() === value.toLowerCase();
+    });
+    return level < 0 ? null : { label: fireLevels[level], level: level };
+  }
+
   function load(location) {
     var id = ++requestId;
     var data = { temperature: location.temperature };
-    var pending = Number(Boolean(location.workerKey)) + Number(Boolean(location.epaStation));
+    var fireAreaCode = fireAreaCodes[location.workerKey];
+    var pending = Number(Boolean(fireAreaCode)) + Number(Boolean(location.epaStation));
     activeLocation = location;
     activeData = data;
     activePending = pending;
@@ -195,15 +218,22 @@
       render(data, pending);
     }
 
-    if (location.workerKey) {
-      var url = new URL(endpoint, window.location.href);
-      url.searchParams.set("location", location.workerKey);
-      fetch(url.href)
+    if (fireAreaCode) {
+      var fireRequest = isLocal
+        ? (function () {
+          var url = new URL(endpoint, window.location.href);
+          url.searchParams.set("location", location.workerKey);
+          return fetch(url.href);
+        }())
+        : fetch(fireDangerUrl);
+      fireRequest
         .then(function (response) {
           if (!response.ok) throw new Error(response.status);
           return response.json();
         })
-        .then(function (result) { complete("fireDanger", result.fireDanger); })
+        .then(function (result) {
+          complete("fireDanger", isLocal ? result.fireDanger : readFireDanger(result, fireAreaCode));
+        })
         .catch(function () { complete("fireDanger", null); });
     }
 
