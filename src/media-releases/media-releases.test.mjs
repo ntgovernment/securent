@@ -78,6 +78,9 @@ test("renders declaration-only cards with their accent colors and checkbox style
     assert.equal(decreasingThreat.querySelector(".media-releases__severity").textContent, "Decreasing threat");
     assert.ok(emergency.querySelector(".media-releases__date-time"));
     assert.match(emergency.querySelector(".media-releases__region").textContent, /Region: Greater Darwin/);
+    const unknownRegionCard = cards.find((card) => card.querySelector(".media-releases__title")?.textContent === "Advice - Remote community");
+    assert.ok(unknownRegionCard);
+    assert.equal(unknownRegionCard.querySelector(".media-releases__region"), null);
     assert.ok(emergency.querySelector(".media-releases__hazard-icon"));
     assert.equal(plannedBurn.querySelector(".media-releases__severity").textContent, "Planned burn");
     assert.equal(plannedBurn.querySelector(".media-releases__hazard-icon"), null);
@@ -249,7 +252,7 @@ for (const scenario of ["populated", "empty", "partial failure", "total failure"
   });
 }
 
-for (const scenario of ["latest three", "production endpoint", "fewer than three", "missing icon", "empty", "invalid response", "http failure", "total failure"]) {
+for (const scenario of ["latest three", "production endpoint", "fewer than three", "missing icon", "unknown region", "empty", "invalid response", "http failure", "total failure"]) {
   test(`compact listing handles ${scenario}`, async () => {
     const window = new Window({ url: scenario === "production endpoint" ? "https://cmsexternal.nt.gov.au/" : "http://localhost/" });
     window.document.write(`<section data-latest-media-releases>
@@ -293,6 +296,7 @@ for (const scenario of ["latest three", "production endpoint", "fewer than three
           const items = scenario === "empty" ? [{ ...notice, Name: "Awards ceremony", Subject: "Awards ceremony" }]
             : scenario === "fewer than three" ? records.slice(0, 2)
             : scenario === "missing icon" ? [{ ...notice, Subject: "Fire ban declaration - Darwin" }]
+            : scenario === "unknown region" ? [{ ...notice, Name: "Advice - Remote community", Subject: "Advice - Remote community" }]
             : scenario === "invalid response" ? { error: "Invalid feed" }
             : [...records, records[1], { ...notice, CampaignID: "news", Name: "Awards ceremony", Subject: "Awards ceremony" }];
           request.resolve({ ok: true, json: async () => items });
@@ -302,7 +306,7 @@ for (const scenario of ["latest three", "production endpoint", "fewer than three
 
       const cards = [...results.querySelectorAll(".media-releases__item")];
       const expected = ["empty", "total failure", "http failure", "invalid response"].includes(scenario) ? 0
-        : scenario === "missing icon" ? 1 : scenario === "fewer than three" ? 2 : 3;
+        : ["missing icon", "unknown region"].includes(scenario) ? 1 : scenario === "fewer than three" ? 2 : 3;
       assert.equal(cards.length, expected);
       assert.equal(results.getAttribute("aria-busy"), "false");
       assert.equal(results.querySelectorAll(".media-releases__skeleton").length, 0);
@@ -316,8 +320,10 @@ for (const scenario of ["latest three", "production endpoint", "fewer than three
       if (cards.length) {
         const heading = cards[0].querySelector(".media-releases__card-heading");
         assert.ok(heading.querySelector(".media-releases__severity"));
-        if (scenario === "missing icon") assert.equal(heading.querySelector("img"), null);
+        if (["missing icon", "unknown region"].includes(scenario)) assert.equal(heading.querySelector("img"), null);
         else assert.match(heading.querySelector("img").src, /\/SecureNT_files\/flood-advice\.webp$/);
+        if (scenario === "unknown region") assert.equal(cards[0].querySelector(".media-releases__region"), null);
+        else assert.ok(cards[0].querySelector(".media-releases__region"));
         assert.equal(cards[0].querySelector(".media-releases__link").rel, "noopener noreferrer");
       }
       if (scenario === "empty") assert.match(listing.querySelector("[data-results-status]").textContent, /no current warnings/i);

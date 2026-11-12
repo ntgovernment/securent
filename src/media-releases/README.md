@@ -51,7 +51,8 @@ them again. The count in **Show all (N)** is the number of hidden options.
 
 Checkbox labels display **Other** for values internally classified as
 **Not identified**. The checkbox values remain unchanged so filtering behavior
-is preserved. The fire-ban option displays as **Fire ban notices**; its card
+is preserved. Cards in both listings omit the region row when the region is
+not identified. The fire-ban option displays as **Fire ban notices**; its card
 badge is singular (**Fire ban notice**) and uses the dark-blue `#1f1f5f` accent.
 Planned burns display as **Planned burn advice** in the filter and **Planned
 burn** on the card. Boil-water notices display as **Boil water notice** in the

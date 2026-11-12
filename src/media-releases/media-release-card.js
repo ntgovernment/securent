@@ -88,14 +88,18 @@ export function renderCard(item, { compact = false } = {}) {
     meta.append(dateTime);
   }
 
-  const region = document.createElement("p");
-  region.className = "media-releases__classification media-releases__region";
-  const mapPin = document.createElement("i");
-  mapPin.className = "fa-light fa-location-dot";
-  mapPin.setAttribute("aria-hidden", "true");
-  const regionLabel = document.createElement("span");
-  regionLabel.textContent = `Region: ${item.regions.join(", ")}`;
-  region.append(mapPin, regionLabel);
+  const regions = item.regions.filter((region) => region !== "Not identified");
+  let region;
+  if (regions.length) {
+    region = document.createElement("p");
+    region.className = "media-releases__classification media-releases__region";
+    const mapPin = document.createElement("i");
+    mapPin.className = "fa-light fa-location-dot";
+    mapPin.setAttribute("aria-hidden", "true");
+    const regionLabel = document.createElement("span");
+    regionLabel.textContent = `Region: ${regions.join(", ")}`;
+    region.append(mapPin, regionLabel);
+  }
 
   const iconUrl = hazardIconFor(item);
   let icon;
@@ -118,7 +122,7 @@ export function renderCard(item, { compact = false } = {}) {
     content.append(severity, title);
   }
   if (meta.hasChildNodes()) content.append(meta);
-  content.append(region);
+  if (region) content.append(region);
   if (url) {
     const moreInformation = document.createElement("span");
     moreInformation.className = "media-releases__more-information";
