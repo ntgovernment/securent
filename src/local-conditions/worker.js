@@ -1,6 +1,8 @@
 // Fetch-handler proxy (Cloudflare Workers style): GET ?location=<key> -> JSON for the Local conditions cards.
 // BOM and NT EPA send no CORS headers, so the browser cannot call them directly.
 
+import { FIRE_AREA_CODES, FIRE_DANGER_URL, readFireDanger } from "./fire-danger.mjs";
+
 const BOM_API = "https://api.weather.bom.gov.au/v1";
 const NTEPA_URL = "http://ntepa.webhop.net/NTEPA/Default.ltr.aspx";
 const USER_AGENT = "SecureNT-local-conditions/1.0";
@@ -16,8 +18,6 @@ const LOCATIONS = {
   nhulunbuy: { name: "Nhulunbuy", search: "Nhulunbuy" },
   yulara: { name: "Yulara", search: "Yulara" },
 };
-
-const FIRE_LEVELS = ["No rating", "Moderate", "High", "Extreme", "Catastrophic"];
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -41,20 +41,16 @@ async function getBomForecast(search) {
   const today = (daily.data || [])[0];
   if (!today) return null;
 
-  // Field names for fire danger are not documented; read defensively.
-  const fireText =
-    today.fire_danger_category?.text || today.fire_danger || null;
-  const fireIndex = FIRE_LEVELS.findIndex(
-    (l) => fireText && fireText.toLowerCase().includes(l.toLowerCase()),
-  );
-
   return {
     temperature: {
       min: today.temp_min ?? null,
       max: today.temp_max ?? null,
     },
-    fireDanger: fireText ? { label: fireText, level: fireIndex } : null,
   };
+}
+
+async function getFireDanger(areaCode) {
+  return readFireDanger(await getJson(FIRE_DANGER_URL), areaCode);
 }
 
 async function getAirQuality(station) {
@@ -95,16 +91,17 @@ export default {
     const cached = await cache.match(request);
     if (cached) return cached;
 
-    const [bom, air] = await Promise.allSettled([
+    const [bom, air, fire] = await Promise.allSettled([
       getBomForecast(loc.search),
       getAirQuality(loc.epaStation),
+      getFireDanger(FIRE_AREA_CODES[key]),
     ]);
 
     const body = {
       location: loc.name,
       updated: new Date().toISOString(),
       temperature: bom.status === "fulfilled" ? bom.value?.temperature ?? null : null,
-      fireDanger: bom.status === "fulfilled" ? bom.value?.fireDanger ?? null : null,
+      fireDanger: fire.status === "fulfilled" ? fire.value : null,
       airQuality: air.status === "fulfilled" ? air.value : null,
     };
 

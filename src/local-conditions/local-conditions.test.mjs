@@ -3,9 +3,12 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { Window } from "happy-dom";
 import { fetchAirQuality, fetchAirQualityStations, parseAirQualityStations } from "./air-quality.mjs";
+import worker from "./worker.js";
+import { FIRE_AREA_CODES, FIRE_DANGER_URL, readFireDanger } from "./fire-danger.mjs";
 
 const script = await readFile(new URL("./local-conditions.js", import.meta.url), "utf8");
 const xml = await readFile(new URL("../../public/IDD60920.xml", import.meta.url), "utf8");
+const fireDangerFixture = JSON.parse(await readFile(new URL("../../public/fire-danger-ratings.json", import.meta.url), "utf8"));
 const fixture = `<product><observations>
   <station bom-id="014015" description="Darwin Airport" lat="-12.4239" lon="130.8925">
     <period index="0"><level type="surface"><element type="minimum_air_temperature">31.5</element><element type="maximum_air_temperature">35.6</element></level></period>
@@ -34,6 +37,60 @@ const epaFixture = { d: [
   { name: "Stokes Hill", serialCode: 3, IndexValue: 64.5 },
   { name: "Katherine", serialCode: 4, IndexValue: 90 },
 ] };
+
+test("fire-danger feed selects the mapped area and normalizes its severity", () => {
+  assert.deepEqual(FIRE_AREA_CODES, {
+    darwin: "NT_FW001",
+    palmerston: "NT_FW001",
+    "alice-springs": "NT_FW014",
+    katherine: "NT_FW007",
+    "tennant-creek": "NT_FW012",
+    nhulunbuy: "NT_FW006",
+    yulara: "NT_FW018",
+  });
+  assert.deepEqual(readFireDanger(fireDangerFixture, FIRE_AREA_CODES.darwin), { label: "Moderate", level: 1 });
+  assert.deepEqual(readFireDanger(fireDangerFixture, FIRE_AREA_CODES["alice-springs"]), { label: "No Rating", level: 0 });
+  assert.equal(readFireDanger(fireDangerFixture, "NT_FW999"), null);
+  assert.equal(readFireDanger({}, "NT_FW001"), null);
+
+  const levels = ["No Rating", "Moderate", "High", "Extreme", "Catastrophic"];
+  for (const [level, severity] of levels.entries()) {
+    assert.deepEqual(readFireDanger({ warnings: [{ area_code: "NT_FW001", severity_code: severity }] }, "NT_FW001"),
+      { label: severity, level });
+  }
+});
+
+test("production worker gets fire danger from the CMS feed independently of BOM temperatures", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalCaches = globalThis.caches;
+  const requestedUrls = [];
+  globalThis.caches = { default: { match: async () => null, put: async () => {} } };
+  globalThis.fetch = async (input) => {
+    const url = String(input);
+    requestedUrls.push(url);
+    if (url === FIRE_DANGER_URL) return Response.json(fireDangerFixture);
+    if (url.includes("/locations?search=")) {
+      return Response.json({ data: [{ state: "NT", geohash: "r1r0f0" }] });
+    }
+    if (url.includes("/forecasts/daily")) {
+      return Response.json({ data: [{ temp_min: 25, temp_max: 34 }] });
+    }
+    return new Response("", { status: 200 });
+  };
+
+  try {
+    const response = await worker.fetch(new Request("https://worker.example/?location=darwin"));
+    const body = await response.json();
+    assert.deepEqual(body.fireDanger, { label: "Moderate", level: 1 });
+    assert.deepEqual(body.temperature, { min: 25, max: 34 });
+    assert.ok(requestedUrls.includes(FIRE_DANGER_URL));
+    assert.ok(requestedUrls.some((url) => url.includes("/forecasts/daily")));
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalCaches === undefined) delete globalThis.caches;
+    else globalThis.caches = originalCaches;
+  }
+});
 
 test("EPA reads station-level JSON indices and rejects invalid or missing readings", () => {
   assert.deepEqual(parseAirQualityStations(epaFixture), [

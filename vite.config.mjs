@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { fetchAirQuality, fetchAirQualityStations } from "./src/local-conditions/air-quality.mjs";
+import { FIRE_AREA_CODES, readFireDanger } from "./src/local-conditions/fire-danger.mjs";
 import { mediaReleaseSources } from "./src/media-releases/feeds.mjs";
 
 const sourceThemeOnly = {
@@ -90,13 +91,27 @@ const localConditionsMock = {
           ? "Invalid EPA station ID" : "Air-quality data is unavailable" }));
       }
     });
-    server.middlewares.use("/api/local-conditions", (req, res) => {
+    server.middlewares.use("/api/local-conditions", async (req, res) => {
       const key = new URL(req.url, "http://localhost").searchParams.get("location");
+      const areaCode = FIRE_AREA_CODES[key];
+      if (!areaCode) {
+        res.statusCode = 400;
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify({ error: "Unknown location" }));
+        return;
+      }
+      let fireDanger = null;
+      try {
+        const fixture = await readFile(new URL("./public/fire-danger-ratings.json", import.meta.url), "utf8");
+        fireDanger = readFireDanger(JSON.parse(fixture), areaCode);
+      } catch (error) {
+        console.warn("Local fire-danger fixture failed:", error.message);
+      }
       const body = {
         location: key,
         updated: new Date().toISOString(),
         temperature: { min: 27, max: 32 },
-        fireDanger: { label: "Moderate", level: 1 },
+        fireDanger,
       };
       res.setHeader("Content-Type", "application/json");
       res.end(JSON.stringify(body));
