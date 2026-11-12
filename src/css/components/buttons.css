@@ -35,3 +35,7 @@
 .homepage-news .btn.ntg-btn {
   border-radius: 0;
 }
+
+.cta-button.btn.ntg-btn--primary {
+  border-radius: 0;
+}
