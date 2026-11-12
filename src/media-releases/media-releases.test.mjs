@@ -33,6 +33,8 @@ test("renders declaration-only cards with their accent colors and checkbox style
       { ...notice, CampaignID: "emergency", Name: "Emergency warning - Cyclone - Darwin", Subject: "Emergency warning - Cyclone - Darwin" },
       { ...notice, CampaignID: "watch-act", Name: "Severe storm watch and act - Darwin", Subject: "Severe storm watch and act - Darwin" },
       { ...notice, CampaignID: "decreasing-threat", Name: "Flood Advice - Decreasing threat - Katherine", Subject: "Flood Advice - Decreasing threat - Katherine" },
+      { ...notice, CampaignID: "heatwave", Name: "Heatwave advice - Alice Springs", Subject: "Heatwave advice - Alice Springs" },
+      { ...notice, CampaignID: "unknown-type", Name: "Advice - Remote community", Subject: "Advice - Remote community" },
     ],
   });
 
@@ -79,23 +81,51 @@ test("renders declaration-only cards with their accent colors and checkbox style
     assert.ok(emergency.querySelector(".media-releases__hazard-icon"));
     assert.equal(plannedBurn.querySelector(".media-releases__severity").textContent, "Planned burn");
     assert.equal(plannedBurn.querySelector(".media-releases__hazard-icon"), null);
-    assert.equal(fireBan.querySelector(".media-releases__severity").textContent, "General information");
+    assert.equal(fireBan.querySelector(".media-releases__severity").textContent, "Fire ban notice");
     assert.equal(fireBan.dataset.declaration, "fire-ban-declaration");
     assert.equal(boilWater.querySelector(".media-releases__severity").textContent, "General information");
     assert.equal(fireBan.dataset.generalInformation, "true");
     assert.equal(boilWater.dataset.generalInformation, "true");
     assert.equal(unknownWarning.querySelector(".media-releases__severity").textContent, "General information");
     assert.equal(unknownWarning.dataset.generalInformation, "true");
-    assert.ok([...listing.querySelectorAll('[data-declaration-filters] input')]
-      .some((input) => input.value === "Planned burn advice"));
-    assert.ok([...listing.querySelectorAll('[data-declaration-filters] input')]
-      .some((input) => input.value === "Fire ban declaration"));
-    assert.ok([...listing.querySelectorAll('[data-declaration-filters] input')]
-      .some((input) => input.value === "Boil water notice"));
-    assert.equal(listing.querySelector('[data-type-filters] input[value="Not identified"]'), null);
+    const incidentNoticeFilters = listing.querySelector("[data-type-filters]");
+    assert.equal(incidentNoticeFilters.parentElement.querySelector("legend").textContent, "Incident or notice type");
+    const fireBanFilter = incidentNoticeFilters.querySelector('input[name="declaration"][value="Fire ban declaration"]');
+    assert.ok(fireBanFilter);
+    assert.equal(fireBanFilter.parentElement.textContent, "Fire ban notices (1)");
+    assert.ok(incidentNoticeFilters.querySelector('input[name="declaration"][value="Planned burn advice"]'));
+    assert.ok(incidentNoticeFilters.querySelector('input[name="declaration"][value="Boil water notice"]'));
+    assert.ok(incidentNoticeFilters.querySelector('input[name="emergencyType"][value="Flooding"]'));
+    const unknownTypeFilter = incidentNoticeFilters.querySelector('input[name="emergencyType"][value="Not identified"]');
+    assert.ok(unknownTypeFilter);
+    assert.equal(unknownTypeFilter.parentElement.textContent, "Other (1)");
+    const incidentOptions = [...incidentNoticeFilters.querySelectorAll(".media-releases__filter")];
+    assert.equal(incidentOptions.length, 8);
+    assert.equal(incidentOptions.filter((option) => option.hidden).length, 2);
+    const expandFilters = incidentNoticeFilters.querySelector("[data-expand-filters]");
+    assert.equal(expandFilters.textContent, "Show all (2)");
+    assert.equal(expandFilters.getAttribute("aria-expanded"), "false");
+    expandFilters.click();
+    assert.equal(incidentOptions.filter((option) => option.hidden).length, 0);
+    assert.equal(expandFilters.textContent, "Show less");
+    assert.equal(expandFilters.getAttribute("aria-expanded"), "true");
+    expandFilters.click();
+    assert.equal(incidentOptions.filter((option) => option.hidden).length, 2);
+    assert.equal(expandFilters.textContent, "Show all (2)");
+    assert.equal(listing.querySelector("[data-declaration-filters]"), null);
+
+    fireBanFilter.checked = true;
+    fireBanFilter.dispatchEvent(new window.Event("change", { bubbles: true }));
+    assert.equal(listing.querySelectorAll("[data-results] .media-releases__item").length, 1);
+    assert.equal(listing.querySelector("[data-results] .media-releases__item").dataset.declaration, "fire-ban-declaration");
+    fireBanFilter.checked = false;
+    fireBanFilter.dispatchEvent(new window.Event("change", { bubbles: true }));
+    const unknownRegion = listing.querySelector('[data-region-filters] input[value="Not identified"]');
+    assert.ok(unknownRegion);
+    assert.equal(unknownRegion.parentElement.textContent, "Other (1)");
     const unknownWarningLevel = listing.querySelector('[data-level-filters] input[value="Not identified"]');
     assert.ok(unknownWarningLevel);
-    assert.equal(unknownWarningLevel.parentElement.textContent, "Not identified (1)");
+    assert.equal(unknownWarningLevel.parentElement.textContent, "Other (1)");
 
     unknownWarningLevel.checked = true;
     unknownWarningLevel.dispatchEvent(new window.Event("change", { bubbles: true }));
@@ -119,7 +149,8 @@ test("renders declaration-only cards with their accent colors and checkbox style
     assert.match(css, /\.media-releases__search input:hover:not\(:focus\):not\(:active\):placeholder-shown,\.media-releases__sort select:hover:not\(:focus\):not\(:active\)\{background-color:#ecf0f0\}/);
 
     assert.match(css, /\.media-releases__item\[data-declaration~=planned-burn-advice\]\{--media-releases-accent:\s*#865aa5\}/);
-    assert.match(css, /\.media-releases__item\[data-general-information=true\]\{--media-releases-accent:\s*#1f1f5f\}/);
+    assert.match(css, /\.media-releases__item\[data-declaration~=fire-ban-declaration\][^{]*\{--media-releases-accent:\s*#1f1f5f\}/);
+    assert.match(css, /\.media-releases__item\[data-general-information=true\][^{]*\{--media-releases-accent:\s*#1f1f5f\}/);
     assert.match(css, /\.media-releases__item\[data-general-information=true\] \.media-releases__severity\{color:#fff\}/);
     assert.match(css, /\.media-releases__item\[data-warning-level=advice\]\{--media-releases-accent:\s*#fadf31\}/);
     assert.match(css, /\.media-releases__item\[data-warning-level=advice\] \.media-releases__severity\{color:#716309\}/);

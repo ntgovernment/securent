@@ -238,6 +238,10 @@ section.media-releases__hero {
   --media-releases-accent: #1f1f5f;
 }
 
+.media-releases__item[data-declaration~="fire-ban-declaration"] {
+  --media-releases-accent: #1f1f5f;
+}
+
 .media-releases__severity {
   display: inline-flex;
   align-items: center;
@@ -438,6 +442,10 @@ section.media-releases__hero {
   gap: 8px;
 }
 
+.media-releases__filter[hidden] {
+  display: none;
+}
+
 .media-releases__filter {
   display: flex;
   align-items: center;
@@ -449,6 +457,25 @@ section.media-releases__hero {
   font-size: 16px;
   line-height: 24px;
   cursor: pointer;
+}
+
+.media-releases__filter-expand {
+  align-self: flex-start;
+  min-height: 32px;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: #174c4e;
+  font-family: Lato, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.media-releases__filter-expand:focus-visible {
+  outline: 3px solid #267e82;
+  outline-offset: 2px;
 }
 
 .media-releases__filter input {

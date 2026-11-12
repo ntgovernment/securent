@@ -93,10 +93,70 @@ if (listing) {
       input.name = name;
       input.value = value;
       const text = document.createElement("span");
-      text.textContent = `${value} (${count})`;
+      text.textContent = `${filterDisplayLabel(value)} (${count})`;
       label.append(input, text);
       container.append(label);
     }
+  }
+
+  function filterDisplayLabel(value) {
+    if (value === "Not identified") return "Other";
+    if (value === "Fire ban declaration") return "Fire ban notices";
+    return value;
+  }
+
+  function renderIncidentNoticeTypeFilters(container) {
+    container.replaceChildren();
+    const options = new Map();
+    for (const item of items) {
+      const itemOptions = new Set();
+      for (const [name, values] of [["emergencyType", item.emergencyTypes], ["declaration", item.declarations]]) {
+        for (const value of values) {
+          const key = `${name}:${value}`;
+          if (itemOptions.has(key)) continue;
+          itemOptions.add(key);
+          const option = options.get(key) || { name, value, count: 0 };
+          option.count += 1;
+          options.set(key, option);
+        }
+      }
+    }
+
+    const entries = [...options.values()].sort((first, second) => {
+      const firstLabel = filterDisplayLabel(first.value);
+      const secondLabel = filterDisplayLabel(second.value);
+      return firstLabel.localeCompare(secondLabel, "en");
+    });
+    const filterLabels = entries.map((entry, index) => {
+      const label = document.createElement("label");
+      label.className = "media-releases__filter";
+      label.hidden = index >= 6;
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.name = entry.name;
+      input.value = entry.value;
+      const text = document.createElement("span");
+      text.textContent = `${filterDisplayLabel(entry.value)} (${entry.count})`;
+      label.append(input, text);
+      container.append(label);
+      return label;
+    });
+
+    const hiddenCount = Math.max(0, entries.length - 6);
+    if (!hiddenCount) return;
+    const expandButton = document.createElement("button");
+    expandButton.type = "button";
+    expandButton.className = "media-releases__filter-expand";
+    expandButton.dataset.expandFilters = "";
+    expandButton.setAttribute("aria-expanded", "false");
+    expandButton.textContent = `Show all (${hiddenCount})`;
+    expandButton.addEventListener("click", () => {
+      const expanded = expandButton.getAttribute("aria-expanded") !== "true";
+      filterLabels.slice(6).forEach((label) => { label.hidden = !expanded; });
+      expandButton.setAttribute("aria-expanded", String(expanded));
+      expandButton.textContent = expanded ? "Show less" : `Show all (${hiddenCount})`;
+    });
+    container.append(expandButton);
   }
 
   function renderFilters() {
@@ -104,8 +164,7 @@ if (listing) {
     renderFilterGroup("source", filters.querySelector("[data-source-filters]"), (item) => item.sources,
       sourceNames, sourceNames);
     renderFilterGroup("region", filters.querySelector("[data-region-filters]"), (item) => item.regions);
-    renderFilterGroup("emergencyType", filters.querySelector("[data-type-filters]"), (item) => item.emergencyTypes);
-    renderFilterGroup("declaration", filters.querySelector("[data-declaration-filters]"), (item) => item.declarations);
+    renderIncidentNoticeTypeFilters(filters.querySelector("[data-type-filters]"));
     renderFilterGroup("warningLevel", filters.querySelector("[data-level-filters]"),
       (item) => item.declarations?.length ? [] : [item.warningLevel], warningLevelOrder);
   }
@@ -165,7 +224,8 @@ if (listing) {
       : !["Emergency warning", "Watch and act", "Advice"].includes(item.warningLevel) && !isDecreasingThreat;
     if (isGeneralInformation) article.dataset.generalInformation = "true";
     severity.textContent = item.declarations.length
-      ? item.declarations.map((declaration) => declaration === "Planned burn advice" ? "Planned burn" : "General information").join(", ")
+      ? item.declarations.map((declaration) => declaration === "Planned burn advice" ? "Planned burn"
+        : declaration === "Fire ban declaration" ? "Fire ban notice" : "General information").join(", ")
       : item.warningLevel === "Emergency warning" ? "Emergency"
         : isDecreasingThreat ? "Decreasing threat"
           : ["Advice", "Watch and act"].includes(item.warningLevel) ? item.warningLevel : "General information";
