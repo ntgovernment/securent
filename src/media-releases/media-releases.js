@@ -25,23 +25,35 @@ if (listing) {
   let currentPage = 1;
 
   const loadingContents = [...listing.children];
-  const loadingOverlay = document.createElement("div");
-  loadingOverlay.className = "media-releases__loading-overlay";
-  loadingOverlay.hidden = true;
-  loadingOverlay.setAttribute("role", "status");
-  const spinner = document.createElement("span");
-  spinner.className = "media-releases__loading-spinner";
-  spinner.setAttribute("aria-hidden", "true");
   const loadingMessage = document.createElement("span");
   loadingMessage.className = "visually-hidden";
-  loadingMessage.textContent = "Loading current warnings...";
-  loadingOverlay.append(spinner, loadingMessage);
-  listing.append(loadingOverlay);
+  loadingMessage.dataset.loadingStatus = "";
+  loadingMessage.setAttribute("role", "status");
+  loadingMessage.setAttribute("aria-live", "polite");
+  listing.append(loadingMessage);
+
+  function createSkeletonCard() {
+    const placeholder = document.createElement("div");
+    placeholder.className = "media-releases__skeleton";
+    placeholder.setAttribute("aria-hidden", "true");
+    placeholder.innerHTML = `<div class="media-releases__skeleton-heading">
+      <span class="media-releases__skeleton-block media-releases__skeleton-icon"></span>
+      <span class="media-releases__skeleton-block media-releases__skeleton-badge"></span>
+    </div>
+    <span class="media-releases__skeleton-block media-releases__skeleton-title"></span>
+    <span class="media-releases__skeleton-block media-releases__skeleton-title-short"></span>
+    <span class="media-releases__skeleton-block media-releases__skeleton-meta"></span>
+    <span class="media-releases__skeleton-block media-releases__skeleton-meta-short"></span>
+    <span class="media-releases__skeleton-block media-releases__skeleton-action"></span>`;
+    return placeholder;
+  }
 
   function setLoading(loading) {
-    listing.classList.toggle("media-releases__listing--loading", loading);
-    loadingOverlay.hidden = !loading;
+    loadingMessage.textContent = loading ? "Loading current warnings..." : "";
     results.setAttribute("aria-busy", String(loading));
+    if (loading) {
+      results.replaceChildren(...Array.from({ length: pageSize }, createSkeletonCard));
+    }
     for (const content of loadingContents) {
       content.inert = loading;
       content.setAttribute("aria-busy", String(loading));
@@ -263,6 +275,7 @@ if (listing) {
       render();
     })
     .catch((error) => {
+      results.replaceChildren();
       status.textContent = "Current warnings are temporarily unavailable. Please try again later.";
       feedNote.hidden = false;
       feedNote.textContent = "No source feeds could be loaded.";

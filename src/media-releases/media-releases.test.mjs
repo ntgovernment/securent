@@ -184,7 +184,7 @@ test("renders declaration-only cards with their accent colors and checkbox style
 });
 
 for (const scenario of ["populated", "empty", "partial failure", "total failure", "render failure"]) {
-  test(`loading overlay clears after ${scenario}`, async () => {
+  test(`loading skeletons clear after ${scenario}`, async () => {
     const window = new Window({ url: "http://localhost/media-releases.html" });
     window.document.write(html);
     const originals = { window: globalThis.window, document: globalThis.document, fetch: globalThis.fetch };
@@ -202,23 +202,29 @@ for (const scenario of ["populated", "empty", "partial failure", "total failure"
     try {
       await import(`../../dist/media-releases.js?loading-test=${encodeURIComponent(scenario)}`);
       const listing = window.document.querySelector("[data-media-releases]");
-      const overlay = listing.querySelector(".media-releases__loading-overlay");
+      const loadingStatus = listing.querySelector("[data-loading-status]");
       const search = listing.querySelector(".media-releases__search");
       const layout = listing.querySelector(".media-releases__layout");
       const results = listing.querySelector("[data-results]");
       assert.equal(requests.length, 3);
-      assert.equal(overlay.hidden, false);
-      assert.equal(overlay.getAttribute("role"), "status");
-      assert.equal(overlay.querySelector(".media-releases__loading-spinner").getAttribute("aria-hidden"), "true");
+      assert.equal(loadingStatus.getAttribute("role"), "status");
+      assert.equal(loadingStatus.getAttribute("aria-live"), "polite");
+      assert.equal(loadingStatus.textContent, "Loading current warnings...");
       assert.equal(search.inert, true);
       assert.equal(layout.inert, true);
-      assert.equal(overlay.inert, false);
+      assert.equal(loadingStatus.inert, false);
       assert.equal(window.document.querySelector("header").inert, false);
       assert.equal(window.document.querySelector("footer").inert, false);
       assert.equal(results.getAttribute("aria-busy"), "true");
+      assert.equal(results.querySelectorAll('.media-releases__skeleton[aria-hidden="true"]').length, 10);
+      assert.equal(results.querySelectorAll(".media-releases__skeleton-block").length, 70);
 
       if (scenario === "render failure") {
-        results.replaceChildren = () => { throw new Error("Render failed"); };
+        const replaceResults = results.replaceChildren.bind(results);
+        results.replaceChildren = (...children) => {
+          if (children.length) throw new Error("Render failed");
+          replaceResults();
+        };
       }
       requests.forEach((request, index) => {
         if (scenario === "total failure" || (scenario === "partial failure" && index === 0)) {
@@ -229,20 +235,20 @@ for (const scenario of ["populated", "empty", "partial failure", "total failure"
       });
       await new Promise((resolve) => setImmediate(resolve));
 
-      assert.equal(overlay.hidden, true);
-      assert.equal(listing.classList.contains("media-releases__listing--loading"), false);
+      assert.equal(loadingStatus.textContent, "");
       assert.equal(search.inert, false);
       assert.equal(layout.inert, false);
       assert.equal(results.getAttribute("aria-busy"), "false");
       const failed = ["total failure", "render failure"].includes(scenario);
       assert.equal(errors.length, failed ? 1 : 0, errors.flat().map(String).join("\n"));
       assert.equal(results.children.length, failed || scenario === "empty" ? 0 : 1);
+      assert.equal(results.querySelectorAll(".media-releases__skeleton").length, 0);
       assert.equal(listing.querySelector("[data-feed-note]").hidden, !failed && scenario !== "partial failure");
       if (failed) {
         assert.match(listing.querySelector("[data-results-status]").textContent, /temporarily unavailable/);
       } else {
         listing.querySelector("[data-search]").dispatchEvent(new window.Event("input"));
-        assert.equal(overlay.hidden, true);
+        assert.equal(results.querySelectorAll(".media-releases__skeleton").length, 0);
       }
     } finally {
       Object.assign(globalThis, originals);

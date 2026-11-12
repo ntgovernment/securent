@@ -1,5 +1,15 @@
 # Current Warnings Filters
 
+## Current Warnings Listing
+
+During initial feed loading, the full listing shows ten animated skeleton
+cards in the results area and announces loading through a separate polite
+status. Results are marked busy and listing controls remain inert until the
+feeds finish. Skeletons are replaced by warning cards, an empty state, or the
+existing error message when loading completes. Reduced-motion preferences
+disable the shimmer. No additional Matrix markup is required; publish the
+rebuilt CSS and JavaScript together with their shared dependencies.
+
 ## Latest Three Warnings
 
 The compact listing requests the merged `campaign-monitor` endpoint and
