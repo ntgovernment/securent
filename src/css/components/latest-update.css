@@ -1,0 +1,66 @@
+/* ==========================================================================
+   Latest update panel
+   ========================================================================== */
+.ntg-callout__content {
+  border: 0;
+  border-left: 0 !important;
+  background: #f5f5f8;
+  padding: 24px 32px;
+  color: #343741;
+  font-family: "Lato", sans-serif;
+}
+
+.ntg-callout__text h3 {
+  margin: 0 0 16px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.ntg-callout__text p {
+  margin: 0 0 16px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.ntg-callout__text p:last-child {
+  margin-bottom: 0;
+}
+
+.ntg-callout__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.ntg-callout__footer .ntg-btn {
+  min-height: 44px;
+  padding: 12px 24px;
+  border-radius: 0;
+  font-size: 16px;
+}
+
+.ntg-callout__updated {
+  margin: 0;
+  color: #686a73;
+  font-size: 16px;
+  line-height: 1.5;
+  text-align: right;
+}
+
+@media (max-width: 575.98px) {
+  .ntg-callout__content {
+    padding: 20px;
+  }
+
+  .ntg-callout__footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ntg-callout__updated {
+    text-align: left;
+  }
+}
