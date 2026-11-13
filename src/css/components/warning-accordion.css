@@ -1,6 +1,7 @@
 .warning-accordion {
   --warning-accordion-accent: var(--clr-status-advice, #fbe032);
   margin-top: 24px;
+  margin-bottom: 24px;
   border: 1px solid #d3d3d7;
   border-left: 5px solid var(--warning-accordion-accent);
   background: #fff;
@@ -133,12 +134,29 @@
 }
 
 .warning-accordion__body a {
-  display: inline-flex;
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
   align-items: center;
-  gap: 12px;
-  color: #174c4e;
+  gap: 8px;
+  padding: 8px 0;
+  color: var(--clr-link-default, #174c4e);
+  font-size: 14px;
   font-weight: 700;
+  line-height: 16px;
   text-decoration: none;
+  transition: none;
+  animation: none;
+}
+
+.warning-accordion__body a:hover {
+  text-decoration: underline;
+}
+
+.warning-accordion__body a.external::before,
+.warning-accordion__body a.external::after {
+  content: none;
+  display: none;
 }
 
 .warning-accordion__body a:focus-visible {
@@ -147,13 +165,19 @@
 }
 
 .warning-accordion__body a svg {
-  width: 20px;
-  height: 20px;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 1.8;
+  stroke-width: 1.5;
+  transition: transform 150ms ease;
+}
+
+.warning-accordion__body a:hover svg {
+  transform: translateX(-4px);
 }
 
 .warning-accordion[open] .warning-accordion__toggle svg {

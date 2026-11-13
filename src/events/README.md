@@ -14,7 +14,7 @@ The Latest update callout uses the shared theme: a 1px strong border, an 8px lef
 
 ## Warning accordion paint layout
 
-Use native `<details>` and `<summary>` markup so the warning summary stays unchanged and the body is revealed when expanded. Leave off the `open` attribute for the collapsed default. The chevron stays pinned to the summary's top-right corner as the locations wrap. Add the warning-level class to `<details>` so its accent matches the status: `warning-level-advice` (yellow, the default), `warning-level-watch_act` (orange), or `warning-level-emergency_warning` (red). Keep each pin and location name in the same `.warning-accordion__location` wrapper; long names may wrap without separating the icon from the label. Replace the asset and content placeholders with the appropriate Matrix asset URLs, metadata, and WYSIWYG content. Repeat the location element for each affected location.
+Use native `<details>` and `<summary>` markup so the warning summary stays unchanged and the body is revealed when expanded. Leave off the `open` attribute for the collapsed default. The accordion has 24px of vertical margin so the surrounding content has consistent spacing. The chevron stays pinned to the summary's top-right corner as the locations wrap. Add the warning-level class to `<details>` so its accent matches the status: `warning-level-advice` (yellow, the default), `warning-level-watch_act` (orange), or `warning-level-emergency_warning` (red). Keep each pin and location name in the same `.warning-accordion__location` wrapper; long names may wrap without separating the icon from the label. The full-width More information link uses a 14px label, 16px right-arrow icon, and 8px gap; hovering underlines the text and shifts the arrow left. The CMS-generated external icon is hidden. Replace the asset and content placeholders with the appropriate Matrix asset URLs, metadata, and WYSIWYG content. Repeat the location element for each affected location.
 
 ```html
 <link rel="stylesheet" href="PUBLISHED-URL-OF-warning-accordion.css">
@@ -43,8 +43,8 @@ Use native `<details>` and `<summary>` markup so the warning summary stays uncha
     [Warning details and safety advice]
     <a href="MORE-INFORMATION-URL">
       More information
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M4 12h15m-6-6 6 6-6 6"></path>
+      <svg aria-hidden="true" viewBox="0 0 16 16">
+        <path d="M1.33 7.67h13.34m-5.33-5.67 5.33 5.67-5.33 5.66"></path>
       </svg>
     </a>
   </div>
