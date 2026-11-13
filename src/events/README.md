@@ -2,7 +2,7 @@
 
 This directory holds page-specific styles for event and recovery pages referenced directly by the CMS.
 
-The event page asset is `event.css`, which controls the warning-level header accent, responsive content widths and event-only sticky in-page navigation. The reusable share nester lives in `src/social-share/`: `social-share.css` contains its styles and `social-share.js` handles popups and copy-link behavior.
+The event page asset is `event.css`, which controls the warning-level header accent and responsive content widths. The reusable share nester lives in `src/social-share/`: `social-share.css` contains its styles and `social-share.js` handles popups and copy-link behavior.
 
 Reference `dist/social-share.css` from the Squiz Matrix share nester/page after the global theme, so its styles are loaded wherever that nester is used. Reference `dist/event.css` on event pages and `dist/social-share.js` for the share behavior. These assets are standalone and are not imported into the global theme bundle. On desktop, the share panel aligns with the first content section below the event H1; it stays in normal flow on smaller screens.
 
@@ -10,7 +10,7 @@ The local Severe Storm - Alice Springs capture loads `dist/event.css`, `dist/soc
 
 ## On This Page
 
-Sticky navigation is event-only. Add `data-event-page` to the event template's existing `<main id="content">`, and put this container in its sidebar inside that main element:
+The event sidebar retains its legacy in-page menu container:
 
 ```html
 <div data-component="ntg-inpage-nav" class="d-print-none">
@@ -18,13 +18,11 @@ Sticky navigation is event-only. Add `data-event-page` to the event template's e
 </div>
 ```
 
-The existing NTG components script populates the empty list from H2 headings other than `.accordion-header`. The local event capture currently has one eligible H2, so its menu contains only **More information**. Do not include previously rendered links in saved captures or they will be appended a second time. Load the shared `dist/theme.js` and the standalone `dist/event.css`; the initializer in `src/js/on-this-page.mjs` only enhances menus inside `main#content[data-event-page]`. Ordinary content-page menus remain unchanged, even if they load the event stylesheet.
+The existing NTG components script populates the empty list from H2 headings other than `.accordion-header`. The local event capture currently has one eligible H2, so its menu contains only **More information**. Do not include previously rendered links in saved captures or they will be appended a second time.
 
-Publish the event template marker and navigation container together with rebuilt `dist/theme.js`, `dist/theme.css` and `dist/event.css`. Refresh all three CMS asset cache references: the theme initializer now enforces event-only activation, the global stylesheet no longer owns sticky-menu styling, and the event stylesheet owns the 1px rail and 6px accent. Do not add `data-event-page` to ordinary content templates. The development server still opens the shelter content capture at `/`; use the explicit event URL above when checking this feature.
+Reverting `9b3e654` removes the shared sticky-navigation initializer and its tests. The later event-template marker and event stylesheet rules remain, but the shared theme no longer adds `.ntg-on-this-page`, so these menus stay in normal flow without automatic active-heading tracking. The development server again opens Current warnings at `/`; use the explicit event URL above to preview the legacy menu.
 
-At desktop widths (768px and wider), the menu sticks 16px below the viewport top and remains inside the event sidebar. Its opaque white background covers content scrolling behind it; tall menus scroll internally. The gray rail is 1px wide and the active orange accent is 6px wide, touching the rail's inner edge with no gap. The visible linked heading nearest the top reference is highlighted with `aria-current="location"`; scrolling and content-size changes update it without moving focus or changing destinations. Smaller screens retain normal flow, and the menu is hidden when printing. The separate site-navigation and share panels are not made sticky.
-
-The event capture currently references theme CSS version `49`, theme JavaScript version `32`, and event CSS version `2`. Refresh cache references after rebuilding, including equivalent CMS references. Run `node --test src/js/on-this-page.test.mjs src/js/navigation.test.mjs` and `npm run build`. Verify both an event page and an ordinary content page so event-only activation does not regress.
+The event capture retains theme CSS version `49`, theme JavaScript version `32`, and event CSS version `2`. Refresh cache references after rebuilding, including equivalent CMS references. Run `node --test src/js/navigation.test.mjs` and `npm run build` after shared-navigation edits.
 
 Event breadcrumb and main content (including accordions) share the header and menu's 80rem maximum width and responsive horizontal gutters. The feedback band is styled site-wide by `src/css/components/feedback.css` in `dist/theme.css`; it extends across the viewport while its content uses the same responsive alignment. The footer retains its existing layout. Main navigation labels align with the header content edge using matching responsive offsets in `src/css/components/header-footer.css`.
 

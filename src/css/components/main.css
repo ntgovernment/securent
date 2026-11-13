@@ -94,7 +94,6 @@ main.ntg-body {
 main#content :where(a[href]):not(:where(
   .breadcrumb *,
   .ntg-sidenav *,
-  .ntg-on-this-page *,
   nav *,
   .pagination *,
   .ntg-social-share *,
@@ -118,7 +117,6 @@ main#content :where(a[href]):not(:where(
 main#content :where(ul > li):not(:where(
   nav *,
   .ntg-sidenav *,
-  .ntg-on-this-page *,
   .ntg-social-share *,
   .hero-banner *,
   .alert *,
@@ -132,7 +130,6 @@ main#content :where(ul > li):not(:where(
 main#content :where(ul > li):not(:where(
   nav *,
   .ntg-sidenav *,
-  .ntg-on-this-page *,
   .ntg-social-share *,
   .hero-banner *,
   .alert *,
