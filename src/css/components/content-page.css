@@ -1,6 +1,0 @@
-@media (min-width: 768px) {
-  body:has(.ntg-social-share)
-    main#content .content__main:not(:has(nav)) > [id^="component_"] {
-    margin-top: 3rem;
-  }
-}
