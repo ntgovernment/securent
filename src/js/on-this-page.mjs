@@ -2,7 +2,7 @@ const initializedMenus = new WeakSet();
 
 export function initializeOnThisPage(window) {
   const document = window.document;
-  document.querySelectorAll('[data-component="ntg-inpage-nav"]').forEach((menu) => {
+  document.querySelectorAll('main#content[data-event-page] [data-component="ntg-inpage-nav"]').forEach((menu) => {
     if (initializedMenus.has(menu)) return;
     initializedMenus.add(menu);
     let entries = [];

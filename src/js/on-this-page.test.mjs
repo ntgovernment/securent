@@ -6,7 +6,7 @@ import { initializeOnThisPage } from "./on-this-page.mjs";
 async function withMenu(check) {
   const window = new Window({ url: "http://localhost:5173/" });
   window.document.body.innerHTML = `
-    <main id="content"><div class="content__main">
+    <main id="content" data-event-page><div class="content__main">
       <h2 id="first">First</h2><h2 id="second">Second</h2><h2 id="third">Third</h2>
     </div><div data-component="ntg-inpage-nav"><ul class="ntg-inpage-nav">
       <li class="nav-item heading">On this page</li>
@@ -98,6 +98,21 @@ test("waits for legacy menu generation and reads subsequently inserted links", a
     await flush();
     assert.equal(window.document.querySelector('[aria-current]').hash, "#second");
     assert.ok(window.document.querySelector('.ntg-on-this-page'));
+  });
+});
+
+test("content-page in-page menus are not enhanced or tracked", async () => {
+  await withMenu(async (window, positions, flush) => {
+    window.document.querySelector("main").removeAttribute("data-event-page");
+    const menu = window.document.querySelector('[data-component="ntg-inpage-nav"]');
+    const original = menu.outerHTML;
+    initializeOnThisPage(window);
+    positions.splice(0, 3, -200, 50, 500);
+    window.dispatchEvent(new window.Event("scroll"));
+    await flush();
+    assert.equal(menu.outerHTML, original);
+    assert.equal(window.document.querySelector(".ntg-on-this-page"), null);
+    assert.equal(menu.querySelector("[aria-current]"), null);
   });
 });
 

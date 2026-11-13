@@ -91,57 +91,10 @@ main.ntg-body {
   border-left-color: var(--clr-text-emphasis, #c33826);
 }
 
-.ntg-on-this-page {
-  --ntg-on-this-page-offset: 16px;
-  background: #fff;
-}
-
-.ntg-on-this-page .ntg-inpage-nav {
-  margin-top: 0;
-}
-
-.ntg-on-this-page .nav-link {
-  position: relative;
-  display: block;
-  padding: 4px 0 !important;
-  color: #174c4e;
-  overflow-wrap: anywhere;
-}
-
-.ntg-on-this-page .nav-link.active {
-  color: var(--clr-text-default, #1f1e27);
-}
-
-.ntg-on-this-page .nav-link.active::before {
-  content: "";
-  position: absolute;
-  inset-block: 0;
-  left: -16px;
-  width: 3px;
-  background: #f4551a;
-}
-
-.ntg-on-this-page .nav-link:focus-visible {
-  outline: 2px solid #174c4e;
-  outline-offset: 3px;
-}
-
-@media (min-width: 768px) {
-  .ntg-on-this-page {
-    position: sticky;
-    top: var(--ntg-on-this-page-offset);
-    z-index: 3;
-    max-height: calc(100vh - var(--ntg-on-this-page-offset) - 16px);
-    max-height: calc(100dvh - var(--ntg-on-this-page-offset) - 16px);
-    overflow-y: auto;
-    padding-right: 4px;
-  }
-}
-
 main#content :where(a[href]):not(:where(
   .breadcrumb *,
   .ntg-sidenav *,
-  .ntg-inpage-nav *,
+  .ntg-on-this-page *,
   nav *,
   .pagination *,
   .ntg-social-share *,
@@ -165,7 +118,7 @@ main#content :where(a[href]):not(:where(
 main#content :where(ul > li):not(:where(
   nav *,
   .ntg-sidenav *,
-  .ntg-inpage-nav *,
+  .ntg-on-this-page *,
   .ntg-social-share *,
   .hero-banner *,
   .alert *,
@@ -179,7 +132,7 @@ main#content :where(ul > li):not(:where(
 main#content :where(ul > li):not(:where(
   nav *,
   .ntg-sidenav *,
-  .ntg-inpage-nav *,
+  .ntg-on-this-page *,
   .ntg-social-share *,
   .hero-banner *,
   .alert *,
