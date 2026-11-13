@@ -39,17 +39,15 @@ const eventPreview = {
     server.middlewares.use(async (req, res, next) => {
       const url = new URL(req.url, "http://localhost");
       const eventCapture = "Severe Storm \u2013 Alice Springs _ SecureNT.html";
+      const shelterCapture = "Find an emergency shelter _ SecureNT.html";
+      const captures = [shelterCapture, "Current warnings _ SecureNT.html", eventCapture];
       const capture =
         url.pathname === "/"
-            ? "Current warnings _ SecureNT.html"
-          : url.pathname === "/" + encodeURIComponent(eventCapture)
-            ? eventCapture
-            : null;
+          ? shelterCapture
+          : captures.find((name) => url.pathname === "/" + encodeURIComponent(name));
       if (
         capture &&
-        (req.method === "GET" || req.method === "HEAD") &&
-        (url.pathname === "/" ||
-          url.pathname === "/" + encodeURIComponent(eventCapture))
+        (req.method === "GET" || req.method === "HEAD")
       ) {
         try {
           const source = await readFile(new URL(capture, import.meta.url), "utf8");

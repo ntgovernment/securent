@@ -2,8 +2,14 @@ import "./homepage-news.js";
 import "./display-cards.js";
 import "../hero-banners/hero-banners.js";
 import { guardQuickExit } from "./quick-exit.mjs";
+import { initializeOnThisPage } from "./on-this-page.mjs";
 
 guardQuickExit(window);
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => initializeOnThisPage(window), { once: true });
+} else {
+  initializeOnThisPage(window);
+}
 
 /* Expand the desktop search field when the icon is activated empty. */
 (function () {
