@@ -175,7 +175,7 @@ export default defineConfig({
         "latest-media-releases": "./src/media-releases/latest-media-releases.js",
         pagination: "./src/pagination/pagination.css",
         "more-updates-cards": "./src/alerts-listing/more-updates-cards.css",
-        "warning-expand": "./src/css/components/warning-expand.css",
+        "warning-accordion": "./src/css/components/warning-accordion.css",
         "theme-styles": "./src/css/main.css",
         "event-styles": "./src/events/event.css",
         "social-share-styles": "./src/social-share/social-share.css",
@@ -216,8 +216,8 @@ export default defineConfig({
           if (assetInfo.name === "more-updates-cards.css") {
             return "more-updates-cards.css";
           }
-          if (assetInfo.name === "warning-expand.css") {
-            return "warning-expand.css";
+          if (assetInfo.name === "warning-accordion.css") {
+            return "warning-accordion.css";
           }
           if (assetInfo.name === "alerts-listing.css") {
             return "alerts-listing.css";

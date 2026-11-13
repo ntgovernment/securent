@@ -8,6 +8,49 @@ Reference `dist/social-share.css` from the Squiz Matrix share nester/page after 
 
 The local Severe Storm - Alice Springs capture loads `dist/event.css`, `dist/social-share.css`, and `dist/social-share.js` alongside the built theme. It uses the production share destinations and falls back to the embedded logo if the production image cannot be loaded. Run `npm run build` to generate these assets, then preview at `/Severe%20Storm%20%E2%80%93%20Alice%20Springs%20_%20SecureNT.html`; shared dependencies come from the gitignored `SecureNT_files/` directory.
 
+Warning accordions use the standalone stylesheet `dist/warning-accordion.css`, built from `src/css/components/warning-accordion.css`. Publish and reference that asset on event pages wherever the warning accordion markup is used.
+
+## Warning accordion paint layout
+
+Use native `<details>` and `<summary>` markup so the warning summary stays unchanged and the body is revealed when expanded. Leave off the `open` attribute for the collapsed default. Replace the asset and content placeholders with the appropriate Matrix asset URLs, metadata, and WYSIWYG content. Repeat the location element for each affected location.
+
+```html
+<link rel="stylesheet" href="PUBLISHED-URL-OF-warning-accordion.css">
+
+<details class="warning-accordion">
+  <summary>
+    <img class="warning-accordion__icon" src="PUBLISHED-URL-OF-WARNING-ICON" alt="">
+    <span class="warning-accordion__content">
+      <strong class="warning-accordion__title">[Incident type] warning: [warning level] for [location]</strong>
+      <span class="warning-accordion__locations">
+        <span class="warning-accordion__location">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"></path>
+            <circle cx="12" cy="10" r="2.25"></circle>
+          </svg>
+          <span>[Location name]</span>
+        </span>
+      </span>
+    </span>
+    <span class="warning-accordion__toggle" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"></path></svg>
+    </span>
+  </summary>
+
+  <div class="warning-accordion__body">
+    [Warning details and safety advice]
+    <a href="MORE-INFORMATION-URL">
+      More information
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M4 12h15m-6-6 6 6-6 6"></path>
+      </svg>
+    </a>
+  </div>
+</details>
+```
+
+Keep the stylesheet version current in local captures and CMS references whenever the standalone CSS changes.
+
 ## On This Page
 
 The event sidebar retains its legacy in-page menu container:
