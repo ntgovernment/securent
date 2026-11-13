@@ -8,6 +8,11 @@
   color: #1f1e27;
   font-family: "Lato", sans-serif;
   line-height: 1.5;
+  transition: box-shadow 150ms ease;
+}
+
+.warning-accordion:hover {
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--warning-accordion-accent) 24%, transparent);
 }
 
 .warning-accordion.warning-level-watch_act {
