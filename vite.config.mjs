@@ -41,7 +41,7 @@ const eventPreview = {
       const eventCapture = "Severe Storm \u2013 Alice Springs _ SecureNT.html";
       const capture =
         url.pathname === "/"
-            ? "Current warnings _ SecureNT.html"
+            ? eventCapture
           : url.pathname === "/" + encodeURIComponent(eventCapture)
             ? eventCapture
             : null;
