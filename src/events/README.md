@@ -10,6 +10,8 @@ The local Severe Storm - Alice Springs capture loads `dist/event.css`, `dist/soc
 
 Warning accordions use the standalone stylesheet `dist/warning-accordion.css`, built from `src/css/components/warning-accordion.css`. Publish and reference that asset on event pages wherever the warning accordion markup is used.
 
+The Latest update callout uses the shared theme: a 1px strong border, an 8px left accent, and the shade background. Rebuild and publish `dist/theme.css` and refresh its CMS cache reference when changing these styles. The local event capture references theme CSS version `50`.
+
 ## Warning accordion paint layout
 
 Use native `<details>` and `<summary>` markup so the warning summary stays unchanged and the body is revealed when expanded. Leave off the `open` attribute for the collapsed default. Replace the asset and content placeholders with the appropriate Matrix asset URLs, metadata, and WYSIWYG content. Repeat the location element for each affected location.
@@ -65,7 +67,7 @@ The existing NTG components script populates the empty list from H2 headings oth
 
 Reverting `9b3e654` removes the shared sticky-navigation initializer and its tests. The later event-template marker and event stylesheet rules remain, but the shared theme no longer adds `.ntg-on-this-page`, so these menus stay in normal flow without automatic active-heading tracking. The development server again opens Current warnings at `/`; use the explicit event URL above to preview the legacy menu.
 
-The event capture retains theme CSS version `49`, theme JavaScript version `32`, and event CSS version `2`. Refresh cache references after rebuilding, including equivalent CMS references. Run `node --test src/js/navigation.test.mjs` and `npm run build` after shared-navigation edits.
+The event capture uses theme CSS version `50`, theme JavaScript version `32`, and event CSS version `2`. Refresh cache references after rebuilding, including equivalent CMS references. Run `node --test src/js/navigation.test.mjs` and `npm run build` after shared-navigation edits.
 
 Event breadcrumb and main content (including accordions) share the header and menu's 80rem maximum width and responsive horizontal gutters. The feedback band is styled site-wide by `src/css/components/feedback.css` in `dist/theme.css`; it extends across the viewport while its content uses the same responsive alignment. The footer retains its existing layout. Main navigation labels align with the header content edge using matching responsive offsets in `src/css/components/header-footer.css`.
 
