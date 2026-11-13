@@ -50,28 +50,35 @@
 .warning-accordion__title {
   display: block;
   color: #174c4e;
-  font-size: 26px;
+  font-size: 20px;
   font-weight: 700;
-  line-height: 31px;
+  line-height: 24px;
 }
 
 .warning-accordion__locations {
-  display: block;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 8px;
+  row-gap: 8px;
   margin-top: 22px;
-  font-size: 20px;
-  line-height: 30px;
+  font-size: 16px;
+  line-height: 24px;
 }
 
 .warning-accordion__location {
-  display: contents;
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 4px;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .warning-accordion__location svg {
-  display: inline-block;
+  display: block;
   width: 16px;
   height: 16px;
-  margin-right: 4px;
-  vertical-align: -3px;
+  flex: 0 0 16px;
+  margin-top: 4px;
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
@@ -84,8 +91,8 @@
   stroke: none;
 }
 
-.warning-accordion__location svg + span {
-  margin-right: 8px;
+.warning-accordion__location > span {
+  min-width: 0;
 }
 
 .warning-accordion__toggle {
@@ -118,7 +125,7 @@
   border-top: 1px solid #d3d3d7;
   background: #f5f5f7;
   color: #1f1e27;
-  font-size: 20px;
+  font-size: 16px;
 }
 
 .warning-accordion__body p {
@@ -168,15 +175,8 @@
     margin-left: 16px;
   }
 
-  .warning-accordion__title {
-    font-size: 20px;
-    line-height: 24px;
-  }
-
   .warning-accordion__locations {
     margin-top: 16px;
-    font-size: 16px;
-    line-height: 24px;
   }
 
   .warning-accordion__toggle {
@@ -189,7 +189,6 @@
 
   .warning-accordion__body {
     padding: 24px 20px;
-    font-size: 18px;
   }
 }
 

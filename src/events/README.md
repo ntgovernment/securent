@@ -14,7 +14,7 @@ The Latest update callout uses the shared theme: a 1px strong border, an 8px lef
 
 ## Warning accordion paint layout
 
-Use native `<details>` and `<summary>` markup so the warning summary stays unchanged and the body is revealed when expanded. Leave off the `open` attribute for the collapsed default. The chevron stays pinned to the summary's top-right corner as the locations wrap. Add the warning-level class to `<details>` so its accent matches the status: `warning-level-advice` (yellow, the default), `warning-level-watch_act` (orange), or `warning-level-emergency_warning` (red). Replace the asset and content placeholders with the appropriate Matrix asset URLs, metadata, and WYSIWYG content. Repeat the location element for each affected location.
+Use native `<details>` and `<summary>` markup so the warning summary stays unchanged and the body is revealed when expanded. Leave off the `open` attribute for the collapsed default. The chevron stays pinned to the summary's top-right corner as the locations wrap. Add the warning-level class to `<details>` so its accent matches the status: `warning-level-advice` (yellow, the default), `warning-level-watch_act` (orange), or `warning-level-emergency_warning` (red). Keep each pin and location name in the same `.warning-accordion__location` wrapper; long names may wrap without separating the icon from the label. Replace the asset and content placeholders with the appropriate Matrix asset URLs, metadata, and WYSIWYG content. Repeat the location element for each affected location.
 
 ```html
 <link rel="stylesheet" href="PUBLISHED-URL-OF-warning-accordion.css">
