@@ -52,11 +52,12 @@ relative paths. The full listings additionally require
 
 On localhost, the Vite development server serves `/api/media-releases/latest`
 from `src/media-releases/latest-warnings.preview.json` and randomly selects
-three unique records per request. The 18 preview examples cover Bushfire,
-Cyclone, Flooding, Storm, and Heatwave across Emergency warning, Watch and
-act, and Advice, plus Decreasing threat, Planned burn, and General
-information. This keeps the homepage preview independent of the live merged
-feed; the production page still requests the merged Campaign Monitor endpoint.
+three unique records per request, including one randomly selected Decreasing
+threat, Planned burn, or General information example and two warning
+type/level examples. The 18 preview examples cover Bushfire, Cyclone, Flooding,
+Storm, and Heatwave across Emergency warning, Watch and act, and Advice. This
+keeps the homepage preview independent of the live merged feed; the production
+page still requests the merged Campaign Monitor endpoint.
 The individual source endpoints still proxy to the NT Government site; other
 hosts request the merged endpoint directly and require CORS permission if they
 are on a different origin. The existing site icon font supplies the clock,

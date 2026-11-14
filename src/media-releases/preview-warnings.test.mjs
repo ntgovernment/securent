@@ -25,9 +25,16 @@ test("local preview covers each hazard type and warning level", () => {
 test("randomizes three distinct preview warnings", () => {
   const first = randomizePreviewWarnings(preview, () => 0);
   const second = randomizePreviewWarnings(preview, () => 0.999);
+  const specialTagPreviews = preview.filter((item) =>
+    /\b(?:decreasing[\s_-]+threats?|planned burns?|boil(?:ing)? water)\b/i.test(item.Subject));
+  const selectedSpecialTags = new Set([0, 0.5, 0.999].map((value) =>
+    randomizePreviewWarnings(preview, () => value)
+      .find((item) => specialTagPreviews.includes(item))?.CampaignID));
 
   assert.equal(first.length, 3);
   assert.equal(new Set(first.map((item) => item.CampaignID)).size, 3);
   assert.ok(first.every((item) => preview.includes(item)));
+  assert.ok(first.some((item) => specialTagPreviews.includes(item)));
   assert.notDeepEqual(first, second);
+  assert.deepEqual(selectedSpecialTags, new Set(specialTagPreviews.map((item) => item.CampaignID)));
 });
