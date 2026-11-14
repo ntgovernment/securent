@@ -38,14 +38,21 @@ export function startRelativeTimeUpdates(container) {
   window.setInterval(refresh, 60_000);
 }
 
-export function createCardSkeleton({ compact = false } = {}) {
+export function createCardSkeleton({ compact = false, featured = false } = {}) {
   const skeleton = document.createElement("div");
-  skeleton.className = compact
-    ? "media-releases__skeleton media-releases__skeleton--compact"
-    : "media-releases__skeleton";
+  skeleton.className = `media-releases__skeleton${compact ? " media-releases__skeleton--compact" : ""}${featured ? " media-releases__skeleton--featured" : ""}`;
   skeleton.setAttribute("aria-hidden", "true");
-  skeleton.innerHTML = compact
+  skeleton.innerHTML = featured
     ? `<div class="media-releases__skeleton-heading">
+        <span class="media-releases__skeleton-block media-releases__skeleton-icon"></span>
+        <span class="media-releases__skeleton-block media-releases__skeleton-badge"></span>
+      </div>
+      <span class="media-releases__skeleton-block media-releases__skeleton-meta"></span>
+      <span class="media-releases__skeleton-block media-releases__skeleton-title"></span>
+      <span class="media-releases__skeleton-block media-releases__skeleton-title-short"></span>
+      <span class="media-releases__skeleton-block media-releases__skeleton-region"></span>`
+    : compact
+      ? `<div class="media-releases__skeleton-heading">
         <span class="media-releases__skeleton-block media-releases__skeleton-icon"></span>
         <span class="media-releases__skeleton-block media-releases__skeleton-badge"></span>
       </div>
@@ -53,8 +60,8 @@ export function createCardSkeleton({ compact = false } = {}) {
       <span class="media-releases__skeleton-block media-releases__skeleton-title-short"></span>
       <span class="media-releases__skeleton-block media-releases__skeleton-meta"></span>
       <span class="media-releases__skeleton-block media-releases__skeleton-meta-short"></span>
-      <span class="media-releases__skeleton-block media-releases__skeleton-action"></span>`
-    : `<span class="media-releases__skeleton-block media-releases__skeleton-icon"></span>
+        <span class="media-releases__skeleton-block media-releases__skeleton-action"></span>`
+      : `<span class="media-releases__skeleton-block media-releases__skeleton-icon"></span>
       <div class="media-releases__skeleton-content">
         <span class="media-releases__skeleton-block media-releases__skeleton-meta"></span>
         <span class="media-releases__skeleton-block media-releases__skeleton-title"></span>
@@ -75,7 +82,7 @@ function hazardIconFor(item) {
   return new URL(base.pathname.includes("/SecureNT_files/") ? `../${assetPath}` : assetPath, base).href;
 }
 
-export function renderCard(item, { compact = false } = {}) {
+export function renderCard(item, { compact = false, featured = false } = {}) {
   const article = document.createElement("article");
   article.className = "media-releases__item";
   article.dataset.warningLevel = warningLevelSlug(item.warningLevel);
@@ -104,8 +111,9 @@ export function renderCard(item, { compact = false } = {}) {
     && (isGeneralInformation || item.emergencyTypes.includes("Not identified"));
   const iconUrl = hazardIconFor(item);
   const isEmergencyTypeCard = !compact && Boolean(iconUrl);
-  const isFormattedCard = isPlannedBurn || isGeneralInformationCard || isEmergencyTypeCard;
+  const isFormattedCard = featured || isPlannedBurn || isGeneralInformationCard || isEmergencyTypeCard;
   if (isFormattedCard) article.classList.add("media-releases__item--formatted");
+  if (featured) article.classList.add("media-releases__item--featured");
   if (isPlannedBurn) article.classList.add("media-releases__item--planned-burn");
   if (isGeneralInformationCard) {
     article.classList.add("media-releases__item--general-information");
@@ -169,7 +177,7 @@ export function renderCard(item, { compact = false } = {}) {
     icon.src = iconUrl;
     icon.alt = "";
     article.classList.add("media-releases__item--with-icon");
-    if (!compact) cardLink.append(icon);
+    if (!compact && !featured) cardLink.append(icon);
   }
 
   if (compact) {
@@ -178,6 +186,21 @@ export function renderCard(item, { compact = false } = {}) {
     if (icon) heading.append(icon);
     heading.append(severity);
     content.append(heading, title);
+  } else if (featured) {
+    const heading = document.createElement("div");
+    heading.className = "media-releases__card-heading";
+    if (icon) {
+      heading.append(icon);
+    } else {
+      const noticeIcon = document.createElement("i");
+      noticeIcon.className = "fa-light fa-triangle-exclamation media-releases__notice-icon";
+      noticeIcon.setAttribute("aria-hidden", "true");
+      heading.append(noticeIcon);
+    }
+    heading.append(severity);
+    content.append(heading);
+    if (meta.hasChildNodes()) content.append(meta);
+    content.append(title);
   } else if (isFormattedCard) {
     if (!icon) {
       const noticeIcon = document.createElement("i");

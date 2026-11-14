@@ -13,7 +13,7 @@ if (listing) {
   results.setAttribute("aria-busy", "true");
   status.classList.add("media-releases__status--loading");
   status.textContent = "Loading current warnings...";
-  results.replaceChildren(...Array.from({ length: 3 }, () => createCardSkeleton({ compact: true })));
+  results.replaceChildren(...Array.from({ length: 3 }, () => createCardSkeleton({ featured: true })));
   fetch(isLocalPreview ? "/api/media-releases/latest" : latestMediaReleaseEndpoint,
     { headers: { Accept: "application/json" }, credentials: "same-origin" })
     .then((response) => {
@@ -23,7 +23,7 @@ if (listing) {
     .then((records) => {
       if (!Array.isArray(records)) throw new TypeError("Warnings endpoint returned an unsupported response shape");
       const items = curateFeeds([{ source: "Merged", items: records }]).slice(0, 3);
-      results.replaceChildren(...items.map((item) => renderCard(item, { compact: true })));
+      results.replaceChildren(...items.map((item) => renderCard(item, { featured: true })));
       status.textContent = items.length ? "" : "There are no current warnings.";
       feedNote.hidden = true;
       feedNote.textContent = "";

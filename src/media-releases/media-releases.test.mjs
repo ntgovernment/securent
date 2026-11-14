@@ -16,6 +16,12 @@ const notice = {
   WebVersionURL: "http://createsend.com/campaign-1",
 };
 
+test("homepage warning-card styles match the reference layout", () => {
+  assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__title\{font-size:32px!important;line-height:36px\}/);
+  assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__severity\{padding:8px 12px;font-size:20px;line-height:24px\}/);
+  assert.match(css, /@media\s*\(max-width:\s*600px\)\s*\{[^}]*\.media-releases__item--featured/);
+});
+
 test("renders declaration-only cards with their accent colors and checkbox styles", async () => {
   const window = new Window({ url: "http://localhost/media-releases.html" });
   window.document.write(html);
@@ -355,7 +361,7 @@ for (const scenario of ["populated", "empty", "partial failure", "total failure"
 }
 
 for (const scenario of ["latest three", "production endpoint", "fewer than three", "missing icon", "unknown region", "empty", "invalid response", "http failure", "total failure"]) {
-  test(`compact listing handles ${scenario}`, async () => {
+  test(`homepage warning cards handle ${scenario}`, async () => {
     const window = new Window({ url: scenario === "production endpoint" ? "https://cmsexternal.nt.gov.au/" : "http://localhost/" });
     window.document.write(`<section data-latest-media-releases>
       <p data-results-status role="status"></p>
@@ -364,6 +370,7 @@ for (const scenario of ["latest three", "production endpoint", "fewer than three
     </section>`);
     const originals = { window: globalThis.window, document: globalThis.document, fetch: globalThis.fetch };
     const originalConsoleError = console.error;
+    const originalDateNow = Date.now;
     const originalSetInterval = window.setInterval;
     const intervalCallbacks = [];
     window.setInterval = (callback, delay) => {
@@ -384,8 +391,8 @@ for (const scenario of ["latest three", "production endpoint", "fewer than three
       assert.equal(intervalCallbacks[0].delay, 60_000);
       assert.equal(results.getAttribute("aria-busy"), "true");
       assert.equal(results.querySelectorAll('.media-releases__skeleton[aria-hidden="true"]').length, 3);
-      assert.equal(results.querySelectorAll(".media-releases__skeleton-block").length, 21);
-      assert.ok(results.querySelector(".media-releases__skeleton--compact"));
+      assert.equal(results.querySelectorAll(".media-releases__skeleton-block").length, 18);
+      assert.ok(results.querySelector(".media-releases__skeleton--featured"));
       assert.equal(listing.querySelector("[data-results-status]").textContent, "Loading current warnings...");
       assert.ok(listing.querySelector("[data-results-status]").classList.contains("media-releases__status--loading"));
       assert.equal(requests.length, 1);
@@ -429,22 +436,43 @@ for (const scenario of ["latest three", "production endpoint", "fewer than three
         ]);
       }
       if (cards.length) {
+        assert.ok(cards[0].classList.contains("media-releases__item--featured"));
         const timeLabel = cards[0].querySelector("time[data-time]");
         assert.ok(timeLabel);
         assert.equal(timeLabel.dateTime, timeLabel.dataset.time);
         const heading = cards[0].querySelector(".media-releases__card-heading");
         assert.ok(heading.querySelector(".media-releases__severity"));
-        if (["missing icon", "unknown region"].includes(scenario)) assert.equal(heading.querySelector("img"), null);
-        else assert.match(heading.querySelector("img").src, /\/SecureNT_files\/flood-advice\.webp$/);
+        if (["missing icon", "unknown region"].includes(scenario)) {
+          assert.equal(heading.querySelector("img"), null);
+          assert.ok(heading.querySelector(".media-releases__notice-icon"));
+        } else {
+          assert.match(heading.querySelector("img").src, /\/SecureNT_files\/flood-advice\.webp$/);
+        }
+        assert.deepEqual(
+          [...cards[0].querySelector(".media-releases__content").children].map((element) => element.className),
+          ["media-releases__card-heading", "media-releases__meta", "media-releases__title",
+            ...(scenario === "unknown region" ? [] : ["media-releases__classification media-releases__region"])],
+        );
+        assert.equal(cards[0].querySelector(".media-releases__more-information"), null);
         if (scenario === "unknown region") assert.equal(cards[0].querySelector(".media-releases__region"), null);
         else assert.ok(cards[0].querySelector(".media-releases__region"));
         assert.equal(cards[0].querySelector(".media-releases__link").rel, "noopener noreferrer");
+        if (scenario === "latest three") {
+          let now = Date.parse(timeLabel.dataset.time) + 60_000;
+          Date.now = () => now;
+          intervalCallbacks[0].callback();
+          assert.equal(timeLabel.textContent, "1 minute ago");
+          now += 60_000;
+          intervalCallbacks[0].callback();
+          assert.equal(timeLabel.textContent, "2 minutes ago");
+        }
       }
       if (scenario === "empty") assert.match(listing.querySelector("[data-results-status]").textContent, /no current warnings/i);
       if (["invalid response", "http failure", "total failure"].includes(scenario)) assert.match(listing.querySelector("[data-results-status]").textContent, /temporarily unavailable/i);
     } finally {
       window.setInterval = originalSetInterval;
       Object.assign(globalThis, originals);
+      Date.now = originalDateNow;
       console.error = originalConsoleError;
       await window.happyDOM.close();
     }

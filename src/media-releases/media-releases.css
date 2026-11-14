@@ -254,6 +254,92 @@ section.media-releases__hero {
   padding-top: 12px;
 }
 
+[data-latest-media-releases] .media-releases__item--featured {
+  border-left-width: 6px;
+}
+
+[data-latest-media-releases] .media-releases__item--featured .media-releases__link {
+  padding: 40px;
+}
+
+[data-latest-media-releases] .media-releases__item--featured .media-releases__content {
+  gap: 24px;
+}
+
+[data-latest-media-releases] .media-releases__item--featured .media-releases__card-heading {
+  gap: 8px;
+  min-height: 40px;
+}
+
+[data-latest-media-releases] .media-releases__item--featured .media-releases__hazard-icon,
+[data-latest-media-releases] .media-releases__item--featured .media-releases__notice-icon {
+  width: 40px;
+  height: 40px;
+  font-size: 40px;
+}
+
+[data-latest-media-releases] .media-releases__item--featured .media-releases__severity {
+  padding: 8px 12px;
+  font-size: 20px;
+  line-height: 24px;
+}
+
+[data-latest-media-releases] .media-releases__item--featured .media-releases__meta {
+  font-size: 22px;
+  line-height: 28px;
+}
+
+[data-latest-media-releases] .media-releases__item--featured .media-releases__title {
+  font-size: 32px !important;
+  line-height: 36px;
+}
+
+[data-latest-media-releases] .media-releases__item--featured .media-releases__region {
+  font-size: 28px;
+  line-height: 32px;
+}
+
+[data-latest-media-releases] .media-releases__item--featured .media-releases__region i {
+  width: 24px;
+  font-size: 24px;
+  line-height: 32px;
+}
+
+[data-latest-media-releases] .media-releases__skeleton--featured {
+  display: flex;
+  min-height: 276px;
+  flex-direction: column;
+  gap: 24px;
+  padding: 40px;
+  border-left-width: 6px;
+}
+
+[data-latest-media-releases] .media-releases__skeleton--featured .media-releases__skeleton-heading {
+  min-height: 40px;
+}
+
+[data-latest-media-releases] .media-releases__skeleton--featured .media-releases__skeleton-icon {
+  width: 40px;
+  height: 40px;
+}
+
+[data-latest-media-releases] .media-releases__skeleton--featured .media-releases__skeleton-badge {
+  width: 140px;
+  height: 40px;
+}
+
+[data-latest-media-releases] .media-releases__skeleton--featured .media-releases__skeleton-meta {
+  height: 28px;
+}
+
+[data-latest-media-releases] .media-releases__skeleton--featured .media-releases__skeleton-title {
+  height: 36px;
+}
+
+[data-latest-media-releases] .media-releases__skeleton--featured .media-releases__skeleton-region {
+  height: 32px;
+}
+
 @media (max-width: 900px) {
   [data-latest-media-releases] .media-releases__results {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -261,6 +347,54 @@ section.media-releases__hero {
 }
 
 @media (max-width: 600px) {
+  [data-latest-media-releases] .media-releases__item--featured .media-releases__link,
+  [data-latest-media-releases] .media-releases__skeleton--featured {
+    padding: 24px;
+  }
+
+  [data-latest-media-releases] .media-releases__item--featured .media-releases__content,
+  [data-latest-media-releases] .media-releases__skeleton--featured {
+    gap: 16px;
+  }
+
+  [data-latest-media-releases] .media-releases__item--featured .media-releases__hazard-icon,
+  [data-latest-media-releases] .media-releases__item--featured .media-releases__notice-icon,
+  [data-latest-media-releases] .media-releases__skeleton--featured .media-releases__skeleton-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 32px;
+  }
+
+  [data-latest-media-releases] .media-releases__item--featured .media-releases__severity {
+    padding: 6px 8px;
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  [data-latest-media-releases] .media-releases__item--featured .media-releases__meta {
+    font-size: 18px;
+    line-height: 24px;
+  }
+
+  [data-latest-media-releases] .media-releases__item--featured .media-releases__title {
+    font-size: 24px !important;
+    line-height: 28px;
+  }
+
+  [data-latest-media-releases] .media-releases__item--featured .media-releases__region {
+    font-size: 20px;
+    line-height: 24px;
+  }
+
+  [data-latest-media-releases] .media-releases__item--featured .media-releases__region i {
+    font-size: 20px;
+    line-height: 24px;
+  }
+
+  [data-latest-media-releases] .media-releases__skeleton--featured .media-releases__skeleton-badge {
+    height: 32px;
+  }
+
   [data-latest-media-releases] .media-releases__results {
     grid-template-columns: minmax(0, 1fr);
   }
