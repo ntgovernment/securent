@@ -38,6 +38,32 @@ export function startRelativeTimeUpdates(container) {
   window.setInterval(refresh, 60_000);
 }
 
+export function createCardSkeleton({ compact = false } = {}) {
+  const skeleton = document.createElement("div");
+  skeleton.className = compact
+    ? "media-releases__skeleton media-releases__skeleton--compact"
+    : "media-releases__skeleton";
+  skeleton.setAttribute("aria-hidden", "true");
+  skeleton.innerHTML = compact
+    ? `<div class="media-releases__skeleton-heading">
+        <span class="media-releases__skeleton-block media-releases__skeleton-icon"></span>
+        <span class="media-releases__skeleton-block media-releases__skeleton-badge"></span>
+      </div>
+      <span class="media-releases__skeleton-block media-releases__skeleton-title"></span>
+      <span class="media-releases__skeleton-block media-releases__skeleton-title-short"></span>
+      <span class="media-releases__skeleton-block media-releases__skeleton-meta"></span>
+      <span class="media-releases__skeleton-block media-releases__skeleton-meta-short"></span>
+      <span class="media-releases__skeleton-block media-releases__skeleton-action"></span>`
+    : `<span class="media-releases__skeleton-block media-releases__skeleton-icon"></span>
+      <div class="media-releases__skeleton-content">
+        <span class="media-releases__skeleton-block media-releases__skeleton-meta"></span>
+        <span class="media-releases__skeleton-block media-releases__skeleton-title"></span>
+        <span class="media-releases__skeleton-block media-releases__skeleton-title-short"></span>
+        <span class="media-releases__skeleton-block media-releases__skeleton-region"></span>
+      </div>`;
+  return skeleton;
+}
+
 function hazardIconFor(item) {
   const filename = awsHazardIconFilename(item.emergencyTypes, item.warningLevel);
   if (!filename) return "";

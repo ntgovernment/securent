@@ -3,12 +3,13 @@
 ## Current Warnings Listing
 
 During initial feed loading, the full listing shows ten animated skeleton
-cards in the results area and announces loading through a separate polite
-status. Results are marked busy and listing controls remain inert until the
-feeds finish. Skeletons are replaced by warning cards, an empty state, or the
-existing error message when loading completes. Reduced-motion preferences
-disable the shimmer. No additional Matrix markup is required; publish the
-rebuilt CSS and JavaScript together with their shared dependencies.
+cards that match the warning-card layout, plus checkbox placeholders in each
+filter group. It announces loading through a separate polite status. Results
+are marked busy and listing controls remain inert until the feeds finish.
+Skeletons are replaced by warning cards, an empty state, or the existing
+error message when loading completes. Reduced-motion preferences disable the
+shimmer. No additional Matrix markup is required; publish the rebuilt CSS and
+JavaScript together with their shared dependencies.
 
 ## Latest Three Warnings
 
@@ -48,8 +49,9 @@ arrow icons. The cards use three columns on wide screens, two below 900px,
 and one below 600px. The component shows an empty message when no eligible
 notices are available and reports when the endpoint is unavailable or invalid.
 During loading, three placeholder cards shimmer in the results grid while an
-accessible loading status is announced. Reduced-motion preferences disable
-the shimmer. The placeholders are replaced when loading succeeds or fails.
+accessible loading status is announced. The placeholders use the compact
+card layout and are replaced when loading succeeds or fails. Reduced-motion
+preferences disable the shimmer.
 
 The Current Warnings page combines emergency types and declarations in one
 **Incident or notice type** filter. Filter groups appear in this order:

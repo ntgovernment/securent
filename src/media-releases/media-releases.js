@@ -3,7 +3,7 @@ import { attachAutocomplete, getAutocompleteCandidates } from "../search/autocom
 import { curateFeeds, filterAndSortNotices, warningLevelOrder } from "./curation.mjs";
 import { fetchMediaReleaseFeeds, mediaReleaseSources } from "./feeds.mjs";
 import { getPageWindow } from "../pagination/page-window.mjs";
-import { renderCard, startRelativeTimeUpdates } from "./media-release-card.js";
+import { createCardSkeleton, renderCard, startRelativeTimeUpdates } from "./media-release-card.js";
 const listing = document.querySelector("[data-media-releases]");
 
 if (listing) {
@@ -33,27 +33,38 @@ if (listing) {
   loadingMessage.setAttribute("aria-live", "polite");
   listing.append(loadingMessage);
 
-  function createSkeletonCard() {
-    const placeholder = document.createElement("div");
-    placeholder.className = "media-releases__skeleton";
-    placeholder.setAttribute("aria-hidden", "true");
-    placeholder.innerHTML = `<div class="media-releases__skeleton-heading">
-      <span class="media-releases__skeleton-block media-releases__skeleton-icon"></span>
-      <span class="media-releases__skeleton-block media-releases__skeleton-badge"></span>
-    </div>
-    <span class="media-releases__skeleton-block media-releases__skeleton-title"></span>
-    <span class="media-releases__skeleton-block media-releases__skeleton-title-short"></span>
-    <span class="media-releases__skeleton-block media-releases__skeleton-meta"></span>
-    <span class="media-releases__skeleton-block media-releases__skeleton-meta-short"></span>
-    <span class="media-releases__skeleton-block media-releases__skeleton-action"></span>`;
-    return placeholder;
+  function renderFilterSkeletons() {
+    const groups = [
+      ["[data-level-filters]", 3],
+      ["[data-type-filters]", 6],
+      ["[data-region-filters]", 4],
+      ["[data-source-filters]", 3],
+    ];
+    for (const [selector, count] of groups) {
+      const container = filters.querySelector(selector);
+      container.replaceChildren(...Array.from({ length: count }, () => {
+        const row = document.createElement("div");
+        row.className = "media-releases__filter-skeleton-row";
+        row.setAttribute("aria-hidden", "true");
+        row.innerHTML = `<span class="media-releases__filter-skeleton-control">
+          <span class="media-releases__skeleton-block media-releases__filter-skeleton-checkbox"></span>
+        </span>
+        <span class="media-releases__skeleton-block media-releases__filter-skeleton-label"></span>`;
+        return row;
+      }));
+    }
+  }
+
+  function clearFilterSkeletons() {
+    filters.querySelectorAll(".media-releases__filter-skeleton-row").forEach((row) => row.remove());
   }
 
   function setLoading(loading) {
     loadingMessage.textContent = loading ? "Loading current warnings..." : "";
     results.setAttribute("aria-busy", String(loading));
     if (loading) {
-      results.replaceChildren(...Array.from({ length: pageSize }, createSkeletonCard));
+      results.replaceChildren(...Array.from({ length: pageSize }, () => createCardSkeleton()));
+      renderFilterSkeletons();
     }
     for (const content of loadingContents) {
       content.inert = loading;
@@ -279,6 +290,7 @@ if (listing) {
     })
     .catch((error) => {
       results.replaceChildren();
+      clearFilterSkeletons();
       status.textContent = "Current warnings are temporarily unavailable. Please try again later.";
       feedNote.hidden = false;
       feedNote.textContent = "No source feeds could be loaded.";

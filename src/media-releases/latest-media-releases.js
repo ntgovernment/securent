@@ -1,6 +1,6 @@
 import { curateFeeds } from "./curation.mjs";
 import { latestMediaReleaseEndpoint } from "./feeds.mjs";
-import { renderCard, startRelativeTimeUpdates } from "./media-release-card.js";
+import { createCardSkeleton, renderCard, startRelativeTimeUpdates } from "./media-release-card.js";
 
 const listing = document.querySelector("[data-latest-media-releases]");
 
@@ -13,21 +13,7 @@ if (listing) {
   results.setAttribute("aria-busy", "true");
   status.classList.add("media-releases__status--loading");
   status.textContent = "Loading current warnings...";
-  results.replaceChildren(...Array.from({ length: 3 }, () => {
-    const placeholder = document.createElement("div");
-    placeholder.className = "media-releases__skeleton";
-    placeholder.setAttribute("aria-hidden", "true");
-    placeholder.innerHTML = `<div class="media-releases__skeleton-heading">
-      <span class="media-releases__skeleton-block media-releases__skeleton-icon"></span>
-      <span class="media-releases__skeleton-block media-releases__skeleton-badge"></span>
-    </div>
-    <span class="media-releases__skeleton-block media-releases__skeleton-title"></span>
-    <span class="media-releases__skeleton-block media-releases__skeleton-title-short"></span>
-    <span class="media-releases__skeleton-block media-releases__skeleton-meta"></span>
-    <span class="media-releases__skeleton-block media-releases__skeleton-meta-short"></span>
-    <span class="media-releases__skeleton-block media-releases__skeleton-action"></span>`;
-    return placeholder;
-  }));
+  results.replaceChildren(...Array.from({ length: 3 }, () => createCardSkeleton({ compact: true })));
   fetch(isLocalPreview ? "/api/media-releases/latest" : latestMediaReleaseEndpoint,
     { headers: { Accept: "application/json" }, credentials: "same-origin" })
     .then((response) => {

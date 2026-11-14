@@ -274,6 +274,12 @@ for (const scenario of ["populated", "empty", "partial failure", "total failure"
       const search = listing.querySelector(".media-releases__search");
       const layout = listing.querySelector(".media-releases__layout");
       const results = listing.querySelector("[data-results]");
+      const filterSkeletonCounts = [
+        ["[data-level-filters]", 3],
+        ["[data-type-filters]", 6],
+        ["[data-region-filters]", 4],
+        ["[data-source-filters]", 3],
+      ];
       assert.equal(requests.length, 3);
       assert.equal(loadingStatus.getAttribute("role"), "status");
       assert.equal(loadingStatus.getAttribute("aria-live"), "polite");
@@ -285,7 +291,28 @@ for (const scenario of ["populated", "empty", "partial failure", "total failure"
       assert.equal(window.document.querySelector("footer").inert, false);
       assert.equal(results.getAttribute("aria-busy"), "true");
       assert.equal(results.querySelectorAll('.media-releases__skeleton[aria-hidden="true"]').length, 10);
-      assert.equal(results.querySelectorAll(".media-releases__skeleton-block").length, 70);
+      assert.equal(results.querySelectorAll(".media-releases__skeleton-block").length, 50);
+      const firstSkeleton = results.querySelector(".media-releases__skeleton");
+      assert.deepEqual([...firstSkeleton.children].map((element) => element.className), [
+        "media-releases__skeleton-block media-releases__skeleton-icon",
+        "media-releases__skeleton-content",
+      ]);
+      assert.deepEqual(
+        [...firstSkeleton.querySelector(".media-releases__skeleton-content").children].map((element) => element.className),
+        [
+          "media-releases__skeleton-block media-releases__skeleton-meta",
+          "media-releases__skeleton-block media-releases__skeleton-title",
+          "media-releases__skeleton-block media-releases__skeleton-title-short",
+          "media-releases__skeleton-block media-releases__skeleton-region",
+        ],
+      );
+      for (const [selector, count] of filterSkeletonCounts) {
+        const container = listing.querySelector(selector);
+        const placeholders = container.querySelectorAll(".media-releases__filter-skeleton-row");
+        assert.equal(placeholders.length, count);
+        assert.equal(container.querySelectorAll("input[type=checkbox]").length, 0);
+        assert.ok([...placeholders].every((placeholder) => placeholder.getAttribute("aria-hidden") === "true"));
+      }
 
       if (scenario === "render failure") {
         const replaceResults = results.replaceChildren.bind(results);
@@ -311,6 +338,7 @@ for (const scenario of ["populated", "empty", "partial failure", "total failure"
       assert.equal(errors.length, failed ? 1 : 0, errors.flat().map(String).join("\n"));
       assert.equal(results.children.length, failed || scenario === "empty" ? 0 : 1);
       assert.equal(results.querySelectorAll(".media-releases__skeleton").length, 0);
+      assert.equal(listing.querySelectorAll(".media-releases__filter-skeleton-row").length, 0);
       assert.equal(listing.querySelector("[data-feed-note]").hidden, !failed && scenario !== "partial failure");
       if (failed) {
         assert.match(listing.querySelector("[data-results-status]").textContent, /temporarily unavailable/);
@@ -357,6 +385,7 @@ for (const scenario of ["latest three", "production endpoint", "fewer than three
       assert.equal(results.getAttribute("aria-busy"), "true");
       assert.equal(results.querySelectorAll('.media-releases__skeleton[aria-hidden="true"]').length, 3);
       assert.equal(results.querySelectorAll(".media-releases__skeleton-block").length, 21);
+      assert.ok(results.querySelector(".media-releases__skeleton--compact"));
       assert.equal(listing.querySelector("[data-results-status]").textContent, "Loading current warnings...");
       assert.ok(listing.querySelector("[data-results-status]").classList.contains("media-releases__status--loading"));
       assert.equal(requests.length, 1);
