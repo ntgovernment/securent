@@ -1,0 +1,128 @@
+[
+  {
+    "Name": "PREVIEW: Cyclone emergency warning - Darwin",
+    "FromName": "SecureNT Local Preview",
+    "SentDate": "2026-11-14 19:10:00",
+    "CampaignID": "preview-cyclone-emergency",
+    "Subject": "PREVIEW: Cyclone emergency warning - Darwin"
+  },
+  {
+    "Name": "PREVIEW: Cyclone watch and act - Nhulunbuy",
+    "FromName": "SecureNT Local Preview",
+    "SentDate": "2026-11-14 19:05:00",
+    "CampaignID": "preview-cyclone-watch-and-act",
+    "Subject": "PREVIEW: Cyclone watch and act - Nhulunbuy"
+  },
+  {
+    "Name": "PREVIEW: Cyclone advice - Tiwi Islands",
+    "FromName": "SecureNT Local Preview",
+    "SentDate": "2026-11-14 19:00:00",
+    "CampaignID": "preview-cyclone-advice",
+    "Subject": "PREVIEW: Cyclone advice - Tiwi Islands"
+  },
+  {
+    "Name": "PREVIEW: Flood emergency warning - Daly River",
+    "FromName": "SecureNT Local Preview",
+    "SentDate": "2026-11-14 18:55:00",
+    "CampaignID": "preview-flood-emergency",
+    "Subject": "PREVIEW: Flood emergency warning - Daly River"
+  },
+  {
+    "Name": "PREVIEW: Flood watch and act - Katherine",
+    "FromName": "SecureNT Local Preview",
+    "SentDate": "2026-11-14 18:50:00",
+    "CampaignID": "preview-flood-watch-and-act",
+    "Subject": "PREVIEW: Flood watch and act - Katherine"
+  },
+  {
+    "Name": "PREVIEW: Flood advice - Barkly",
+    "FromName": "SecureNT Local Preview",
+    "SentDate": "2026-11-14 18:45:00",
+    "CampaignID": "preview-flood-advice",
+    "Subject": "PREVIEW: Flood advice - Barkly"
+  },
+  {
+    "Name": "PREVIEW: Severe storm emergency warning - Alice Springs",
+    "FromName": "SecureNT Local Preview",
+    "SentDate": "2026-11-14 18:40:00",
+    "CampaignID": "preview-storm-emergency",
+    "Subject": "PREVIEW: Severe storm emergency warning - Alice Springs"
+  },
+  {
+    "Name": "PREVIEW: Severe storm watch and act - Darwin",
+    "FromName": "SecureNT Local Preview",
+    "SentDate": "2026-11-14 18:35:00",
+    "CampaignID": "preview-storm-watch-and-act",
+    "Subject": "PREVIEW: Severe storm watch and act - Darwin"
+  },
+  {
+    "Name": "PREVIEW: Severe storm advice - Top End",
+    "FromName": "SecureNT Local Preview",
+    "SentDate": "2026-11-14 18:30:00",
+    "CampaignID": "preview-storm-advice",
+    "Subject": "PREVIEW: Severe storm advice - Top End"
+  },
+  {
+    "Name": "PREVIEW: Bushfire emergency warning - Darwin",
+    "FromName": "SecureNT Local Preview",
+    "SentDate": "2026-11-14 18:25:00",
+    "CampaignID": "preview-bushfire-emergency",
+    "Subject": "PREVIEW: Bushfire emergency warning - Darwin"
+  },
+  {
+    "Name": "PREVIEW: Bushfire watch and act - Katherine",
+    "FromName": "SecureNT Local Preview",
+    "SentDate": "2026-11-14 18:20:00",
+    "CampaignID": "preview-bushfire-watch-and-act",
+    "Subject": "PREVIEW: Bushfire watch and act - Katherine"
+  },
+  {
+    "Name": "PREVIEW: Bushfire advice - Alice Springs",
+    "FromName": "SecureNT Local Preview",
+    "SentDate": "2026-11-14 18:15:00",
+    "CampaignID": "preview-bushfire-advice",
+    "Subject": "PREVIEW: Bushfire advice - Alice Springs"
+  },
+  {
+    "Name": "PREVIEW: Heatwave emergency warning - Alice Springs",
+    "FromName": "SecureNT Local Preview",
+    "SentDate": "2026-11-14 18:10:00",
+    "CampaignID": "preview-heatwave-emergency",
+    "Subject": "PREVIEW: Heatwave emergency warning - Alice Springs"
+  },
+  {
+    "Name": "PREVIEW: Heatwave watch and act - Barkly",
+    "FromName": "SecureNT Local Preview",
+    "SentDate": "2026-11-14 18:05:00",
+    "CampaignID": "preview-heatwave-watch-and-act",
+    "Subject": "PREVIEW: Heatwave watch and act - Barkly"
+  },
+  {
+    "Name": "PREVIEW: Heatwave advice - Katherine",
+    "FromName": "SecureNT Local Preview",
+    "SentDate": "2026-11-14 18:00:00",
+    "CampaignID": "preview-heatwave-advice",
+    "Subject": "PREVIEW: Heatwave advice - Katherine"
+  },
+  {
+    "Name": "PREVIEW: Flood advice - Decreasing threat - Katherine",
+    "FromName": "SecureNT Local Preview",
+    "SentDate": "2026-11-14 17:55:00",
+    "CampaignID": "preview-flood-decreasing-threat",
+    "Subject": "PREVIEW: Flood advice - Decreasing threat - Katherine"
+  },
+  {
+    "Name": "PREVIEW: Planned burn advice - Darwin",
+    "FromName": "SecureNT Local Preview",
+    "SentDate": "2026-11-14 17:50:00",
+    "CampaignID": "preview-planned-burn",
+    "Subject": "PREVIEW: Planned burn advice - Darwin"
+  },
+  {
+    "Name": "PREVIEW: Boil water notice - East Arnhem",
+    "FromName": "SecureNT Local Preview",
+    "SentDate": "2026-11-14 17:45:00",
+    "CampaignID": "preview-general-information",
+    "Subject": "PREVIEW: Boil water notice - East Arnhem"
+  }
+]

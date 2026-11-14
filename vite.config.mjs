@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
@@ -7,6 +8,7 @@ import { cloudflare } from "@cloudflare/vite-plugin";
 import { fetchAirQuality, fetchAirQualityStations } from "./src/local-conditions/air-quality.mjs";
 import { FIRE_AREA_CODES, readFireDanger } from "./src/local-conditions/fire-danger.mjs";
 import { latestMediaReleaseEndpoint, mediaReleaseSources } from "./src/media-releases/feeds.mjs";
+import { randomizePreviewWarnings } from "./src/media-releases/preview-warnings.mjs";
 
 const sourceThemeOnly = {
   name: "source-theme-only",
@@ -50,6 +52,54 @@ const excludeLocalCapturePhotos = {
         "",
       );
     },
+  },
+};
+
+let capturedPopperSourcePromise;
+
+function getCapturedPopperSourceWithoutMap() {
+  if (!capturedPopperSourcePromise) {
+    capturedPopperSourcePromise = readFile(new URL("./SecureNT_files/popper.min.js.download", import.meta.url))
+      .then((source) => Buffer.from(
+        source.toString("utf8").replace(/\r?\n?\/\/# sourceMappingURL=popper\.min\.js\.map\s*$/, ""),
+      ));
+  }
+  return capturedPopperSourcePromise;
+}
+
+const cleanCapturedPopperSourceMap = {
+  name: "clean-captured-popper-source-map",
+  apply: "serve",
+  transformIndexHtml: {
+    order: "pre",
+    async handler(html) {
+      const sourceAttribute = 'src="./SecureNT_files/popper.min.js.download"';
+      if (!html.includes(sourceAttribute)) return html;
+      const source = await getCapturedPopperSourceWithoutMap();
+      const integrity = createHash("sha384").update(source).digest("base64");
+      const rewritten = html.replace(
+        /src="\.\/SecureNT_files\/popper\.min\.js\.download" integrity="[^"]+"/,
+        `src="/__vite-preview/popper.min.js" integrity="sha384-${integrity}"`,
+      );
+      if (rewritten === html) throw new Error("Unable to rewrite the captured Popper script tag");
+      return rewritten;
+    },
+  },
+  configureServer(server) {
+    server.middlewares.use("/__vite-preview/popper.min.js", async (req, res, next) => {
+      if (req.method !== "GET" && req.method !== "HEAD") {
+        next();
+        return;
+      }
+      try {
+        const source = await getCapturedPopperSourceWithoutMap();
+        res.setHeader("Content-Type", "text/javascript; charset=utf-8");
+        res.setHeader("Cache-Control", "no-store");
+        res.end(req.method === "HEAD" ? undefined : source);
+      } catch (error) {
+        next(error);
+      }
+    });
   },
 };
 
@@ -164,8 +214,9 @@ const mediaReleaseFeedProxy = {
       try {
         let payload;
         if (sourceId === "latest") {
-          payload = JSON.parse(await readFile(new URL("./public/campaign-monitor.json", import.meta.url), "utf8"));
-          if (!Array.isArray(payload)) throw new TypeError("Local campaign-monitor fixture must be an array");
+          payload = JSON.parse(await readFile(new URL("./src/media-releases/latest-warnings.preview.json", import.meta.url), "utf8"));
+          if (!Array.isArray(payload)) throw new TypeError("Local warning preview must be an array");
+          payload = randomizePreviewWarnings(payload);
         } else {
           const response = await fetch(endpoint, { headers: { Accept: "application/json" } });
           if (!response.ok) throw new Error(`Feed request failed (${response.status})`);
@@ -188,6 +239,7 @@ export default defineConfig({
     sourceThemeOnly,
     resolveNtgLogoPath,
     excludeLocalCapturePhotos,
+    cleanCapturedPopperSourceMap,
     pagePreview,
     localConditionsMock,
     mediaReleaseFeedProxy,

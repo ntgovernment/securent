@@ -259,85 +259,89 @@ section.media-releases__hero {
 }
 
 [data-latest-media-releases] .media-releases__item--featured .media-releases__link {
-  padding: 40px;
+  padding: 24px;
 }
 
 [data-latest-media-releases] .media-releases__item--featured .media-releases__content {
-  gap: 24px;
+  gap: 12px;
 }
 
 [data-latest-media-releases] .media-releases__item--featured .media-releases__card-heading {
-  gap: 8px;
-  min-height: 40px;
+  gap: 4px;
+  min-height: 24px;
 }
 
 [data-latest-media-releases] .media-releases__item--featured .media-releases__hazard-icon,
 [data-latest-media-releases] .media-releases__item--featured .media-releases__notice-icon {
-  width: 40px;
-  height: 40px;
-  font-size: 40px;
+  width: 24px;
+  height: 24px;
+  font-size: 24px;
 }
 
 [data-latest-media-releases] .media-releases__item--featured .media-releases__severity {
-  padding: 8px 12px;
-  font-size: 20px;
-  line-height: 24px;
+  padding: 4px 8px;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 1px;
 }
 
 [data-latest-media-releases] .media-releases__item--featured .media-releases__meta {
-  font-size: 22px;
-  line-height: 28px;
+  color: #666774;
+  font-size: 14px;
+  line-height: 20px;
 }
 
 [data-latest-media-releases] .media-releases__item--featured .media-releases__title {
-  font-size: 32px !important;
-  line-height: 36px;
+  font-size: 20px !important;
+  line-height: 24px;
 }
 
 [data-latest-media-releases] .media-releases__item--featured .media-releases__region {
-  font-size: 28px;
-  line-height: 32px;
+  color: #666774;
+  font-size: 16px;
+  line-height: 24px;
 }
 
 [data-latest-media-releases] .media-releases__item--featured .media-releases__region i {
-  width: 24px;
-  font-size: 24px;
-  line-height: 32px;
+  width: 16px;
+  font-size: 16px;
+  line-height: 24px;
 }
 
 [data-latest-media-releases] .media-releases__skeleton--featured {
   display: flex;
-  min-height: 276px;
+  min-height: 216px;
   flex-direction: column;
-  gap: 24px;
-  padding: 40px;
+  gap: 12px;
+  padding: 24px;
   border-left-width: 6px;
 }
 
 [data-latest-media-releases] .media-releases__skeleton--featured .media-releases__skeleton-heading {
-  min-height: 40px;
+  min-height: 24px;
+  gap: 4px;
 }
 
 [data-latest-media-releases] .media-releases__skeleton--featured .media-releases__skeleton-icon {
-  width: 40px;
-  height: 40px;
+  width: 24px;
+  height: 24px;
 }
 
 [data-latest-media-releases] .media-releases__skeleton--featured .media-releases__skeleton-badge {
   width: 140px;
-  height: 40px;
+  height: 24px;
 }
 
 [data-latest-media-releases] .media-releases__skeleton--featured .media-releases__skeleton-meta {
-  height: 28px;
+  height: 16px;
 }
 
 [data-latest-media-releases] .media-releases__skeleton--featured .media-releases__skeleton-title {
-  height: 36px;
+  height: 24px;
 }
 
 [data-latest-media-releases] .media-releases__skeleton--featured .media-releases__skeleton-region {
-  height: 32px;
+  height: 24px;
 }
 
 @media (max-width: 900px) {
@@ -347,54 +351,6 @@ section.media-releases__hero {
 }
 
 @media (max-width: 600px) {
-  [data-latest-media-releases] .media-releases__item--featured .media-releases__link,
-  [data-latest-media-releases] .media-releases__skeleton--featured {
-    padding: 24px;
-  }
-
-  [data-latest-media-releases] .media-releases__item--featured .media-releases__content,
-  [data-latest-media-releases] .media-releases__skeleton--featured {
-    gap: 16px;
-  }
-
-  [data-latest-media-releases] .media-releases__item--featured .media-releases__hazard-icon,
-  [data-latest-media-releases] .media-releases__item--featured .media-releases__notice-icon,
-  [data-latest-media-releases] .media-releases__skeleton--featured .media-releases__skeleton-icon {
-    width: 32px;
-    height: 32px;
-    font-size: 32px;
-  }
-
-  [data-latest-media-releases] .media-releases__item--featured .media-releases__severity {
-    padding: 6px 8px;
-    font-size: 16px;
-    line-height: 20px;
-  }
-
-  [data-latest-media-releases] .media-releases__item--featured .media-releases__meta {
-    font-size: 18px;
-    line-height: 24px;
-  }
-
-  [data-latest-media-releases] .media-releases__item--featured .media-releases__title {
-    font-size: 24px !important;
-    line-height: 28px;
-  }
-
-  [data-latest-media-releases] .media-releases__item--featured .media-releases__region {
-    font-size: 20px;
-    line-height: 24px;
-  }
-
-  [data-latest-media-releases] .media-releases__item--featured .media-releases__region i {
-    font-size: 20px;
-    line-height: 24px;
-  }
-
-  [data-latest-media-releases] .media-releases__skeleton--featured .media-releases__skeleton-badge {
-    height: 32px;
-  }
-
   [data-latest-media-releases] .media-releases__results {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -497,18 +453,34 @@ section.media-releases__hero {
   font-size: 12px;
   font-weight: 700;
   line-height: 16px;
+  letter-spacing: 1px;
   text-transform: uppercase;
   overflow-wrap: anywhere;
 }
 
-.media-releases__item[data-warning-level="emergency_warning"] .media-releases__severity,
-.media-releases__item[data-warning-level="watch_act"] .media-releases__severity,
-.media-releases__item[data-general-information="true"] .media-releases__severity {
-  color: #fff;
+.media-releases__item[data-warning-level="emergency_warning"] .media-releases__severity {
+  background: var(--clr-status-danger-bg, #f7e7eb);
+  color: var(--clr-status-danger, #a60f37);
+}
+
+.media-releases__item[data-warning-level="watch_act"] .media-releases__severity {
+  background: #ffe4cc;
+  color: #9e4b00;
 }
 
 .media-releases__item[data-warning-level="advice"] .media-releases__severity {
+  background: #fdf4b9;
   color: #716309;
+}
+
+.media-releases__item[data-general-information="true"] .media-releases__severity {
+  background: var(--clr-bg-shade-alt, #e7e7ea);
+  color: var(--clr-text-default, #1f1e27);
+}
+
+.media-releases__item--planned-burn .media-releases__severity {
+  background: #dbcde4;
+  color: #634578;
 }
 
 .media-releases__content {

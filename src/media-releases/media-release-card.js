@@ -125,7 +125,7 @@ export function renderCard(item, { compact = false, featured = false } = {}) {
       : isDecreasingThreat ? "Decreasing threat"
         : ["Advice", "Watch and act"].includes(item.warningLevel) ? item.warningLevel : "General information";
 
-  const title = document.createElement("h2");
+  const title = document.createElement("h3");
   title.className = "media-releases__title";
   title.textContent = item.title;
 

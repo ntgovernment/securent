@@ -17,9 +17,24 @@ const notice = {
 };
 
 test("homepage warning-card styles match the reference layout", () => {
-  assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__title\{font-size:32px!important;line-height:36px\}/);
-  assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__severity\{padding:8px 12px;font-size:20px;line-height:24px\}/);
-  assert.match(css, /@media\s*\(max-width:\s*600px\)\s*\{[^}]*\.media-releases__item--featured/);
+  assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__link\{padding:24px\}/);
+  assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__content\{gap:12px\}/);
+  assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__title\{font-size:20px!important;line-height:24px\}/);
+  assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__severity\{padding:4px 8px;font-size:12px;line-height:16px;letter-spacing:1px\}/);
+  assert.match(css, /\.media-releases__severity\{[^}]*padding:4px 8px;[^}]*font-size:12px;[^}]*line-height:16px;[^}]*letter-spacing:1px;[^}]*text-transform:uppercase/);
+  assert.match(css, /\.media-releases__item\[data-warning-level=emergency_warning\] \.media-releases__severity\{background:var\(--clr-status-danger-bg,\s*#f7e7eb\);color:var\(--clr-status-danger,\s*#a60f37\)\}/);
+  assert.match(css, /\.media-releases__item\[data-warning-level=watch_act\] \.media-releases__severity\{background:#ffe4cc;color:#9e4b00\}/);
+  assert.match(css, /\.media-releases__item\[data-warning-level=advice\] \.media-releases__severity\{background:#fdf4b9;color:#716309\}/);
+  assert.match(css, /\.media-releases__item\[data-general-information=true\] \.media-releases__severity\{background:var\(--clr-bg-shade-alt,\s*#e7e7ea\);color:var\(--clr-text-default,\s*#1f1e27\)\}/);
+  assert.match(css, /\.media-releases__item--planned-burn \.media-releases__severity\{background:#dbcde4;color:#634578\}/);
+  assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__card-heading\{gap:4px;min-height:24px\}/);
+  assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__hazard-icon,\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__notice-icon\{width:24px;height:24px;font-size:24px\}/);
+  assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__meta\{color:#666774;font-size:14px;line-height:20px\}/);
+  assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__region\{color:#666774;font-size:16px;line-height:24px\}/);
+  assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__region i\{width:16px;font-size:16px;line-height:24px\}/);
+  assert.match(css, /\[data-latest-media-releases\] \.media-releases__skeleton--featured\{display:flex;min-height:216px;flex-direction:column;gap:12px;padding:24px;border-left-width:6px\}/);
+  assert.match(css, /\[data-latest-media-releases\] \.media-releases__skeleton--featured \.media-releases__skeleton-heading\{min-height:24px;gap:4px\}/);
+  assert.match(css, /@media\s*\(max-width:\s*600px\)\s*\{[^}]*\[data-latest-media-releases\]\s*\.media-releases__results/);
 });
 
 test("renders declaration-only cards with their accent colors and checkbox styles", async () => {
@@ -227,9 +242,9 @@ test("renders declaration-only cards with their accent colors and checkbox style
     assert.match(css, /\.media-releases__item--formatted \.media-releases__hazard-icon\{width:48px;height:48px\}/);
     assert.match(css, /\.media-releases__item\[data-declaration~=fire-ban-declaration\][^{]*\{--media-releases-accent:\s*#1f1f5f\}/);
     assert.match(css, /\.media-releases__item\[data-general-information=true\][^{]*\{--media-releases-accent:\s*#1f1f5f\}/);
-    assert.match(css, /\.media-releases__item\[data-general-information=true\] \.media-releases__severity\{color:#fff\}/);
+    assert.match(css, /\.media-releases__item\[data-general-information=true\] \.media-releases__severity\{background:var\(--clr-bg-shade-alt,\s*#e7e7ea\);color:var\(--clr-text-default,\s*#1f1e27\)\}/);
     assert.match(css, /\.media-releases__item\[data-warning-level=advice\]\{--media-releases-accent:\s*#fadf31\}/);
-    assert.match(css, /\.media-releases__item\[data-warning-level=advice\] \.media-releases__severity\{color:#716309\}/);
+    assert.match(css, /\.media-releases__item\[data-warning-level=advice\] \.media-releases__severity\{background:#fdf4b9;color:#716309\}/);
     assert.match(css, /\.media-releases__item:hover\{box-shadow:0 4px 16px #0f0f2f26\}/);
     assert.match(css, /\.media-releases__item\[data-warning-level=watch_act\] \.media-releases__severity/);
     assert.doesNotMatch(css, /\.media-releases__item\[data-declaration\] \.media-releases__severity/);
@@ -429,9 +444,12 @@ for (const scenario of ["latest three", "production endpoint", "fewer than three
       assert.equal(results.getAttribute("aria-busy"), "false");
       assert.equal(results.querySelectorAll(".media-releases__skeleton").length, 0);
       assert.equal(listing.querySelector("[data-results-status]").classList.contains("media-releases__status--loading"), false);
+      for (const card of cards) {
+        assert.equal(card.querySelector(".media-releases__title").tagName, "H3");
+      }
       assert.equal(listing.querySelector("[data-feed-note]").hidden, !["invalid response", "http failure", "total failure"].includes(scenario));
       if (expected === 3) {
-        assert.deepEqual(cards.map((card) => card.querySelector("h2").textContent), [
+        assert.deepEqual(cards.map((card) => card.querySelector("h3").textContent), [
           "Flood Advice - Daly River - 4", "Flood Advice - Daly River - 3", "Flood Advice - Daly River - 2",
         ]);
       }
@@ -442,6 +460,12 @@ for (const scenario of ["latest three", "production endpoint", "fewer than three
         assert.equal(timeLabel.dateTime, timeLabel.dataset.time);
         const heading = cards[0].querySelector(".media-releases__card-heading");
         assert.ok(heading.querySelector(".media-releases__severity"));
+        assert.deepEqual([...heading.children].map((element) => element.className), [
+          scenario === "missing icon" || scenario === "unknown region"
+            ? "fa-light fa-triangle-exclamation media-releases__notice-icon"
+            : "media-releases__hazard-icon",
+          "media-releases__severity",
+        ]);
         if (["missing icon", "unknown region"].includes(scenario)) {
           assert.equal(heading.querySelector("img"), null);
           assert.ok(heading.querySelector(".media-releases__notice-icon"));

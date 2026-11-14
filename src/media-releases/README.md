@@ -25,6 +25,13 @@ timestamps are stored as ISO values in the time element's `data-time`
 attribute, and the relative labels refresh every minute using minutes, hours,
 or days ago.
 
+Featured warning titles use an `h3` styled at 20px bold with a 24px line
+height. Severity badges use 12px bold Lato, 16px line height, 1px letter
+spacing, and 4px by 8px padding. Emergency uses the danger background/text
+tokens; Watch and act uses `#FFE4CC` / `#9E4B00`; Advice and Decreasing threat
+use `#FDF4B9` / `#716309`; Planned burn uses `#DBCDE4` / `#634578`; and
+General information uses the neutral background/text tokens.
+
 Include the existing site theme and icon fonts, `media-releases.css`, and the
 standalone module. Deploy `dist/SecureNT_files/media-release-card.js`,
 `dist/SecureNT_files/autocomplete.js`, and the generated
@@ -44,12 +51,16 @@ relative paths. The full listings additionally require
 ```
 
 On localhost, the Vite development server serves `/api/media-releases/latest`
-from `public/campaign-monitor.json` so the homepage listing works without the
-remote Campaign Monitor endpoint. The individual source endpoints still proxy
-to the NT Government site; other hosts request the merged endpoint directly
-and require CORS permission if they are on a different origin. The existing
-site icon font supplies the clock, location, and arrow icons. The cards use
-three columns on wide screens, two below 900px,
+from `src/media-releases/latest-warnings.preview.json` and randomly selects
+three unique records per request. The 18 preview examples cover Bushfire,
+Cyclone, Flooding, Storm, and Heatwave across Emergency warning, Watch and
+act, and Advice, plus Decreasing threat, Planned burn, and General
+information. This keeps the homepage preview independent of the live merged
+feed; the production page still requests the merged Campaign Monitor endpoint.
+The individual source endpoints still proxy to the NT Government site; other
+hosts request the merged endpoint directly and require CORS permission if they
+are on a different origin. The existing site icon font supplies the clock,
+location, and arrow icons. The cards use three columns on wide screens, two below 900px,
 and one below 600px. The component shows an empty message when no eligible
 notices are available and reports when the endpoint is unavailable or invalid.
 During loading, three placeholder cards shimmer in the results grid while an
