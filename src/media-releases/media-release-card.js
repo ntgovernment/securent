@@ -16,17 +16,26 @@ function safeLink(value) {
   }
 }
 
-function formatDateTime(value) {
-  const timestamp = updatedTimestamp(value);
-  if (timestamp === null) return "";
-  return new Intl.DateTimeFormat("en-AU", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    timeZone: "Australia/Darwin",
-  }).format(timestamp);
+function relativeTimeLabel(timestamp, now) {
+  const minutes = Math.floor(Math.max(0, now - timestamp) / 60_000);
+  if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  const days = Math.floor(hours / 24);
+  return `${days} day${days === 1 ? "" : "s"} ago`;
+}
+
+export function startRelativeTimeUpdates(container) {
+  const refresh = () => {
+    const now = Date.now();
+    for (const time of container.querySelectorAll("time[data-time]")) {
+      const timestamp = Date.parse(time.dataset.time);
+      if (!Number.isFinite(timestamp)) throw new TypeError("Warning card has an invalid data-time value");
+      time.textContent = relativeTimeLabel(timestamp, now);
+    }
+  };
+  refresh();
+  window.setInterval(refresh, 60_000);
 }
 
 function hazardIconFor(item) {
@@ -88,8 +97,8 @@ export function renderCard(item, { compact = false } = {}) {
 
   const meta = document.createElement("p");
   meta.className = "media-releases__meta";
-  const publishedAt = formatDateTime(item.publishedAt);
-  if (publishedAt) {
+  const publishedAt = updatedTimestamp(item.publishedAt);
+  if (publishedAt !== null) {
     const dateTime = document.createElement("span");
     dateTime.className = "media-releases__date-time";
     if (!isFormattedCard) {
@@ -98,7 +107,11 @@ export function renderCard(item, { compact = false } = {}) {
       clock.setAttribute("aria-hidden", "true");
       dateTime.append(clock);
     }
-    dateTime.append(document.createTextNode(publishedAt));
+    const time = document.createElement("time");
+    time.dateTime = new Date(publishedAt).toISOString();
+    time.dataset.time = time.dateTime;
+    time.textContent = relativeTimeLabel(publishedAt, Date.now());
+    dateTime.append(time);
     meta.append(dateTime);
   }
 

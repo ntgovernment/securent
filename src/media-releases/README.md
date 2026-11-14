@@ -18,7 +18,9 @@ newest-first ordering to its JSON array. It displays up to three cards and
 does not require the full listing's search, filters, or pagination. The
 endpoint does not identify individual source failures or preserve source
 precedence for duplicate campaigns. Latest-three cards keep their compact
-badge and **More information** layout.
+badge and **More information** layout. Their publication timestamps are
+stored as ISO values in the time element's `data-time` attribute, and the
+relative labels refresh every minute using minutes, hours, or days ago.
 
 Include the existing site theme and icon fonts, `media-releases.css`, and the
 standalone module. Deploy `dist/SecureNT_files/media-release-card.js`,
@@ -64,10 +66,13 @@ them again. The count in **Show all (N)** is the number of hidden options.
 Checkbox labels display **Other** for values internally classified as
 **Not identified**. The checkbox values remain unchanged so filtering behavior
 is preserved. Cards in both listings omit the region row when the region is
-not identified. Full Current warnings cards share an icon, date, title, and
-optional region layout without severity badges or a separate **More
-information** action. Emergency cards retain their AWS WEBP icons and
-warning-level border accents. The region uses `fa-light fa-location-dot`
+not identified. Full Current warnings cards share an icon, relative
+publication time, title, and optional region layout without severity badges
+or a separate **More information** action. Each card stores its timestamp as
+an ISO value in the time element's `data-time` attribute, and both listing
+styles refresh the relative label every minute. Emergency cards retain their
+AWS WEBP icons and warning-level border accents. The region uses
+`fa-light fa-location-dot`
 instead of a visible **Region:** prefix, while keeping an accessible region
 label. The fire-ban option displays as **Fire ban notices**; its card uses the
 neutral warning icon and `#343741` accent. Planned burns display as **Planned

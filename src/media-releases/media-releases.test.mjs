@@ -20,6 +20,13 @@ test("renders declaration-only cards with their accent colors and checkbox style
   const window = new Window({ url: "http://localhost/media-releases.html" });
   window.document.write(html);
   const originals = { window: globalThis.window, document: globalThis.document, fetch: globalThis.fetch };
+  const originalDateNow = Date.now;
+  const originalSetInterval = window.setInterval;
+  const intervalCallbacks = [];
+  window.setInterval = (callback, delay) => {
+    intervalCallbacks.push({ callback, delay });
+    return intervalCallbacks.length;
+  };
   globalThis.window = window;
   globalThis.document = window.document;
   globalThis.fetch = async () => ({
@@ -76,6 +83,29 @@ test("renders declaration-only cards with their accent colors and checkbox style
       assert.ok(cardLink.contains(cardLink.querySelector(".media-releases__title")));
       assert.equal(card.querySelector(".media-releases__agency, .media-releases__source, .media-releases__hazard"), null);
     }
+    const timeLabel = emergency.querySelector("time[data-time]");
+    assert.ok(timeLabel);
+    assert.equal(timeLabel.dateTime, timeLabel.dataset.time);
+    assert.ok(Number.isFinite(Date.parse(timeLabel.dataset.time)));
+    assert.equal(intervalCallbacks.length, 1);
+    assert.equal(intervalCallbacks[0].delay, 60_000);
+    const publishedTimestamp = Date.parse(timeLabel.dataset.time);
+    let now = publishedTimestamp + 60_000;
+    Date.now = () => now;
+    intervalCallbacks[0].callback();
+    assert.equal(timeLabel.textContent, "1 minute ago");
+    now = publishedTimestamp + 2 * 60_000;
+    intervalCallbacks[0].callback();
+    assert.equal(timeLabel.textContent, "2 minutes ago");
+    now = publishedTimestamp + 60 * 60_000;
+    intervalCallbacks[0].callback();
+    assert.equal(timeLabel.textContent, "1 hour ago");
+    now = publishedTimestamp + 24 * 60 * 60_000;
+    intervalCallbacks[0].callback();
+    assert.equal(timeLabel.textContent, "1 day ago");
+    now = publishedTimestamp + 2 * 24 * 60 * 60_000;
+    intervalCallbacks[0].callback();
+    assert.equal(timeLabel.textContent, "2 days ago");
     for (const card of [emergency, watchAct, decreasingThreat]) {
       assert.ok(card.classList.contains("media-releases__item--formatted"));
       assert.equal(card.querySelector(".media-releases__severity"), null);
@@ -214,6 +244,8 @@ test("renders declaration-only cards with their accent colors and checkbox style
     assert.match(css, /\.media-releases__filter input:checked:before\{border-color:#174c4e;background:#174c4e\}/);
     assert.match(css, /\.media-releases__filter input:focus-visible\s*\{/);
   } finally {
+    Date.now = originalDateNow;
+    window.setInterval = originalSetInterval;
     Object.assign(globalThis, originals);
     await window.happyDOM.close();
   }
@@ -304,6 +336,12 @@ for (const scenario of ["latest three", "production endpoint", "fewer than three
     </section>`);
     const originals = { window: globalThis.window, document: globalThis.document, fetch: globalThis.fetch };
     const originalConsoleError = console.error;
+    const originalSetInterval = window.setInterval;
+    const intervalCallbacks = [];
+    window.setInterval = (callback, delay) => {
+      intervalCallbacks.push({ callback, delay });
+      return intervalCallbacks.length;
+    };
     globalThis.window = window;
     globalThis.document = window.document;
     const requests = [];
@@ -314,6 +352,8 @@ for (const scenario of ["latest three", "production endpoint", "fewer than three
       await import(`../../dist/latest-media-releases.js?test=${encodeURIComponent(scenario)}`);
       const listing = window.document.querySelector("[data-latest-media-releases]");
       const results = listing.querySelector("[data-results]");
+      assert.equal(intervalCallbacks.length, 1);
+      assert.equal(intervalCallbacks[0].delay, 60_000);
       assert.equal(results.getAttribute("aria-busy"), "true");
       assert.equal(results.querySelectorAll('.media-releases__skeleton[aria-hidden="true"]').length, 3);
       assert.equal(results.querySelectorAll(".media-releases__skeleton-block").length, 21);
@@ -360,6 +400,9 @@ for (const scenario of ["latest three", "production endpoint", "fewer than three
         ]);
       }
       if (cards.length) {
+        const timeLabel = cards[0].querySelector("time[data-time]");
+        assert.ok(timeLabel);
+        assert.equal(timeLabel.dateTime, timeLabel.dataset.time);
         const heading = cards[0].querySelector(".media-releases__card-heading");
         assert.ok(heading.querySelector(".media-releases__severity"));
         if (["missing icon", "unknown region"].includes(scenario)) assert.equal(heading.querySelector("img"), null);
@@ -371,6 +414,7 @@ for (const scenario of ["latest three", "production endpoint", "fewer than three
       if (scenario === "empty") assert.match(listing.querySelector("[data-results-status]").textContent, /no current warnings/i);
       if (["invalid response", "http failure", "total failure"].includes(scenario)) assert.match(listing.querySelector("[data-results-status]").textContent, /temporarily unavailable/i);
     } finally {
+      window.setInterval = originalSetInterval;
       Object.assign(globalThis, originals);
       console.error = originalConsoleError;
       await window.happyDOM.close();

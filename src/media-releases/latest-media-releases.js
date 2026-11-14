@@ -1,11 +1,12 @@
 import { curateFeeds } from "./curation.mjs";
 import { latestMediaReleaseEndpoint } from "./feeds.mjs";
-import { renderCard } from "./media-release-card.js";
+import { renderCard, startRelativeTimeUpdates } from "./media-release-card.js";
 
 const listing = document.querySelector("[data-latest-media-releases]");
 
 if (listing) {
   const results = listing.querySelector("[data-results]");
+  startRelativeTimeUpdates(results);
   const status = listing.querySelector("[data-results-status]");
   const feedNote = listing.querySelector("[data-feed-note]");
   const isLocalPreview = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);

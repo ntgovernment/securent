@@ -3,7 +3,7 @@ import { attachAutocomplete, getAutocompleteCandidates } from "../search/autocom
 import { curateFeeds, filterAndSortNotices, warningLevelOrder } from "./curation.mjs";
 import { fetchMediaReleaseFeeds, mediaReleaseSources } from "./feeds.mjs";
 import { getPageWindow } from "../pagination/page-window.mjs";
-import { renderCard } from "./media-release-card.js";
+import { renderCard, startRelativeTimeUpdates } from "./media-release-card.js";
 const listing = document.querySelector("[data-media-releases]");
 
 if (listing) {
@@ -17,6 +17,7 @@ if (listing) {
   filterPanel.open = !mobile.matches;
   mobile.addEventListener("change", () => { filterPanel.open = !mobile.matches; });
   const results = listing.querySelector("[data-results]");
+  startRelativeTimeUpdates(results);
   const status = listing.querySelector("[data-results-status]");
   const feedNote = listing.querySelector("[data-feed-note]");
   const pagination = listing.querySelector("[data-pagination]");
