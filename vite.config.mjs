@@ -33,24 +33,20 @@ const excludeLocalCapturePhotos = {
   },
 };
 
-const eventPreview = {
-  name: "event-preview",
+const pagePreview = {
+  name: "page-preview",
   configureServer(server) {
     server.middlewares.use(async (req, res, next) => {
       const url = new URL(req.url, "http://localhost");
+      const currentWarningsCapture = "Current warnings _ SecureNT.html";
       const eventCapture = "Severe Storm \u2013 Alice Springs _ SecureNT.html";
-      const capture =
-        url.pathname === "/"
-            ? eventCapture
-          : url.pathname === "/" + encodeURIComponent(eventCapture)
-            ? eventCapture
-            : null;
-      if (
-        capture &&
-        (req.method === "GET" || req.method === "HEAD") &&
-        (url.pathname === "/" ||
-          url.pathname === "/" + encodeURIComponent(eventCapture))
-      ) {
+      const captures = new Map([
+        ["/", currentWarningsCapture],
+        ["/" + encodeURIComponent(currentWarningsCapture), currentWarningsCapture],
+        ["/" + encodeURIComponent(eventCapture), eventCapture],
+      ]);
+      const capture = captures.get(url.pathname);
+      if (capture && (req.method === "GET" || req.method === "HEAD")) {
         try {
           const source = await readFile(new URL(capture, import.meta.url), "utf8");
           const html = await server.transformIndexHtml(url.pathname, source);
@@ -160,7 +156,7 @@ export default defineConfig({
   plugins: [
     sourceThemeOnly,
     excludeLocalCapturePhotos,
-    eventPreview,
+    pagePreview,
     localConditionsMock,
     mediaReleaseFeedProxy,
     cloudflare(),

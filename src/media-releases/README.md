@@ -17,7 +17,8 @@ applies the existing operational-warning filtering, deduplication, and
 newest-first ordering to its JSON array. It displays up to three cards and
 does not require the full listing's search, filters, or pagination. The
 endpoint does not identify individual source failures or preserve source
-precedence for duplicate campaigns.
+precedence for duplicate campaigns. Latest-three cards keep their compact
+badge and **More information** layout.
 
 Include the existing site theme and icon fonts, `media-releases.css`, and the
 standalone module. Deploy `dist/SecureNT_files/media-release-card.js`,
@@ -58,15 +59,23 @@ The Incident or notice type list includes emergency types plus Fire ban,
 planned burn, and boil-water declarations. It shows six options initially;
 **Show all (N)** expands the remaining options, and **Show less** collapses
 them again. The count in **Show all (N)** is the number of hidden options.
+**Other**, for internally **Not identified** emergency types, sorts last.
 
 Checkbox labels display **Other** for values internally classified as
 **Not identified**. The checkbox values remain unchanged so filtering behavior
 is preserved. Cards in both listings omit the region row when the region is
-not identified. The fire-ban option displays as **Fire ban notices**; its card
-badge is singular (**Fire ban notice**) and uses the dark-blue `#1f1f5f` accent.
-Planned burns display as **Planned burn advice** in the filter and **Planned
-burn** on the card. Boil-water notices display as **Boil water notice** in the
-filter; declaration cards otherwise use the **General information** badge.
+not identified. Full Current warnings cards share an icon, date, title, and
+optional region layout without severity badges or a separate **More
+information** action. Emergency cards retain their AWS WEBP icons and
+warning-level border accents. The region uses `fa-light fa-location-dot`
+instead of a visible **Region:** prefix, while keeping an accessible region
+label. The fire-ban option displays as **Fire ban notices**; its card uses the
+neutral warning icon and `#343741` accent. Planned burns display as **Planned
+burn advice** in the filter and use the `#865AA5` warning icon and accent.
+Boil-water notices display as **Boil water notice** in the filter; fire-ban,
+boil-water, other and general-information cards share the neutral icon and
+accent. Compact latest-three cards retain their existing badge and action
+layout.
 
 For Matrix markup, keep the Incident or notice type fieldset with its
 `data-type-filters` list. Do not add a separate Declaration fieldset or

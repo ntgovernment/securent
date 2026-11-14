@@ -66,31 +66,61 @@ test("renders declaration-only cards with their accent colors and checkbox style
       assert.equal(card.querySelectorAll("a").length, 1);
       assert.equal(cardLink.target, "_blank");
       assert.equal(cardLink.rel, "noopener noreferrer");
-      assert.equal(cardLink.querySelector(".media-releases__more-information").textContent, "More information");
-      assert.equal(cardLink.querySelector(".media-releases__more-information-label").textContent, "More information");
-      assert.equal(cardLink.querySelector(".media-releases__more-information i").getAttribute("aria-hidden"), "true");
+      if (card.classList.contains("media-releases__item--formatted")) {
+        assert.equal(cardLink.querySelector(".media-releases__more-information"), null);
+      } else {
+        assert.equal(cardLink.querySelector(".media-releases__more-information").textContent, "More information");
+        assert.equal(cardLink.querySelector(".media-releases__more-information-label").textContent, "More information");
+        assert.equal(cardLink.querySelector(".media-releases__more-information i").getAttribute("aria-hidden"), "true");
+      }
       assert.ok(cardLink.contains(cardLink.querySelector(".media-releases__title")));
       assert.equal(card.querySelector(".media-releases__agency, .media-releases__source, .media-releases__hazard"), null);
     }
-    assert.equal(emergency.querySelector(".media-releases__severity").textContent, "Emergency");
-    assert.equal(watchAct.querySelector(".media-releases__severity").textContent, "Watch and act");
+    for (const card of [emergency, watchAct, decreasingThreat]) {
+      assert.ok(card.classList.contains("media-releases__item--formatted"));
+      assert.equal(card.querySelector(".media-releases__severity"), null);
+      assert.ok(card.querySelector(".media-releases__hazard-icon"));
+      assert.deepEqual(
+        [...card.querySelector(".media-releases__content").children].map((element) => element.className),
+        ["media-releases__meta", "media-releases__title", "media-releases__classification media-releases__region"],
+      );
+    }
     assert.equal(decreasingThreat.dataset.warningLevel, "advice");
-    assert.equal(decreasingThreat.querySelector(".media-releases__severity").textContent, "Decreasing threat");
     assert.ok(emergency.querySelector(".media-releases__date-time"));
     assert.match(emergency.querySelector(".media-releases__region").textContent, /Region: Greater Darwin/);
+    assert.ok(emergency.querySelector(".media-releases__region .fa-location-dot"));
+    assert.equal(emergency.querySelector(".media-releases__region .visually-hidden").textContent, "Region: ");
     const unknownRegionCard = cards.find((card) => card.querySelector(".media-releases__title")?.textContent === "Advice - Remote community");
     assert.ok(unknownRegionCard);
     assert.equal(unknownRegionCard.querySelector(".media-releases__region"), null);
     assert.ok(emergency.querySelector(".media-releases__hazard-icon"));
-    assert.equal(plannedBurn.querySelector(".media-releases__severity").textContent, "Planned burn");
+    assert.ok(plannedBurn.classList.contains("media-releases__item--formatted"));
+    assert.ok(plannedBurn.classList.contains("media-releases__item--planned-burn"));
+    assert.equal(plannedBurn.querySelector(".media-releases__severity"), null);
+    assert.equal(plannedBurn.querySelector(".media-releases__notice-icon").getAttribute("aria-hidden"), "true");
+    assert.deepEqual(
+      [...plannedBurn.querySelector(".media-releases__content").children].map((element) => element.className),
+      ["media-releases__meta", "media-releases__title", "media-releases__classification media-releases__region"],
+    );
+    assert.equal(plannedBurn.querySelector(".media-releases__date-time i"), null);
+    const plannedBurnLocationIcon = plannedBurn.querySelector(".media-releases__region i");
+    assert.ok(plannedBurnLocationIcon.classList.contains("fa-location-dot"));
+    assert.equal(plannedBurnLocationIcon.getAttribute("aria-hidden"), "true");
     assert.equal(plannedBurn.querySelector(".media-releases__hazard-icon"), null);
-    assert.equal(fireBan.querySelector(".media-releases__severity").textContent, "Fire ban notice");
+    assert.match(plannedBurn.querySelector(".media-releases__region").textContent, /Region: Greater Darwin/);
+    assert.equal(plannedBurn.querySelector(".media-releases__region .visually-hidden").textContent, "Region: ");
     assert.equal(fireBan.dataset.declaration, "fire-ban-declaration");
-    assert.equal(boilWater.querySelector(".media-releases__severity").textContent, "General information");
     assert.equal(fireBan.dataset.generalInformation, "true");
     assert.equal(boilWater.dataset.generalInformation, "true");
-    assert.equal(unknownWarning.querySelector(".media-releases__severity").textContent, "General information");
     assert.equal(unknownWarning.dataset.generalInformation, "true");
+    for (const card of [fireBan, boilWater, unknownWarning, unknownRegionCard]) {
+      assert.ok(card.classList.contains("media-releases__item--formatted"));
+      assert.ok(card.classList.contains("media-releases__item--general-information"));
+      assert.equal(card.querySelector(".media-releases__severity"), null);
+      assert.ok(card.querySelector(".media-releases__notice-icon").classList.contains("fa-triangle-exclamation"));
+      assert.equal(card.querySelector(".media-releases__notice-icon").getAttribute("aria-hidden"), "true");
+    }
+    assert.ok(fireBan.querySelector(".media-releases__region .fa-location-dot"));
     const incidentNoticeFilters = listing.querySelector("[data-type-filters]");
     assert.equal(incidentNoticeFilters.parentElement.querySelector("legend").textContent, "Incident or notice type");
     const fireBanFilter = incidentNoticeFilters.querySelector('input[name="declaration"][value="Fire ban declaration"]');
@@ -104,6 +134,7 @@ test("renders declaration-only cards with their accent colors and checkbox style
     assert.equal(unknownTypeFilter.parentElement.textContent, "Other (1)");
     const incidentOptions = [...incidentNoticeFilters.querySelectorAll(".media-releases__filter")];
     assert.equal(incidentOptions.length, 8);
+    assert.equal(incidentOptions.at(-1).textContent, "Other (1)");
     assert.equal(incidentOptions.filter((option) => option.hidden).length, 2);
     const expandFilters = incidentNoticeFilters.querySelector("[data-expand-filters]");
     assert.equal(expandFilters.textContent, "Show all (2)");
@@ -151,14 +182,19 @@ test("renders declaration-only cards with their accent colors and checkbox style
     assert.match(alertsSelectBase, /background-color:#fff/);
     assert.match(css, /\.media-releases__search input:hover:not\(:focus\):not\(:active\):placeholder-shown,\.media-releases__sort select:hover:not\(:focus\):not\(:active\)\{background-color:#ecf0f0\}/);
 
-    assert.match(css, /\.media-releases__item\[data-declaration~=planned-burn-advice\]\{--media-releases-accent:\s*#865aa5\}/);
+    assert.match(css, /\.media-releases__item--formatted\.media-releases__item--planned-burn\{--media-releases-accent:\s*#865aa5\}/);
+    assert.match(css, /\.media-releases__item--formatted\.media-releases__item--general-information\{--media-releases-accent:\s*#343741\}/);
+    assert.match(css, /\.media-releases__item--formatted \.media-releases__link\{grid-template-columns:48px minmax\(0,1fr\)\}/);
+    assert.match(css, /\.media-releases__notice-icon\{[^}]*color:var\(--media-releases-accent\);[^}]*font-size:48px/);
+    assert.match(css, /\.media-releases__item--formatted \.media-releases__meta\{[^}]*font-size:14px;[^}]*line-height:20px/);
+    assert.match(css, /\.media-releases__item--formatted \.media-releases__region\{[^}]*font-size:16px;[^}]*line-height:24px/);
+    assert.match(css, /\.media-releases__item--formatted \.media-releases__hazard-icon\{width:48px;height:48px\}/);
     assert.match(css, /\.media-releases__item\[data-declaration~=fire-ban-declaration\][^{]*\{--media-releases-accent:\s*#1f1f5f\}/);
     assert.match(css, /\.media-releases__item\[data-general-information=true\][^{]*\{--media-releases-accent:\s*#1f1f5f\}/);
     assert.match(css, /\.media-releases__item\[data-general-information=true\] \.media-releases__severity\{color:#fff\}/);
     assert.match(css, /\.media-releases__item\[data-warning-level=advice\]\{--media-releases-accent:\s*#fadf31\}/);
     assert.match(css, /\.media-releases__item\[data-warning-level=advice\] \.media-releases__severity\{color:#716309\}/);
     assert.match(css, /\.media-releases__item:hover\{box-shadow:0 4px 16px #0f0f2f26\}/);
-    assert.match(css, /\.media-releases__item\[data-declaration~=planned-burn-advice\] \.media-releases__severity/);
     assert.match(css, /\.media-releases__item\[data-warning-level=watch_act\] \.media-releases__severity/);
     assert.doesNotMatch(css, /\.media-releases__item\[data-declaration\] \.media-releases__severity/);
     assert.match(css, /\.media-releases__item\{[^}]*border-left:4px solid var\(--media-releases-accent\)/);

@@ -274,6 +274,20 @@ section.media-releases__hero {
   grid-template-columns: 79px minmax(0, 1fr);
 }
 
+.media-releases__item--formatted .media-releases__link {
+  grid-template-columns: 48px minmax(0, 1fr);
+}
+
+.media-releases__notice-icon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  color: var(--media-releases-accent);
+  font-size: 48px;
+  line-height: 1;
+}
+
 .media-releases__item:hover {
   box-shadow: 0 4px 16px rgba(15, 15, 47, 0.15);
 }
@@ -299,16 +313,20 @@ section.media-releases__hero {
   --media-releases-accent: var(--clr-status-emergency-warning);
 }
 
-.media-releases__item[data-declaration~="planned-burn-advice"] {
-  --media-releases-accent: #865aa5;
-}
-
 .media-releases__item[data-general-information="true"] {
   --media-releases-accent: #1f1f5f;
 }
 
 .media-releases__item[data-declaration~="fire-ban-declaration"] {
   --media-releases-accent: #1f1f5f;
+}
+
+.media-releases__item--formatted.media-releases__item--planned-burn {
+  --media-releases-accent: #865aa5;
+}
+
+.media-releases__item--formatted.media-releases__item--general-information {
+  --media-releases-accent: #343741;
 }
 
 .media-releases__severity {
@@ -329,7 +347,6 @@ section.media-releases__hero {
 
 .media-releases__item[data-warning-level="emergency_warning"] .media-releases__severity,
 .media-releases__item[data-warning-level="watch_act"] .media-releases__severity,
-.media-releases__item[data-declaration~="planned-burn-advice"] .media-releases__severity,
 .media-releases__item[data-general-information="true"] .media-releases__severity {
   color: #fff;
 }
@@ -366,6 +383,18 @@ section.media-releases__hero {
   margin: 0;
   color: #555963;
   font-family: Lato, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.media-releases__item--formatted .media-releases__meta {
+  color: #666774;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.media-releases__item--formatted .media-releases__region {
+  color: #666774;
   font-size: 16px;
   line-height: 24px;
 }
@@ -410,6 +439,11 @@ section.media-releases__hero {
   height: 75px;
   aspect-ratio: 583 / 550;
   object-fit: contain;
+}
+
+.media-releases__item--formatted .media-releases__hazard-icon {
+  width: 48px;
+  height: 48px;
 }
 
 .media-releases__more-information {
@@ -709,6 +743,12 @@ section.media-releases__hero {
 
   .media-releases__item--with-icon .media-releases__link {
     grid-template-columns: 64px minmax(0, 1fr);
+  }
+
+  .media-releases__item--formatted .media-releases__link {
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 16px;
+    padding: 18px 16px;
   }
 
   .media-releases__hazard-icon {
