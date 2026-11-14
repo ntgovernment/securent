@@ -2,8 +2,10 @@ import "./homepage-news.js";
 import "./display-cards.js";
 import "../hero-banners/hero-banners.js";
 import { guardQuickExit } from "./quick-exit.mjs";
+import { initializeEventNavigation } from "../events/on-this-page.ts";
 
 guardQuickExit(window);
+initializeEventNavigation(window);
 
 /* Expand the desktop search field when the icon is activated empty. */
 (function () {

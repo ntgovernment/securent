@@ -6,11 +6,11 @@ The event page asset is `event.css`, which controls the warning-level header acc
 
 Reference `dist/social-share.css` from the Squiz Matrix share nester/page after the global theme, so its styles are loaded wherever that nester is used. Reference `dist/event.css` on event pages and `dist/social-share.js` for the share behavior. These assets are standalone and are not imported into the global theme bundle. On desktop, the share panel aligns with the first content section below the event H1; it stays in normal flow on smaller screens.
 
-The local Severe Storm - Alice Springs capture loads `dist/event.css`, `dist/social-share.css`, and `dist/social-share.js` alongside the built theme. It uses the production share destinations and falls back to the embedded logo if the production image cannot be loaded. Run `npm run build` to generate these assets, then preview at `/Severe%20Storm%20%E2%80%93%20Alice%20Springs%20_%20SecureNT.html`; shared dependencies come from the gitignored `SecureNT_files/` directory.
+The local Severe Storm - Alice Springs capture loads rebuilt `dist/event.css` and `dist/theme.js`. Its captured theme, vendor dependencies and social-share assets remain in the gitignored `Severe Storm – Alice Springs _ SecureNT_files/` directory. Run `npm run build` before previewing at `/` or `/Severe%20Storm%20%E2%80%93%20Alice%20Springs%20_%20SecureNT.html`. The page has a prominent synthetic-content notice; its sample text and captured warning panels are not live emergency information.
 
 Warning accordions use the standalone stylesheet `dist/warning-accordion.css`, built from `src/css/components/warning-accordion.css`. Publish and reference that asset on event pages wherever the warning accordion markup is used.
 
-The Latest update callout uses the shared theme: a 1px strong border, an 8px left accent, and the shade background. Rebuild and publish `dist/theme.css` and refresh its CMS cache reference when changing these styles. The local event capture references theme CSS version `50`.
+The Latest update callout uses the shared theme: a 1px strong border, an 8px left accent, and the shade background. Rebuild and publish `dist/theme.css` and refresh its CMS cache reference when changing these styles. The local event capture currently uses its captured theme stylesheet.
 
 ## Warning accordion paint layout
 
@@ -63,11 +63,15 @@ The event sidebar retains its legacy in-page menu container:
 </div>
 ```
 
-The existing NTG components script populates the empty list from H2 headings other than `.accordion-header`. The local event capture currently has one eligible H2, so its menu contains only **More information**. Do not include previously rendered links in saved captures or they will be appended a second time.
+The existing NTG components script populates the empty list from H2 headings other than `.accordion-header`. Do not include previously rendered links in saved captures or they will be appended a second time.
 
-Reverting `9b3e654` removes the shared sticky-navigation initializer and its tests. The later event-template marker and event stylesheet rules remain, but the shared theme no longer adds `.ntg-on-this-page`, so these menus stay in normal flow without automatic active-heading tracking. The development server again opens Current warnings at `/`; use the explicit event URL above to preview the legacy menu.
+Add `data-event-page` to the event template's `<main>` element. The shared theme enhances only this page type, adding `.ntg-on-this-page` to the navigation container. At widths of 768px and above, the menu floats within its sidebar using sticky positioning, with a 16px top offset and scrolling for long menus. On smaller screens it remains in normal flow. Links stay underlined while hovered; the inherited hover border is disabled to prevent flashing and layout shifts. Social sharing stays separate from the floating menu.
 
-The event capture uses theme CSS version `50`, theme JavaScript version `32`, and event CSS version `2`. Refresh cache references after rebuilding, including equivalent CMS references. Run `node --test src/js/navigation.test.mjs` and `npm run build` after shared-navigation edits.
+`on-this-page.ts` tracks the section at the top quarter of the viewport, retaining the current section until the next heading reaches that position. The first visible heading is used before any section reaches that line, and the final link is selected at the bottom of the page. Active links receive `.active` and `aria-current="location"` without moving keyboard focus. Links populated later by the legacy component are supported. Other page types are unchanged.
+
+The development server opens the synthetic Severe Storm event capture at `/`. It has six H2 sections for testing navigation. The capture loads built `dist/theme.js?v=34` and `dist/event.css?v=5`. Publish both assets with the event template marker and refresh equivalent CMS cache references. Run `node --test src/events/on-this-page.test.mjs src/js/navigation.test.mjs` and `npm run build` after edits. The TypeScript tests require Node.js 22.18 or later for native type stripping.
+
+For browser verification, reload `/` normally and confirm that the raw navigation list is empty but the rendered list contains one link per H2, without duplicates. Scroll down and back up to check the active link and `aria-current`. Hover links to confirm a persistent underline, no bottom border and no height change. Check sticky positioning at widths of 768px and above and normal flow below that breakpoint.
 
 Event breadcrumb and main content (including accordions) share the header and menu's 80rem maximum width and responsive horizontal gutters. The feedback band is styled site-wide by `src/css/components/feedback.css` in `dist/theme.css`; it extends across the viewport while its content uses the same responsive alignment. The footer retains its existing layout. Main navigation labels align with the header content edge using matching responsive offsets in `src/css/components/header-footer.css`.
 

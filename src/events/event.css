@@ -31,12 +31,18 @@ main[data-event-page] .ntg-on-this-page .nav-link {
   position: relative;
   display: block;
   padding: 4px 0 !important;
+  border-bottom: 0;
   color: #174c4e;
   overflow-wrap: anywhere;
 }
 
 main[data-event-page] .ntg-on-this-page .nav-link.active {
   color: var(--clr-text-default);
+}
+
+main[data-event-page] .ntg-on-this-page .nav-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 main[data-event-page] .ntg-on-this-page .nav-link.active::before {
