@@ -253,14 +253,33 @@ test("the feed populates every station and shows its observed temperatures", asy
   assert.deepEqual(Array.from(groups, (group) => group.querySelector(".lc-attribution").textContent),
     ["Source: Bushfires NT", "Source: NTEPA", "Source: Bureau of Meteorology"]);
   assert.equal(context.window.document.querySelectorAll(".lc-attribution").length, 3);
-  assert.equal(context.window.document.querySelectorAll(".lc-card .lc-attribution").length, 0);
+  assert.equal(context.window.document.querySelectorAll(".lc-card .lc-attribution").length, 3);
   assert.equal(groups[0].querySelector("a").href, "https://www.pfes.nt.gov.au/incidentmap");
   assert.equal(groups[1].querySelector("a").href, "https://ntepa.nt.gov.au/");
   assert.equal(groups[2].querySelector("a").href, "https://www.bom.gov.au/location/australia/northern-territory#observations");
+  const bomTimestamp = groups[2].querySelector(".lc-card__timestamp time");
+  assert.ok(bomTimestamp.querySelector(".fa-light.fa-clock"));
+  assert.equal(bomTimestamp.hasAttribute("datetime"), false);
   selectLocation(context, "014253");
-  assert.equal(context.window.document.querySelectorAll(".lc-card-group").length, 0);
-  assert.equal(context.window.document.querySelectorAll(".lc-attribution").length, 0);
+  assert.equal(context.window.document.querySelectorAll(".lc-card-group").length, 3);
+  assert.equal(context.window.document.querySelectorAll(".lc-attribution").length, 3);
+  assert.equal(context.window.document.querySelectorAll(".lc-card .fa-circle-exclamation").length, 3);
   assert.equal(context.requests.length, 4);
+});
+
+test("cards show an unavailable message when all local condition feeds have no data", async () => {
+  const context = await widget({
+    feed: "<observations></observations>",
+    air: () => Promise.resolve(response({})),
+    worker: () => Promise.resolve(response({})),
+  });
+  const cards = context.window.document.querySelectorAll(".lc-card");
+  assert.equal(cards.length, 3);
+  for (const card of cards) {
+    assert.match(card.querySelector(".lc-attribution").textContent, /Data not available\./);
+    assert.ok(card.querySelector(".lc-attribution .fa-light.fa-circle-exclamation"));
+    assert.equal(card.querySelector(".lc-attribution a"), null);
+  }
 });
 
 test("temperature remains available when only one bound is present", async () => {
@@ -270,8 +289,13 @@ test("temperature remains available when only one bound is present", async () =>
   assert.ok(temperature);
   assert.match(temperature.textContent, /32 °C/);
   assert.match(temperature.textContent, /Observed maximum –/);
-  assert.equal(groupFor(context, "Temperature").querySelector(".lc-attribution").textContent,
-    "Source: Bureau of Meteorology");
+  const temperatureGroup = groupFor(context, "Temperature");
+  assert.equal(temperatureGroup.querySelector(".lc-attribution").textContent, "Source: Bureau of Meteorology");
+  const temperatureCard = cardFor(context, "Temperature");
+  const timestampRow = temperatureCard.querySelector(".lc-card__timestamp");
+  assert.equal(timestampRow.previousElementSibling, temperatureCard.querySelector(".lc-card__title"));
+  assert.equal(timestampRow.querySelector("time").textContent, "Today");
+  assert.ok(timestampRow.querySelector(".fa-light.fa-clock"));
 });
 
 test("localhost fetches the matching EPA station and displays an index, not PM2.5", async () => {
@@ -282,9 +306,10 @@ test("localhost fetches the matching EPA station and displays an index, not PM2.
       airQuality: { category: "Fair", pm25: 999 } })),
   });
   assert.ok(context.requests.includes("/api/air-quality?id=2"));
-  const airCard = () => cardFor(context, "Air quality monitor");
+  const airCard = () => cardFor(context, "Air quality index");
   assert.match(airCard().textContent, /51 Index/);
-  assert.doesNotMatch(airCard().textContent, /PM2\.5|Fair|999/);
+  assert.equal(airCard().querySelector(".lc-air").textContent, "Good");
+  assert.doesNotMatch(airCard().textContent, /PM2\.5|999/);
   selectLocation(context, "014072");
   await settle();
   assert.ok(context.requests.includes("/api/air-quality?id=3"));
@@ -293,8 +318,8 @@ test("localhost fetches the matching EPA station and displays an index, not PM2.
   selectLocation(context, "014253");
   await settle();
   assert.equal(context.requests.length, count);
-  assert.equal(airCard(), null);
-  assert.equal(groupFor(context, "Air quality monitor"), null);
+  assert.match(airCard().textContent, /Data not available/);
+  assert.ok(airCard().querySelector(".fa-circle-exclamation"));
 });
 
 test("production requests the JSON Matrix asset and selects the station index", async () => {
@@ -306,30 +331,42 @@ test("production requests the JSON Matrix asset and selects the station index", 
     });
     assert.ok(context.requests.includes("./?a=1657186"));
     assert.equal(context.requests.some((url) => url.includes("1657178") || url.includes("1657186?id")), false);
-    assert.match(cardFor(context, "Air quality monitor").textContent,
+    assert.match(cardFor(context, "Air quality index").textContent,
       new RegExp(Number(value) + " Index"));
   }
 });
 
-test("air quality displays the station colour and description in both environments", async () => {
-  for (const local of [true, false]) {
-    for (const [id, category, colour] of [[1, "Good", "#42A93C"], [2, "Fair", "#EEC900"]]) {
-      const station = parseAirQualityStations(epaFixture)[id - 1];
-      const context = await widget({
-        url: local ? "http://localhost/" : "https://example.com/conditions",
-        saved: "epa-" + id,
-        air: () => Promise.resolve(response(local ? station : epaFixture)),
-      });
-      const card = cardFor(context, "Air quality monitor");
-      assert.equal(card.querySelector(".lc-air").textContent, category);
-      assert.equal(card.querySelector(".lc-air__dot").style.backgroundColor, colour);
-      assert.equal(card.querySelector(".lc-air__dot").getAttribute("aria-hidden"), "true");
-      assert.doesNotMatch(card.textContent, /Poor|999/);
-    }
+test("AQI chart uses the Australia bands and doubles the matching status", async () => {
+  const levels = [
+    { index: 0, range: "0–33", label: "Very good", colour: "#7ed5e6" },
+    { index: 34, range: "34–66", label: "Good", colour: "#c4e177" },
+    { index: 67, range: "67–99", label: "Fair", colour: "#f9ca3c" },
+    { index: 100, range: "100–149", label: "Poor", colour: "#ee892d" },
+    { index: 150, range: "150–200", label: "Very poor", colour: "#451c62" },
+    { index: 201, range: "200+", label: "Hazardous", colour: "#5c2415" },
+  ];
+  for (const [selectedIndex, selected] of levels.entries()) {
+    const context = await widget({
+      air: () => Promise.resolve(response({ index: selected.index, category: "Ignored", colour: "#000000" })),
+    });
+    const card = cardFor(context, "Air quality index");
+    const chart = card.querySelector(".lc-air-chart");
+    const segments = Array.from(chart.querySelectorAll(".lc-rating-chart__segment"));
+    assert.equal(card.querySelector(".lc-air").textContent, selected.label);
+    assert.ok(Array.from(card.children).indexOf(chart) <
+      Array.from(card.children).indexOf(card.querySelector(".lc-card__row")));
+    assert.deepEqual(segments.map((segment) => segment.style.backgroundColor), levels.map((level) => level.colour));
+    assert.deepEqual(segments.map((segment) => segment.style.flexGrow),
+      levels.map((_, index) => index === selectedIndex ? "2" : "1"));
+    assert.equal(chart.querySelector(".lc-rating-chart__marker").style.left,
+      (selectedIndex + 1) / 7 * 100 + "%");
+    assert.equal(chart.getAttribute("role"), "img");
+    assert.match(chart.getAttribute("aria-label"), new RegExp(selected.label));
+    levels.forEach((level) => assert.match(chart.getAttribute("aria-label"), new RegExp(level.range)));
   }
 });
 
-test("available AQI source includes the station and reading date/time in NT time", async () => {
+test("available AQI source marks the reading time relatively without the station", async () => {
   for (const local of [true, false]) {
     const station = parseAirQualityStations(epaFixture)[1];
     const context = await widget({
@@ -338,26 +375,37 @@ test("available AQI source includes the station and reading date/time in NT time
         ? { index: station.index, station: station.name, time: station.time }
         : epaFixture)),
     });
-    const source = groupFor(context, "Air quality monitor").querySelector(".lc-attribution");
-    assert.match(source.textContent, /Source: NTEPA, Winnellie, 08\/11\/2026, 21:00 ACST/);
+    const group = groupFor(context, "Air quality index");
+    const source = group.querySelector(".lc-attribution");
+    assert.equal(source.textContent, "Source: NTEPA");
+    assert.doesNotMatch(group.textContent, /Winnellie/);
     assert.equal(source.querySelector("a").href, "https://ntepa.nt.gov.au/");
-    assert.equal(source.querySelector("time").dateTime, station.time);
+    const card = cardFor(context, "Air quality index");
+    const timestampRow = card.querySelector(".lc-card__timestamp");
+    assert.equal(timestampRow.previousElementSibling, card.querySelector(".lc-card__title"));
+    const time = timestampRow.querySelector("time");
+    assert.match(time.textContent, /^\d+ days ago$/);
+    assert.equal(time.dateTime, station.time);
+    assert.ok(time.querySelector(".fa-light.fa-clock"));
   }
 });
 
-test("unavailable AQI omits its card and source; valid readings do not fabricate timestamps", async () => {
+test("unavailable AQI shows its card without fabricated readings; valid readings do not fabricate timestamps", async () => {
   for (const index of [null, 0]) {
     for (const time of [null, "invalid", "2026-11-08T11:30:00.000Z"]) {
       const context = await widget({ air: () => Promise.resolve(response({ index, station: "Winnellie", time })) });
-      const group = groupFor(context, "Air quality monitor");
+      const group = groupFor(context, "Air quality index");
       if (index === null) {
-        assert.equal(group, null);
-        assert.equal(cardFor(context, "Air quality monitor"), null);
+        assert.match(group.textContent, /Data not available/);
+        assert.ok(group.querySelector(".fa-circle-exclamation"));
+        assert.equal(group.querySelector(".lc-attribution").querySelector("a"), null);
         continue;
       }
       const source = group.querySelector(".lc-attribution");
-      assert.match(source.textContent, /Source: NTEPA, Winnellie/);
-      assert.equal(Boolean(source.querySelector("time")), index === 0 && time === "2026-11-08T11:30:00.000Z");
+      assert.match(source.textContent, /Source: NTEPA/);
+      assert.doesNotMatch(source.textContent, /Winnellie/);
+      assert.equal(Boolean(group.querySelector(".lc-card__timestamp time")),
+        index === 0 && time === "2026-11-08T11:30:00.000Z");
     }
   }
 });
@@ -371,10 +419,10 @@ test("missing descriptions and invalid colours do not hide the air-quality index
           ? { index: 51, colour: "url(invalid)", category }
           : { d: [{ serialCode: 2, IndexValue: 51, IndexColorStrHex: "url(invalid)", IndexColorDescription: category }] })),
       });
-      const card = cardFor(context, "Air quality monitor");
+      const card = cardFor(context, "Air quality index");
       assert.match(card.textContent, /51 Index/);
-      if (category) assert.equal(card.querySelector(".lc-air__dot").style.backgroundColor, "#999999");
-      else assert.equal(card.querySelector(".lc-air"), null);
+      assert.equal(card.querySelector(".lc-air").textContent, "Good");
+      assert.equal(card.querySelectorAll(".lc-air-chart .lc-rating-chart__segment").length, 6);
     }
   }
 });
@@ -387,8 +435,8 @@ test("air failures and invalid readings preserve fire danger and temperatures", 
         air: () => Promise.resolve(response(local ? { index: value } : { d: [{ serialCode: 2, IndexValue: value }] })),
         worker: () => Promise.resolve(response({ fireDanger: { label: "Moderate", level: 1 } })),
       });
-      assert.equal(cardFor(context, "Air quality monitor"), null);
-      assert.equal(groupFor(context, "Air quality monitor"), null);
+      assert.match(cardFor(context, "Air quality index").textContent, /Data not available/);
+      assert.ok(cardFor(context, "Air quality index").querySelector(".fa-circle-exclamation"));
       assert.ok(cardFor(context, "Bushfire danger rating"));
       assert.ok(cardFor(context, "Temperature"));
       assert.match(context.window.document.querySelector(".lc-cards").textContent, /Moderate/);
@@ -418,7 +466,7 @@ test("air quality loads independently while fire danger is pending or failed", a
   resolveWorker(response("", false));
   await settle();
   assert.match(cards.textContent, /0 Index/);
-  assert.equal(groupFor(context, "Bushfire danger rating"), null);
+  assert.match(groupFor(context, "Bushfire danger rating").textContent, /Data not available/);
   assert.equal(cards.querySelectorAll(".lc-skeleton-group").length, 0);
   assert.equal(cards.hasAttribute("aria-busy"), false);
   assert.equal(context.window.document.querySelector(".lc-status").textContent, "");
@@ -444,8 +492,7 @@ test("late EPA success or failure cannot overwrite a newer location", async () =
     selectLocation(context, "014253");
     resolveAir(response({ index: 999 }, !failed));
     await settle();
-    assert.equal(cardFor(context, "Air quality monitor"), null);
-    assert.equal(groupFor(context, "Air quality monitor"), null);
+    assert.match(groupFor(context, "Air quality index").textContent, /Data not available/);
     assert.equal(cards.hasAttribute("aria-busy"), false);
   }
 });
@@ -460,6 +507,9 @@ test("the checked-in BOM snapshot populates every station", async () => {
     Array.from(context.select.options, (option) => option.value).filter((key) => !key.startsWith("epa-")).sort(),
     stations.map((station) => station.getAttribute("bom-id")).sort(),
   );
+  const sourceTime = groupFor(context, "Temperature").querySelector(".lc-card__timestamp time");
+  assert.match(sourceTime.textContent, /^\d+ (?:min|hr|days?) ago$/);
+  assert.equal(sourceTime.dateTime, new Date(document.querySelector("amoc > issue-time-local").textContent).toISOString());
 });
 
 test("localhost adds all missing EPA locations and restores their selections", async () => {
@@ -475,10 +525,9 @@ test("localhost adds all missing EPA locations and restores their selections", a
     selectLocation(context, option.value);
     await settle();
     assert.ok(context.requests.includes(`/api/air-quality?id=${station.serialCode}`));
-    assert.match(cardFor(context, "Air quality monitor").textContent,
+    assert.match(cardFor(context, "Air quality index").textContent,
       new RegExp(station.IndexValue + " Index"));
-    assert.equal(cardFor(context, "Temperature"), null);
-    assert.equal(groupFor(context, "Temperature"), null);
+    assert.match(groupFor(context, "Temperature").textContent, /Data not available/);
   }
 });
 
@@ -495,7 +544,7 @@ test("EPA locations merge by name without duplicating or losing existing BOM dat
   selectLocation(context, "014272");
   await settle();
   assert.ok(context.requests.includes("/api/air-quality?id=1"));
-  assert.match(cardFor(context, "Air quality monitor").textContent, /0 Index/);
+  assert.match(cardFor(context, "Air quality index").textContent, /0 Index/);
   assert.match(cardFor(context, "Temperature").textContent, /36 °C/);
 });
 
@@ -516,10 +565,10 @@ test("catalog failures keep the original BOM locations usable", async () => {
 test("production adds and restores EPA-only locations from the cached JSON asset", async () => {
   const context = await widget({ url: "https://example.com/conditions", saved: "epa-4" });
   assert.equal(context.select.value, "epa-4");
-  assert.match(cardFor(context, "Air quality monitor").textContent, /90 Index/);
+  assert.match(cardFor(context, "Air quality index").textContent, /90 Index/);
   selectLocation(context, "epa-1");
   await settle();
-  assert.match(cardFor(context, "Air quality monitor").textContent, /0 Index/);
+  assert.match(cardFor(context, "Air quality index").textContent, /0 Index/);
   assert.equal(context.requests.filter((url) => url === "./?a=1657186").length, 3);
 });
 
@@ -540,26 +589,61 @@ test("production reads mapped fire ratings from the CMS integration directly", a
   const card = cardFor(context, "Bushfire danger rating");
   assert.match(card.textContent, /No Rating/);
   const warning = fireDangerFixture.warnings.find((item) => item.area_code === FIRE_AREA_CODES["alice-springs"]);
-  const issuedDate = new Intl.DateTimeFormat("en-AU", {
-    timeZone: "Australia/Darwin", day: "2-digit", month: "2-digit", year: "numeric",
-  }).format(new Date(warning.issuetime));
-  assert.match(card.textContent, new RegExp("Issue date: " + issuedDate));
+  const source = card.querySelector(".lc-attribution");
+  const sourceTime = card.querySelector(".lc-card__timestamp time");
+  const timestampRow = card.querySelector(".lc-card__timestamp");
+  assert.ok(sourceTime);
+  assert.equal(source.textContent, "Source: Bushfires NT");
+  assert.equal(timestampRow.previousElementSibling, card.querySelector(".lc-card__title"));
+  assert.doesNotMatch(source.textContent, /Issue date:/);
+  assert.match(sourceTime.textContent, /^\d+ (?:min|hr|days?) ago$/);
+  assert.equal(sourceTime.dateTime, new Date(warning.issuetime).toISOString());
+  assert.ok(sourceTime.querySelector(".fa-light.fa-clock"));
 });
 
-test("fire danger gauge has six units with the selected rating doubled", async () => {
+test("condition dates use Today without a time and relative min, hour, or day labels", async () => {
+  const currentTime = Date.now();
+  for (const [age, pattern] of [
+    [15 * 60 * 1000, /^\d+ min ago$/],
+    [2 * 60 * 60 * 1000 + 5 * 60 * 1000, /^2 hr ago$/],
+    [2 * 24 * 60 * 60 * 1000 + 5 * 60 * 1000, /^2 days ago$/],
+  ]) {
+    const issuedAt = new Date(currentTime - age).toISOString();
+    const context = await widget({
+      worker: () => Promise.resolve(response({ fireDanger: { label: "Moderate", level: 1, issuedAt } })),
+    });
+    const time = cardFor(context, "Bushfire danger rating").querySelector(".lc-card__timestamp time");
+    assert.match(time.textContent, pattern);
+    assert.ok(time.querySelector(".fa-light.fa-clock"));
+  }
+
+  const parts = new Intl.DateTimeFormat("en-AU", {
+    timeZone: "Australia/Darwin", year: "numeric", month: "2-digit", day: "2-digit",
+  }).formatToParts(new Date(currentTime));
+  const today = ["year", "month", "day"].map((key) => parts.find((part) => part.type === key).value).join("-");
+  const context = await widget({
+    worker: () => Promise.resolve(response({ fireDanger: { label: "Moderate", level: 1, issuedAt: today } })),
+  });
+  const time = cardFor(context, "Bushfire danger rating").querySelector(".lc-card__timestamp time");
+  assert.equal(time.textContent, "Today");
+  assert.ok(time.querySelector(".fa-light.fa-clock"));
+});
+
+test("fire danger chart doubles the selected rating", async () => {
   const labels = ["No Rating", "Moderate", "High", "Extreme", "Catastrophic"];
+  const colours = ["#999999", "#5fb830", "#f4d63a", "#f28100", "#a80a0a"];
   for (const [level, label] of labels.entries()) {
     const context = await widget({
       worker: () => Promise.resolve(response({ fireDanger: { label, level } })),
     });
     const card = cardFor(context, "Bushfire danger rating");
     const bar = card.querySelector(".lc-fire");
-    const segments = Array.from(bar.querySelectorAll(".lc-fire__seg"));
+    const segments = Array.from(bar.querySelectorAll(".lc-rating-chart__segment"));
     assert.equal(segments.length, 5);
-    assert.equal(segments[0].style.background, "#999999");
     assert.deepEqual(segments.map((segment) => segment.style.flexGrow),
       labels.map((_, index) => index === level ? "2" : "1"));
-    assert.equal(bar.querySelector(".lc-fire__marker").style.left, (level + 1) / 6 * 100 + "%");
+    assert.deepEqual(segments.map((segment) => segment.style.backgroundColor), colours);
+    assert.equal(bar.querySelector(".lc-rating-chart__marker").style.left, (level + 1) / 6 * 100 + "%");
     assert.equal(bar.getAttribute("role"), "img");
     assert.equal(bar.getAttribute("aria-label"), "Fire danger rating: " + label);
   }
@@ -644,12 +728,12 @@ test("BOM failures still populate EPA locations and display their readings", asy
       assert.equal(context.select.options.length, 4);
       assert.equal(context.select.value, "epa-2");
       assert.equal(context.window.document.querySelector(".lc-use-location").disabled, true);
-      const airCard = cardFor(context, "Air quality monitor");
+      const airCard = cardFor(context, "Air quality index");
       assert.match(airCard.textContent, /51 Index/);
-      assert.equal(airCard.querySelector(".lc-air").textContent, "Fair");
-      assert.equal(cardFor(context, "Temperature"), null);
-      assert.equal(groupFor(context, "Temperature"), null);
-      assert.match(groupFor(context, "Air quality monitor").querySelector(".lc-attribution").textContent, /Winnellie/);
+      assert.equal(airCard.querySelector(".lc-air").textContent, "Good");
+      assert.match(groupFor(context, "Temperature").textContent, /Data not available/);
+      assert.doesNotMatch(groupFor(context, "Air quality index").querySelector(".lc-attribution").textContent,
+        /Winnellie/);
     }
   }
 });
@@ -685,7 +769,7 @@ test("catalog timeouts preserve the other feed and ignore late results", async (
     assert.equal(context.select.disabled, false);
     assert.equal(context.select.options.length, stalled === "observations" ? 4 : 6);
     if (stalled === "observations") {
-      assert.match(cardFor(context, "Air quality monitor").textContent, /51 Index/);
+      assert.match(cardFor(context, "Air quality index").textContent, /51 Index/);
     } else {
       assert.match(cardFor(context, "Temperature").textContent, /36 °C/);
     }
@@ -766,7 +850,7 @@ test("either catalog populates immediately and late arrivals preserve user selec
       assert.equal(context.window.localStorage.getItem("securent.localConditions.location"), selected);
       assert.equal(context.window.document.querySelector(".lc-use-location").disabled, false);
       if (delayed === "observations") {
-        assert.match(cardFor(context, "Air quality monitor").textContent, /90 Index/);
+        assert.match(cardFor(context, "Air quality index").textContent, /90 Index/);
       } else {
         assert.match(cardFor(context, "Temperature").textContent, /36 °C/);
       }
@@ -809,7 +893,7 @@ test("late BOM matches enrich the selected EPA location without losing its readi
   assert.equal(context.select.value, "014015");
   assert.equal(context.select.querySelector('[value="epa-2"]'), null);
   assert.equal(context.requests.length, requests);
-  assert.match(cardFor(context, "Air quality monitor").textContent, /51 Index/);
+  assert.match(cardFor(context, "Air quality index").textContent, /51 Index/);
   assert.match(cardFor(context, "Temperature").textContent, /36 °C/);
   assert.match(cardFor(context, "Bushfire danger rating").textContent, /Moderate/);
 });

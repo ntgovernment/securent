@@ -40,6 +40,14 @@
   var locations = [];
 
   var FIRE_COLOURS = ["#999999", "#5fb830", "#f4d63a", "#f28100", "#a80a0a"];
+  var AQI_LEVELS = [
+    { min: 0, max: 33, range: "0–33", label: "Very good", colour: "#7ed5e6" },
+    { min: 34, max: 66, range: "34–66", label: "Good", colour: "#c4e177" },
+    { min: 67, max: 99, range: "67–99", label: "Fair", colour: "#f9ca3c" },
+    { min: 100, max: 149, range: "100–149", label: "Poor", colour: "#ee892d" },
+    { min: 150, max: 200, range: "150–200", label: "Very poor", colour: "#451c62" },
+    { min: 201, max: Infinity, range: "200+", label: "Hazardous", colour: "#5c2415" },
+  ];
 
   var select = root.querySelector(".lc-select");
   var useBtn = root.querySelector(".lc-use-location");
@@ -64,6 +72,50 @@
     return node;
   }
 
+  function darwinDay(date) {
+    var parts = new Intl.DateTimeFormat("en-AU", {
+      timeZone: "Australia/Darwin", year: "numeric", month: "2-digit", day: "2-digit",
+    }).formatToParts(date);
+    var values = {};
+    parts.forEach(function (part) {
+      if (part.type !== "literal") values[part.type] = Number(part.value);
+    });
+    return Date.UTC(values.year, values.month - 1, values.day);
+  }
+
+  function relativeTimeText(date, value) {
+    if (!/(?:T|\s)\d{2}:\d{2}/.test(value)) {
+      var days = Math.floor((darwinDay(new Date()) - darwinDay(date)) / 86400000);
+      if (days <= 0) return "Today";
+      return days + (days === 1 ? " day ago" : " days ago");
+    }
+
+    var minutes = Math.floor((Date.now() - date.getTime()) / 60000);
+    if (minutes < 1) return "Today";
+    if (minutes < 60) return minutes + " min ago";
+    var hours = Math.floor(minutes / 60);
+    if (hours < 24) return hours + " hr ago";
+    var elapsedDays = Math.floor(hours / 24);
+    return elapsedDays + (elapsedDays === 1 ? " day ago" : " days ago");
+  }
+
+  function clockTimeElement(text, date) {
+    var time = el("time", "lc-relative-time");
+    var icon = el("i", "fa-light fa-clock");
+    icon.setAttribute("aria-hidden", "true");
+    time.appendChild(icon);
+    time.appendChild(document.createTextNode(text));
+    if (date) time.dateTime = date.toISOString();
+    return time;
+  }
+
+  function relativeTimeElement(value) {
+    if (typeof value !== "string") return null;
+    var date = new Date(value);
+    if (!Number.isFinite(date.getTime())) return null;
+    return clockTimeElement(relativeTimeText(date, value), date);
+  }
+
   function card(title, iconClass) {
     var c = el("div", "lc-card");
     c.appendChild(el("h3", "lc-card__title", title));
@@ -83,59 +135,56 @@
     placeholder.appendChild(el("span", "lc-skeleton-block lc-skeleton-block--meta"));
     var source = el("p", "lc-attribution lc-skeleton-source");
     source.appendChild(el("span", "lc-skeleton-block lc-skeleton-block--source"));
+    placeholder.appendChild(source);
     group.appendChild(placeholder);
-    group.appendChild(source);
     return group;
+  }
+
+  function ratingChart(className, label, levels, selectedIndex) {
+    var chart = el("div", "lc-rating-chart " + className);
+    chart.setAttribute("role", "img");
+    chart.setAttribute("aria-label", label);
+    levels.forEach(function (level, index) {
+      var segment = el("span", "lc-rating-chart__segment");
+      segment.style.backgroundColor = level.colour;
+      segment.style.flexGrow = index === selectedIndex ? "2" : "1";
+      chart.appendChild(segment);
+    });
+    var marker = el("span", "lc-rating-chart__marker");
+    marker.setAttribute("aria-hidden", "true");
+    marker.style.left = (selectedIndex + 1) / (levels.length + 1) * 100 + "%";
+    chart.appendChild(marker);
+    return chart;
   }
 
   function fireCard(data) {
     var c = card("Bushfire danger rating", "fa-fire-flame-curved");
     if (!data) return null;
 
-    var bar = el("div", "lc-fire");
-    bar.setAttribute("role", "img");
-    bar.setAttribute("aria-label", "Fire danger rating: " + data.label);
-    FIRE_COLOURS.forEach(function (colour, index) {
-      var seg = el("span", "lc-fire__seg");
-      seg.style.background = colour;
-      seg.style.flexGrow = index === data.level ? "2" : "1";
-      bar.appendChild(seg);
+    var fireLevelsForChart = fireLevels.map(function (label, index) {
+      return { label: label, colour: FIRE_COLOURS[index] };
     });
-    var marker = el("span", "lc-fire__marker");
-    marker.setAttribute("aria-hidden", "true");
-    marker.style.left = (data.level + 1) / 6 * 100 + "%";
-    bar.appendChild(marker);
-    c.appendChild(bar);
+    c.appendChild(ratingChart("lc-fire", "Fire danger rating: " + data.label, fireLevelsForChart, data.level));
     c.appendChild(el("p", "lc-card__label", data.label));
-    if (typeof data.issuedAt === "string") {
-      var issueDate = new Date(data.issuedAt);
-      if (Number.isFinite(issueDate.getTime())) {
-        c.appendChild(el("p", "lc-card__issue-date", "Issue date: " + new Intl.DateTimeFormat("en-AU", {
-          timeZone: "Australia/Darwin", day: "2-digit", month: "2-digit", year: "numeric",
-        }).format(issueDate)));
-      }
-    }
     return c;
   }
 
   function airCard(data) {
-    var c = card("Air quality monitor", "fa-fan");
+    var c = card("Air quality index", "fa-fan");
     if (!data || !Number.isFinite(data.index)) return null;
 
+    var level = AQI_LEVELS.find(function (item) {
+      return data.index >= item.min && data.index <= item.max;
+    });
+    if (!level) return null;
     var row = el("div", "lc-card__row");
     var value = el("span", "lc-card__value", String(data.index));
     value.appendChild(el("span", "lc-card__unit", " Index"));
     row.appendChild(value);
-    if (typeof data.category === "string" && data.category.trim()) {
-      var badge = el("span", "lc-air");
-      var dot = el("span", "lc-air__dot");
-      dot.setAttribute("aria-hidden", "true");
-      dot.style.backgroundColor = typeof data.colour === "string" && /^#[0-9a-f]{6}$/i.test(data.colour)
-        ? data.colour : "#999999";
-      badge.appendChild(dot);
-      badge.appendChild(document.createTextNode(data.category.trim()));
-      row.appendChild(badge);
-    }
+    row.appendChild(el("span", "lc-air", level.label));
+    var chartLabel = "Australia AQI: current index " + data.index + ", " + level.label + ". "
+      + AQI_LEVELS.map(function (item) { return item.label + " " + item.range; }).join("; ");
+    c.appendChild(ratingChart("lc-air-chart", chartLabel, AQI_LEVELS, AQI_LEVELS.indexOf(level)));
     c.appendChild(row);
     return c;
   }
@@ -162,7 +211,7 @@
     return c;
   }
 
-  function cardWithSource(cardNode, name, url, reading) {
+  function cardWithSource(cardNode, name, url, reading, showTodayIfMissing) {
     var group = el("div", "lc-card-group");
     var source = el("p", "lc-attribution");
     source.appendChild(document.createTextNode("Source: "));
@@ -173,23 +222,30 @@
     } else {
       source.appendChild(document.createTextNode(name));
     }
-    if (reading && Number.isFinite(reading.index)) {
-      if (typeof reading.station === "string" && reading.station.trim()) {
-        source.appendChild(document.createTextNode(", " + reading.station.trim()));
-      }
-      var date = typeof reading.time === "string" ? new Date(reading.time) : null;
-      if (date && Number.isFinite(date.getTime())) {
-        var time = el("time", null, new Intl.DateTimeFormat("en-AU", {
-          timeZone: "Australia/Darwin", day: "2-digit", month: "2-digit", year: "numeric",
-          hour: "2-digit", minute: "2-digit", hour12: false, timeZoneName: "short",
-        }).format(date));
-        time.dateTime = date.toISOString();
-        source.appendChild(document.createTextNode(", "));
-        source.appendChild(time);
-      }
+    var timestamp = reading && (reading.time || reading.issuedAt);
+    var time = timestamp && relativeTimeElement(timestamp);
+    if (!time && showTodayIfMissing) time = clockTimeElement("Today");
+    if (time) {
+      var timestampRow = el("p", "lc-card__timestamp");
+      timestampRow.appendChild(time);
+      var title = cardNode.querySelector(".lc-card__title");
+      cardNode.insertBefore(timestampRow, title.nextSibling);
     }
+    cardNode.appendChild(source);
     group.appendChild(cardNode);
-    group.appendChild(source);
+    return group;
+  }
+
+  function cardWithoutData(title, iconClass) {
+    var group = el("div", "lc-card-group");
+    var cardNode = card(title, iconClass);
+    var source = el("p", "lc-attribution lc-attribution--unavailable");
+    var icon = el("i", "fa-light fa-circle-exclamation");
+    icon.setAttribute("aria-hidden", "true");
+    source.appendChild(icon);
+    source.appendChild(document.createTextNode(" Data not available."));
+    cardNode.appendChild(source);
+    group.appendChild(cardNode);
     return group;
   }
 
@@ -199,12 +255,16 @@
     var fire = fireCard(data.fireDanger);
     var air = airCard(data.airQuality);
     var temperature = tempCard(data.temperature);
-    if (fire) groups.push(cardWithSource(fire, "Bushfires NT", "https://www.pfes.nt.gov.au/incidentmap"));
+    if (fire) groups.push(cardWithSource(fire, "Bushfires NT",
+      "https://www.pfes.nt.gov.au/incidentmap", data.fireDanger));
     else if (waiting.indexOf("fireDanger") >= 0) groups.push(skeletonGroup());
+    else groups.push(cardWithoutData("Bushfire danger rating", "fa-fire-flame-curved"));
     if (air) groups.push(cardWithSource(air, "NTEPA", "https://ntepa.nt.gov.au/", data.airQuality));
     else if (waiting.indexOf("airQuality") >= 0) groups.push(skeletonGroup());
+    else groups.push(cardWithoutData("Air quality index", "fa-fan"));
     if (temperature) groups.push(cardWithSource(temperature, "Bureau of Meteorology",
-      "https://www.bom.gov.au/location/australia/northern-territory#observations"));
+      "https://www.bom.gov.au/location/australia/northern-territory#observations", data.temperature, true));
+    else if (waiting.indexOf("temperature") < 0) groups.push(cardWithoutData("Temperature", "fa-temperature-half"));
     cards.replaceChildren.apply(cards, groups);
     if (waiting.length) cards.setAttribute("aria-busy", "true");
     else cards.removeAttribute("aria-busy");
@@ -366,6 +426,8 @@
     if (xml.querySelector("parsererror") || xml.documentElement.nodeName !== "product") {
       throw new Error("Invalid BOM XML");
     }
+    var issueTime = xml.querySelector("amoc > issue-time-local") || xml.querySelector("amoc > issue-time-utc");
+    var observationTime = issueTime && issueTime.textContent.trim();
     return Array.from(xml.querySelectorAll("observations > station")).map(function (station) {
       var name = station.getAttribute("description");
       return {
@@ -378,6 +440,7 @@
         temperature: {
           min: temperature(station, "minimum_air_temperature"),
           max: temperature(station, "maximum_air_temperature"),
+          time: observationTime || null,
         },
       };
     }).filter(function (location) {

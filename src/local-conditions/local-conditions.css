@@ -131,16 +131,22 @@ main.ntg-body--homepage #current-conditions > #local-conditions > .container-xl 
   color: var(--clr-text-default);
 }
 
+.lc-card__timestamp {
+  margin: 0.25rem 3.5rem 0.5rem 0;
+  color: var(--clr-text-default);
+  font-size: 0.875rem;
+}
+
 .lc-card__none {
   margin: auto 0 0;
   color: var(--clr-text-default);
 }
 
-.lc-card__issue-date {
-  margin: 0.25rem 0 0;
-  text-align: right;
-  font-size: 0.875rem;
-  color: var(--clr-text-default);
+.lc-relative-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
 }
 
 .lc-skeleton-group .lc-card {
@@ -174,51 +180,48 @@ main.ntg-body--homepage #current-conditions > #local-conditions > .container-xl 
   }
 }
 
-.lc-fire {
+.lc-rating-chart {
   position: relative;
   display: flex;
-  width: 70%;
+  width: 100%;
   height: 1.75rem;
   margin-top: auto;
   border-radius: 1rem;
   overflow: visible;
 }
 
-.lc-fire__seg {
+.lc-rating-chart__segment {
   flex: 1;
 }
 
-.lc-fire__seg:first-child {
+.lc-rating-chart__segment:first-child {
   border-radius: 1rem 0 0 1rem;
 }
 
-.lc-fire__seg:nth-of-type(5) {
+.lc-rating-chart__segment:nth-last-child(2) {
   border-radius: 0 1rem 1rem 0;
 }
 
-.lc-fire__marker {
+.lc-rating-chart__marker {
   position: absolute;
   top: -0.6rem;
   width: 0;
   height: 0;
   margin-left: -0.6rem;
-  border-left: 0.6rem solid transparent;
   border-right: 0.6rem solid transparent;
   border-top: 1.1rem solid #1c1c24;
+  border-left: 0.6rem solid transparent;
+}
+
+.lc-air-chart {
+  margin-top: 0.75rem;
 }
 
 .lc-air {
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
   font-size: 1.25rem;
   font-weight: 500;
-}
-
-.lc-air__dot {
-  width: 1.75rem;
-  height: 1.75rem;
-  border-radius: 50%;
 }
 
 .lc-temp-row {
@@ -245,8 +248,18 @@ main.ntg-body--homepage #current-conditions > #local-conditions > .container-xl 
 }
 
 .lc-attribution {
-  margin: 0.5rem 0 0;
+  margin: auto 0 0;
+  padding-top: 0.5rem;
   font-size: 0.875rem;
+  color: #8b8b96;
+}
+
+.lc-attribution--unavailable i {
+  margin-right: 0.25rem;
+}
+
+.lc-attribution a {
+  color: inherit;
 }
 
 @media (max-width: 991.98px) {
@@ -291,7 +304,4 @@ main.ntg-body--homepage #current-conditions > #local-conditions > .container-xl 
     background: #f4f4f6;
   }
 
-  .lc-fire {
-    width: 100%;
-  }
 }
