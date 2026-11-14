@@ -1,3 +1,5 @@
+@import "../css/tokens.css";
+
 .ntg-social-share {
   position: relative;
   container-type: inline-size;
@@ -7,7 +9,7 @@
 .ntg-social-share > p {
   margin: 0 !important;
   padding: 16px 24px;
-  color: var(--clr-text-default, #1f1e27);
+  color: var(--clr-text-default);
   font-family: Lato, sans-serif;
   font-size: 18px;
   font-weight: 700;
@@ -43,7 +45,7 @@
   max-height: 32px !important;
   padding: 4px;
   border-radius: 0;
-  color: var(--clr-text-default, #1f1e27) !important;
+  color: var(--clr-text-default) !important;
   font-size: 20px;
   text-decoration: none;
   background-color: transparent !important;
@@ -52,18 +54,18 @@
 .ntg-social-share__link i,
 .ntg-social-share__link i::before,
 .ntg-social-share__link svg {
-  color: var(--clr-text-default, #1f1e27) !important;
+  color: var(--clr-text-default) !important;
   background-color: transparent !important;
 }
 
 .ntg-social-share__link:hover,
 .ntg-social-share__link:focus-visible {
-  color: var(--clr-text-default, #1f1e27);
+  color: var(--clr-text-default);
   background-color: var(--clr-bg-shade-alt, #e7e7ea) !important;
 }
 
 .ntg-social-share__link:focus-visible {
-  outline: 2px solid var(--clr-text-default, #1f1e27);
+  outline: 2px solid var(--clr-text-default);
   outline-offset: 2px;
 }
 

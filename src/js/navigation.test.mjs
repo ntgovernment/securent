@@ -102,14 +102,25 @@ test("compact search icon reveals the banner field and Escape closes it", async 
       const document = window.document;
       const toggle = document.querySelector(".mobile-search-toggle");
       const input = document.querySelector(".mobile-banner input[name='query']");
+      const banner = document.querySelector(".mobile-banner.banner-search");
+      const nav = document.querySelector("nav.nav-masthead");
       assert.ok(toggle);
       assert.equal(document.querySelector("header.ntg-header").classList.contains("search-toggle-enhanced"), true);
       assert.equal(toggle.getAttribute("aria-expanded"), "false");
+      if (width === 900) {
+        toggle.getBoundingClientRect = () => ({ top: 14, right: 821, height: 44 });
+      }
+      const navClass = nav.className;
       toggle.click();
       assert.equal(document.body.classList.contains("mobile-search-open"), true);
       assert.equal(toggle.getAttribute("aria-expanded"), "true");
       assert.equal(toggle.getAttribute("aria-label"), "Close search");
       assert.equal(document.activeElement, input);
+      assert.equal(nav.className, navClass);
+      if (width === 900) {
+        assert.equal(banner.style.getPropertyValue("--search-overlay-top"), "12px");
+        assert.equal(banner.style.getPropertyValue("--search-overlay-right"), "79px");
+      }
       document.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Escape" }));
       assert.equal(document.body.classList.contains("mobile-search-open"), false);
       assert.equal(toggle.getAttribute("aria-expanded"), "false");
@@ -128,6 +139,7 @@ test("search toggle initializes in captures whose navigation is already enhanced
     toggle.className = "mobile-search-toggle";
     toggle.setAttribute("aria-expanded", "false");
     toggle.setAttribute("aria-label", "Open search");
+    toggle.dataset.searchToggleReady = "true";
     nav.dataset.navigationReady = "true";
     header.querySelector(".header-tools").append(toggle);
 
@@ -196,12 +208,21 @@ test("tablet search breakpoint uses the icon and the banner shares desktop field
       ),
     );
     assert.ok(tabletRule);
+    const tabletRules = [...tabletRule.cssRules];
     assert.equal(
-      [...tabletRule.cssRules]
+      tabletRules
         .find((rule) => rule.selectorText === "header.ntg-header.search-toggle-enhanced .mobile-search-toggle")
         .style.display,
       "inline-flex",
     );
+    const banner = tabletRules.find((rule) => rule.selectorText === ".mobile-banner.banner-search");
+    const expandedBanner = tabletRules.find((rule) =>
+      rule.selectorText === "body.mobile-search-open .mobile-banner.banner-search",
+    );
+    assert.equal(banner.style.position, "fixed");
+    assert.equal(banner.style.width, "296px");
+    assert.equal(banner.style.clipPath, "inset(0 0 0 100%)");
+    assert.equal(expandedBanner.style.clipPath, "inset(0)");
 
     const headerSheet = new window.CSSStyleSheet();
     headerSheet.replaceSync(headerCss);

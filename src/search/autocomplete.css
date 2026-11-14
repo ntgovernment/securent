@@ -11,7 +11,7 @@
   overflow-y: auto;
   border: 1px solid #d3d3d7;
   background: #fff;
-  color: #1f1e27;
+  color: var(--clr-text-default);
   list-style: none !important;
   list-style-image: none !important;
   padding-inline-start: 0 !important;

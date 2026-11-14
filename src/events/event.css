@@ -1,3 +1,5 @@
+@import "../css/tokens.css";
+
 .event-page__header-accent {
   height: 24px;
   background-color: var(--clr-status-neutral);
@@ -34,7 +36,7 @@ main[data-event-page] .ntg-on-this-page .nav-link {
 }
 
 main[data-event-page] .ntg-on-this-page .nav-link.active {
-  color: var(--clr-text-default, #1f1e27);
+  color: var(--clr-text-default);
 }
 
 main[data-event-page] .ntg-on-this-page .nav-link.active::before {

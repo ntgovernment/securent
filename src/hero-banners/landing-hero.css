@@ -1,6 +1,6 @@
 .hero-banner.intro-section.bg-ntg-background-alt {
   background: var(--clr-bg-shade-alt, #e7e7ea) !important;
-  color: var(--clr-text-default, #1f1e27);
+  color: var(--clr-text-default);
   font-family: Lato, sans-serif;
 }
 
@@ -29,7 +29,7 @@
   width: 100%;
   margin: 0 !important;
   padding: 0 !important;
-  color: var(--clr-text-default, #1f1e27) !important;
+  color: var(--clr-text-default) !important;
   font-size: 40px;
   font-weight: 700;
   letter-spacing: 0;
@@ -42,7 +42,7 @@
   max-width: none;
   margin: 0 !important;
   padding: 0 !important;
-  color: var(--clr-text-default, #1f1e27) !important;
+  color: var(--clr-text-default) !important;
   font-size: 18px;
   line-height: 20px;
   overflow-wrap: anywhere;
@@ -85,7 +85,7 @@
 }
 
 .hero-banner.intro-section.bg-ntg-background-alt .intro-text-link:focus-visible {
-  outline: 2px solid #1f1e27;
+  outline: 2px solid var(--clr-text-default);
   outline-offset: 3px;
 }
 

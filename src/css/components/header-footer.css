@@ -140,7 +140,7 @@ header.ntg-header .header-tools .ntg-header-search .form-control,
   border: 0;
   border-radius: 0;
   background-color: #e9e9eb;
-  color: #343741;
+  color: var(--clr-text-default);
   opacity: 1;
   transition: none;
 }

@@ -31,7 +31,7 @@ section[class*="ntg-featured-content-small--"] {
   padding: 0;
   border-radius: 0 !important;
   background: transparent;
-  color: #333640;
+  color: var(--clr-text-default);
 }
 
 .ntg-featured-content-small__text .wysiwyg_asset_id {
@@ -40,7 +40,7 @@ section[class*="ntg-featured-content-small--"] {
 
 .ntg-featured-content-small__text .wysiwyg_asset_id h2 {
   margin: 0 0 24px;
-  color: #32353f;
+  color: var(--clr-text-default);
   font-size: 32px;
   font-weight: 700;
   line-height: 36px;
@@ -48,7 +48,7 @@ section[class*="ntg-featured-content-small--"] {
 
 .ntg-featured-content-small__text .wysiwyg_asset_id p {
   margin: 0 0 16px;
-  color: #333640;
+  color: var(--clr-text-default);
   font-size: 16px;
   font-weight: 400;
   line-height: 24px;

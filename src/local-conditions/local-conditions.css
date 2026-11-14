@@ -111,7 +111,7 @@ main.ntg-body--homepage #current-conditions > #local-conditions > .container-xl 
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
-  color: #4a4a57;
+  color: var(--clr-text-default);
 }
 
 .lc-card__value {
@@ -128,19 +128,19 @@ main.ntg-body--homepage #current-conditions > #local-conditions > .container-xl 
   text-align: right;
   font-size: 1.25rem;
   font-weight: 700;
-  color: #4a4a57;
+  color: var(--clr-text-default);
 }
 
 .lc-card__none {
   margin: auto 0 0;
-  color: #4a4a57;
+  color: var(--clr-text-default);
 }
 
 .lc-card__issue-date {
   margin: 0.25rem 0 0;
   text-align: right;
   font-size: 0.875rem;
-  color: #4a4a57;
+  color: var(--clr-text-default);
 }
 
 .lc-skeleton-group .lc-card {

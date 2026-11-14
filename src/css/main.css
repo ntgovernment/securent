@@ -7,6 +7,7 @@
      2. Add an @import line below, in the desired cascade order
    ========================================================================== */
 
+@import "./tokens.css";
 @import "./components/mainmenu-dropdown.css";
 @import "./components/header-footer.css";
 @import "./components/feedback.css";

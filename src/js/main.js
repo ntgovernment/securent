@@ -40,9 +40,21 @@ guardQuickExit(window);
     searchButton.innerHTML = '<span class="fa-regular fa-magnifying-glass" aria-hidden="true"></span>';
     headerTools.append(searchButton);
   }
-  if (!searchButton.dataset.searchToggleReady) {
-    searchButton.dataset.searchToggleReady = "true";
-    header.classList.add("search-toggle-enhanced");
+  const searchBanner = document.querySelector(".mobile-banner.banner-search");
+  const searchToggleBound = Symbol.for("securent.searchToggleBound");
+  header.classList.add("search-toggle-enhanced");
+  function positionSearchBanner() {
+    if (!searchBanner || !document.body.classList.contains("mobile-search-open")
+      || window.innerWidth < 768 || window.innerWidth >= 992) return;
+    const bounds = searchButton.getBoundingClientRect();
+    const height = bounds.height || 44;
+    const top = bounds.height ? bounds.top + (height - 48) / 2 : 12;
+    const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
+    searchBanner.style.setProperty("--search-overlay-top", `${top}px`);
+    searchBanner.style.setProperty("--search-overlay-right", `${Math.max(0, viewportWidth - bounds.right)}px`);
+  }
+  if (!searchButton[searchToggleBound]) {
+    searchButton[searchToggleBound] = true;
     const isOpen = document.body.classList.contains("mobile-search-open");
     searchButton.setAttribute("aria-expanded", isOpen ? "true" : "false");
     searchButton.setAttribute("aria-label", isOpen ? "Close search" : "Open search");
@@ -54,8 +66,9 @@ guardQuickExit(window);
       const isSearchOpen = document.body.classList.toggle("mobile-search-open");
       searchButton.setAttribute("aria-expanded", isSearchOpen ? "true" : "false");
       searchButton.setAttribute("aria-label", isSearchOpen ? "Close search" : "Open search");
+      positionSearchBanner();
       if (isSearchOpen) {
-        const input = document.querySelector(".mobile-banner .ntg-header-search input[name='query']");
+        const input = searchBanner && searchBanner.querySelector(".ntg-header-search input[name='query']");
         if (input) input.focus();
       }
     });
@@ -66,7 +79,10 @@ guardQuickExit(window);
       searchButton.setAttribute("aria-label", "Open search");
       searchButton.focus();
     });
+    window.addEventListener("resize", positionSearchBanner);
+    window.addEventListener("scroll", positionSearchBanner, { passive: true });
   }
+  positionSearchBanner();
 
   if (nav.dataset.navigationReady) return;
   const navbar = header.querySelector(".navbar");

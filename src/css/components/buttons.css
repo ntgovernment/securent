@@ -17,12 +17,12 @@
 /* ---- Secondary (outline) button ---- */
 .btn.ntg-btn--secondary {
   background: #fff;
-  color: #343741;
+  color: var(--clr-text-default);
   box-shadow: 0 0 0 1.5px #343741 inset;
 }
 
 .btn.ntg-btn--secondary:active {
-  color: #343741;
+  color: var(--clr-text-default);
 }
 
 /* ---- Secondary hover (existing) ---- */

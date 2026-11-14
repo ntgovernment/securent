@@ -1,3 +1,5 @@
+@import "../tokens.css";
+
 .warning-accordion {
   --warning-accordion-accent: var(--clr-status-advice, #fbe032);
   margin-top: 24px;
@@ -5,7 +7,7 @@
   border: 1px solid #d3d3d7;
   border-left: 5px solid var(--warning-accordion-accent);
   background: #fff;
-  color: #1f1e27;
+  color: var(--clr-text-default);
   font-family: "Lato", sans-serif;
   line-height: 1.5;
   transition: box-shadow 150ms ease;
@@ -130,7 +132,7 @@
   padding: 30px;
   border-top: 1px solid #d3d3d7;
   background: #f5f5f7;
-  color: #1f1e27;
+  color: var(--clr-text-default);
   font-size: 16px;
 }
 

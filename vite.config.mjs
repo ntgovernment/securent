@@ -19,6 +19,17 @@ const sourceThemeOnly = {
   },
 };
 
+const resolveNtgLogoPath = {
+  name: "resolve-ntg-logo-path",
+  enforce: "pre",
+  transform(code, id) {
+    const stylesheetId = id.split("?")[0].replaceAll("\\", "/");
+    const assetPath = "mysource_files/ntg-primary-mono.svg";
+    if (!stylesheetId.endsWith("/ntgbase.min.css") || !code.includes(assetPath)) return null;
+    return code.replaceAll(assetPath, `/${assetPath}`);
+  },
+};
+
 const excludeLocalCapturePhotos = {
   name: "exclude-local-capture-photos",
   apply: "build",
@@ -166,6 +177,7 @@ export default defineConfig({
   root: ".",
   plugins: [
     sourceThemeOnly,
+    resolveNtgLogoPath,
     excludeLocalCapturePhotos,
     pagePreview,
     localConditionsMock,
