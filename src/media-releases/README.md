@@ -13,7 +13,7 @@ JavaScript together with their shared dependencies.
 
 ## Latest Three Warnings
 
-The homepage's latest-three cards request the merged `campaign-monitor`
+The homepage's latest-three featured cards request the merged `campaign-monitor`
 endpoint and apply the existing operational-warning filtering,
 deduplication, and newest-first ordering to its JSON array. It displays up to
 three cards and does not require the full listing's search, filters, or

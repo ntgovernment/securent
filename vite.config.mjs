@@ -11,9 +11,18 @@ import { latestMediaReleaseEndpoint, mediaReleaseSources } from "./src/media-rel
 const sourceThemeOnly = {
   name: "source-theme-only",
   apply: "build",
+  transformIndexHtml: {
+    order: "pre",
+    handler(html) {
+      return html.replace('href="./dist/theme.css"', 'href="/theme.css"');
+    },
+  },
   load(id) {
-    const stylesheet = fileURLToPath(new URL("./dist/theme.css", import.meta.url));
-    if (id.split("?")[0] === stylesheet.replaceAll("\\", "/")) {
+    const stylesheet = fileURLToPath(new URL("./dist/theme.css", import.meta.url)).replaceAll("\\", "/");
+    const moduleId = decodeURI(id.split("?")[0])
+      .replaceAll("\\", "/")
+      .replace(/^\/([A-Za-z]:\/)/, "$1");
+    if (moduleId.toLowerCase() === stylesheet.toLowerCase()) {
       return "";
     }
   },
@@ -214,8 +223,7 @@ export default defineConfig({
             ? "[name].js"
             : "SecureNT_files/[name].js",
         chunkFileNames: "SecureNT_files/[name].js",
-        // CSS goes to dist/ root for easy git file bridge referencing;
-        // other assets keep their original subfolder.
+        // Feature CSS stays in dist/ for the git file bridge; capture-only assets stay under SecureNT_files/.
         assetFileNames: (assetInfo) => {
           if (assetInfo.name === "print.css") {
             return "[name][extname]";
@@ -244,7 +252,7 @@ export default defineConfig({
           if (assetInfo.name === "media-releases.css") {
             return "media-releases.css";
           }
-          if (assetInfo.name && assetInfo.name.endsWith(".css")) {
+          if (assetInfo.name === "theme-styles.css") {
             return "theme.css";
           }
           return "SecureNT_files/[name][extname]";

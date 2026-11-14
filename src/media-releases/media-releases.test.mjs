@@ -243,7 +243,7 @@ test("renders declaration-only cards with their accent colors and checkbox style
     assert.match(css, /\.media-releases__item--with-icon \.media-releases__link\{grid-template-columns:79px minmax\(0,1fr\)\}/);
     const checkboxBoxStyle = css.match(/\.media-releases__filter input:before\{([^}]*)\}/)?.[1];
     assert.ok(checkboxBoxStyle);
-    assert.match(checkboxBoxStyle, /border:2px solid #1f1e27/);
+    assert.match(checkboxBoxStyle, /border:2px solid var\(--clr-text-default\)/);
     assert.match(checkboxBoxStyle, /background:#fff/);
     assert.doesNotMatch(checkboxBoxStyle, /border-radius/);
     assert.match(css, /\.media-releases__filter input:not\(:checked\):hover:before\{background:#ecf0f0\}/);
