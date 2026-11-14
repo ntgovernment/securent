@@ -109,18 +109,28 @@ header.ntg-header .header-tools .ps-4 {
   padding-left: 0 !important;
 }
 
-header.ntg-header .header-tools .ntg-header-search {
+@media (min-width: 768px) and (max-width: 991.98px) {
+  header.ntg-header.search-toggle-enhanced .header-tools .ps-4 {
+    display: none !important;
+  }
+}
+
+header.ntg-header .header-tools .ntg-header-search,
+.mobile-banner.banner-search .ntg-header-search {
   width: 296px;
+  max-width: 100%;
   margin: 0;
 }
 
-header.ntg-header .header-tools .ntg-header-search .input-group {
+header.ntg-header .header-tools .ntg-header-search .input-group,
+.mobile-banner.banner-search .ntg-header-search .input-group {
   display: flex;
   width: 100%;
   height: 48px;
 }
 
-header.ntg-header .header-tools .ntg-header-search .form-control {
+header.ntg-header .header-tools .ntg-header-search .form-control,
+.mobile-banner.banner-search .ntg-header-search .form-control {
   position: static;
   flex: 1 1 auto;
   width: auto;
@@ -135,12 +145,14 @@ header.ntg-header .header-tools .ntg-header-search .form-control {
   transition: none;
 }
 
-header.ntg-header .header-tools .ntg-header-search .input-group-append {
+header.ntg-header .header-tools .ntg-header-search .input-group-append,
+.mobile-banner.banner-search .ntg-header-search .input-group-append {
   display: flex;
   flex: 0 0 50px;
 }
 
-header.ntg-header .header-tools .ntg-header-search .input-group-append button {
+header.ntg-header .header-tools .ntg-header-search .input-group-append button,
+.mobile-banner.banner-search .ntg-header-search .input-group-append button {
   display: flex;
   width: 50px;
   height: 48px;
@@ -154,11 +166,14 @@ header.ntg-header .header-tools .ntg-header-search .input-group-append button {
 }
 
 header.ntg-header .header-tools .ntg-header-search .input-group-append button:hover,
-header.ntg-header .header-tools .ntg-header-search .input-group-append button:focus-visible {
+header.ntg-header .header-tools .ntg-header-search .input-group-append button:focus-visible,
+.mobile-banner.banner-search .ntg-header-search .input-group-append button:hover,
+.mobile-banner.banner-search .ntg-header-search .input-group-append button:focus-visible {
   background: #c33826;
 }
 
-header.ntg-header .header-tools .ntg-header-search .input-group-append button::before {
+header.ntg-header .header-tools .ntg-header-search .input-group-append button::before,
+.mobile-banner.banner-search .ntg-header-search .input-group-append button::before {
   color: #ffffff;
   font-size: 1.5rem;
   font-weight: 300;

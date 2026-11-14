@@ -41,11 +41,13 @@ relative paths. The full listings additionally require
 <script type="module" src="./dist/latest-media-releases.js"></script>
 ```
 
-On localhost, the Vite development server proxies `/api/media-releases/latest`
-to `https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor`;
-other hosts request that URL directly and require CORS permission if they are
-on a different origin. The existing site icon font supplies the clock, location, and
-arrow icons. The cards use three columns on wide screens, two below 900px,
+On localhost, the Vite development server serves `/api/media-releases/latest`
+from `public/campaign-monitor.json` so the compact listing works without the
+remote Campaign Monitor endpoint. The individual source endpoints still proxy
+to the NT Government site; other hosts request the merged endpoint directly
+and require CORS permission if they are on a different origin. The existing
+site icon font supplies the clock, location, and arrow icons. The cards use
+three columns on wide screens, two below 900px,
 and one below 600px. The component shows an empty message when no eligible
 notices are available and reports when the endpoint is unavailable or invalid.
 During loading, three placeholder cards shimmer in the results grid while an

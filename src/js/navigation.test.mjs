@@ -37,7 +37,10 @@ function fixture(window) {
           </li>
         </ul></nav>
       </div>
-    </div></header>`;
+    </div></header>
+    <div class="mobile-banner banner-search">
+      <form class="ntg-header-search"><input name="query" aria-label="Search"></form>
+    </div>`;
 }
 
 async function withMenu(width, check) {
@@ -92,6 +95,53 @@ test("mobile disclosures reset siblings and descendants without intercepting des
   });
 });
 
+test("compact search icon reveals the banner field and Escape closes it", async () => {
+  for (const width of [390, 900]) {
+    await withMenu(width, async (window, initialize) => {
+      initialize();
+      const document = window.document;
+      const toggle = document.querySelector(".mobile-search-toggle");
+      const input = document.querySelector(".mobile-banner input[name='query']");
+      assert.ok(toggle);
+      assert.equal(document.querySelector("header.ntg-header").classList.contains("search-toggle-enhanced"), true);
+      assert.equal(toggle.getAttribute("aria-expanded"), "false");
+      toggle.click();
+      assert.equal(document.body.classList.contains("mobile-search-open"), true);
+      assert.equal(toggle.getAttribute("aria-expanded"), "true");
+      assert.equal(toggle.getAttribute("aria-label"), "Close search");
+      assert.equal(document.activeElement, input);
+      document.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Escape" }));
+      assert.equal(document.body.classList.contains("mobile-search-open"), false);
+      assert.equal(toggle.getAttribute("aria-expanded"), "false");
+      assert.equal(toggle.getAttribute("aria-label"), "Open search");
+      assert.equal(document.activeElement, toggle);
+    });
+  }
+});
+
+test("search toggle initializes in captures whose navigation is already enhanced", async () => {
+  await withMenu(900, async (window, initialize) => {
+    const document = window.document;
+    const nav = document.querySelector("nav.nav-masthead");
+    const header = document.querySelector("header.ntg-header");
+    const toggle = document.createElement("button");
+    toggle.className = "mobile-search-toggle";
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-label", "Open search");
+    nav.dataset.navigationReady = "true";
+    header.querySelector(".header-tools").append(toggle);
+
+    initialize();
+    assert.equal(header.classList.contains("search-toggle-enhanced"), true);
+    toggle.click();
+    assert.equal(document.body.classList.contains("mobile-search-open"), true);
+    assert.equal(document.activeElement, document.querySelector(".mobile-banner input[name='query']"));
+    document.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Escape" }));
+    assert.equal(document.body.classList.contains("mobile-search-open"), false);
+    assert.equal(document.activeElement, toggle);
+  });
+});
+
 test("desktop keeps level 3 visible and closes panels on Escape, focus departure and outside click", async () => {
   await withMenu(1440, async (window, initialize) => {
     initialize();
@@ -130,6 +180,46 @@ test("breakpoint changes restore scrolling, reset disclosure state and initializ
     window.dispatchEvent(new window.Event("resize"));
     assert.equal(document.querySelector(".ntg-main-nav__submenu").hidden, true);
   });
+});
+
+test("tablet search breakpoint uses the icon and the banner shares desktop field dimensions", async () => {
+  const menuCss = await readFile(new URL("../css/components/mainmenu-dropdown.css", import.meta.url), "utf8");
+  const headerCss = await readFile(new URL("../css/components/header-footer.css", import.meta.url), "utf8");
+  const window = new Window();
+  try {
+    const menuSheet = new window.CSSStyleSheet();
+    menuSheet.replaceSync(menuCss);
+    const tabletRule = [...menuSheet.cssRules].find((rule) =>
+      rule.conditionText === "(min-width: 768px) and (max-width: 991.98px)"
+      && [...rule.cssRules].some((nested) =>
+        nested.selectorText === "header.ntg-header.search-toggle-enhanced .mobile-search-toggle",
+      ),
+    );
+    assert.ok(tabletRule);
+    assert.equal(
+      [...tabletRule.cssRules]
+        .find((rule) => rule.selectorText === "header.ntg-header.search-toggle-enhanced .mobile-search-toggle")
+        .style.display,
+      "inline-flex",
+    );
+
+    const headerSheet = new window.CSSStyleSheet();
+    headerSheet.replaceSync(headerCss);
+    const bannerWidth = [...headerSheet.cssRules].find((rule) =>
+      rule.selectorText?.includes("header.ntg-header .header-tools .ntg-header-search")
+      && rule.selectorText.includes(".mobile-banner.banner-search .ntg-header-search")
+      && rule.style.width === "296px",
+    );
+    const bannerInputGroup = [...headerSheet.cssRules].find((rule) =>
+      rule.selectorText?.includes("header.ntg-header .header-tools .ntg-header-search .input-group")
+      && rule.selectorText.includes(".mobile-banner.banner-search .ntg-header-search .input-group")
+      && rule.style.height === "48px",
+    );
+    assert.ok(bannerWidth);
+    assert.ok(bannerInputGroup);
+  } finally {
+    await window.happyDOM.close();
+  }
 });
 
 test("missing navigation is a no-op", async () => {

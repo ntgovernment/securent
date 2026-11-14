@@ -29,6 +29,45 @@ guardQuickExit(window);
   const menuList = nav && nav.querySelector(".ntg-main-nav__links");
   const headerTools = header && header.querySelector(".header-tools");
   if (!nav || !header || !menuList || !headerTools || !menuList.classList.contains("cms-main-nav")) return;
+
+  let searchButton = headerTools.querySelector(".mobile-search-toggle");
+  if (!searchButton) {
+    searchButton = document.createElement("button");
+    searchButton.className = "mobile-search-toggle";
+    searchButton.type = "button";
+    searchButton.setAttribute("aria-label", "Open search");
+    searchButton.setAttribute("aria-expanded", "false");
+    searchButton.innerHTML = '<span class="fa-regular fa-magnifying-glass" aria-hidden="true"></span>';
+    headerTools.append(searchButton);
+  }
+  if (!searchButton.dataset.searchToggleReady) {
+    searchButton.dataset.searchToggleReady = "true";
+    header.classList.add("search-toggle-enhanced");
+    const isOpen = document.body.classList.contains("mobile-search-open");
+    searchButton.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    searchButton.setAttribute("aria-label", isOpen ? "Close search" : "Open search");
+    searchButton.addEventListener("click", function () {
+      if (header.classList.contains("menu-open")) {
+        const menuButton = headerTools.querySelector(".mobile-menu-toggle");
+        if (menuButton) menuButton.click();
+      }
+      const isSearchOpen = document.body.classList.toggle("mobile-search-open");
+      searchButton.setAttribute("aria-expanded", isSearchOpen ? "true" : "false");
+      searchButton.setAttribute("aria-label", isSearchOpen ? "Close search" : "Open search");
+      if (isSearchOpen) {
+        const input = document.querySelector(".mobile-banner .ntg-header-search input[name='query']");
+        if (input) input.focus();
+      }
+    });
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== "Escape" || !document.body.classList.contains("mobile-search-open")) return;
+      document.body.classList.remove("mobile-search-open");
+      searchButton.setAttribute("aria-expanded", "false");
+      searchButton.setAttribute("aria-label", "Open search");
+      searchButton.focus();
+    });
+  }
+
   if (nav.dataset.navigationReady) return;
   const navbar = header.querySelector(".navbar");
   if (!navbar) return;
@@ -67,14 +106,7 @@ guardQuickExit(window);
   menuButton.setAttribute("aria-controls", menuId);
   menuButton.setAttribute("aria-expanded", "false");
   menuButton.innerHTML = "<span></span><span></span><span></span>";
-
-  const searchButton = document.createElement("button");
-  searchButton.className = "mobile-search-toggle";
-  searchButton.type = "button";
-  searchButton.setAttribute("aria-label", "Open search");
-  searchButton.setAttribute("aria-expanded", "false");
-  searchButton.innerHTML = '<span class="fa-regular fa-magnifying-glass" aria-hidden="true"></span>';
-  headerTools.append(searchButton, menuButton);
+  headerTools.append(menuButton);
 
   const closeButton = document.createElement("button");
   closeButton.className = "mobile-nav-close";
@@ -211,17 +243,6 @@ guardQuickExit(window);
     setMenuOpen(false, true);
   });
 
-  searchButton.addEventListener("click", function () {
-    if (header.classList.contains("menu-open")) setMenuOpen(false, false);
-    const isOpen = document.body.classList.toggle("mobile-search-open");
-    searchButton.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    searchButton.setAttribute("aria-label", isOpen ? "Close search" : "Open search");
-    if (isOpen) {
-      const input = document.querySelector(".mobile-banner .ntg-header-search input[name='query']");
-      if (input) input.focus();
-    }
-  });
-
   renderedMenu.addEventListener("click", function (event) {
     const control = event.target.closest("a, .mobile-submenu-toggle, .desktop-main-nav__toggle");
     const item = control && control.parentElement;
@@ -250,11 +271,6 @@ guardQuickExit(window);
     if (event.key === "Escape") {
       if (header.classList.contains("menu-open")) setMenuOpen(false, true);
       else closeDesktopMenu(true);
-      if (document.body.classList.contains("mobile-search-open")) {
-        document.body.classList.remove("mobile-search-open");
-        searchButton.setAttribute("aria-expanded", "false");
-        searchButton.setAttribute("aria-label", "Open search");
-      }
       return;
     }
 

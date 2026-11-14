@@ -33,18 +33,26 @@ const excludeLocalCapturePhotos = {
   },
 };
 
+const includeLocalCapture =
+  process.env.SECURENT_NO_LOCAL_CAPTURE !== "1" &&
+  existsSync(new URL("./SecureNT.html", import.meta.url));
+
 const pagePreview = {
   name: "page-preview",
   configureServer(server) {
     server.middlewares.use(async (req, res, next) => {
       const url = new URL(req.url, "http://localhost");
+      const homepageCapture = "SecureNT.html";
       const currentWarningsCapture = "Current warnings _ SecureNT.html";
       const eventCapture = "Severe Storm \u2013 Alice Springs _ SecureNT.html";
       const captures = new Map([
-        ["/", currentWarningsCapture],
+        ["/", includeLocalCapture ? homepageCapture : currentWarningsCapture],
         ["/" + encodeURIComponent(currentWarningsCapture), currentWarningsCapture],
         ["/" + encodeURIComponent(eventCapture), eventCapture],
       ]);
+      if (includeLocalCapture) {
+        captures.set("/" + encodeURIComponent(homepageCapture), homepageCapture);
+      }
       const capture = captures.get(url.pathname);
       if (capture && (req.method === "GET" || req.method === "HEAD")) {
         try {
@@ -134,10 +142,17 @@ const mediaReleaseFeedProxy = {
       }
 
       try {
-        const response = await fetch(endpoint, { headers: { Accept: "application/json" } });
-        if (!response.ok) throw new Error(`Feed request failed (${response.status})`);
-        res.statusCode = response.status;
-        res.end(JSON.stringify(await response.json()));
+        let payload;
+        if (sourceId === "latest") {
+          payload = JSON.parse(await readFile(new URL("./public/campaign-monitor.json", import.meta.url), "utf8"));
+          if (!Array.isArray(payload)) throw new TypeError("Local campaign-monitor fixture must be an array");
+        } else {
+          const response = await fetch(endpoint, { headers: { Accept: "application/json" } });
+          if (!response.ok) throw new Error(`Feed request failed (${response.status})`);
+          res.statusCode = response.status;
+          payload = await response.json();
+        }
+        res.end(JSON.stringify(payload));
       } catch (error) {
         console.warn(`Local media-release feed failed (${sourceId}):`, error.message);
         res.statusCode = 502;
@@ -146,10 +161,6 @@ const mediaReleaseFeedProxy = {
     });
   },
 };
-
-const includeLocalCapture =
-  process.env.SECURENT_NO_LOCAL_CAPTURE !== "1" &&
-  existsSync(new URL("./SecureNT.html", import.meta.url));
 
 export default defineConfig({
   root: ".",
