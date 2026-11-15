@@ -354,7 +354,7 @@ The local `SecureNT.html` capture is gitignored. For local preview, its feature-
 
 ### Homepage active recovery programs
 
-The homepage Active recovery programs display cards use `src/css/components/active-recovery.css`, imported through `src/css/main.css`. Keep these styles scoped to `.active-recovery-programs` so the More updates cards and other display-card components are unaffected. The section's content edges align with the featured-content card using the same 52px tablet and 56px desktop insets. Card bodies fill equal-height cards so each **Find out more** action stays at the bottom. Preserve the link's hover margin and padding to prevent the tallest card from resizing the section.
+The homepage Active recovery programs display cards use `src/css/components/active-recovery.css`, imported through `src/css/main.css`. The local capture uses `.active-recovery-programs`; production markup has only `.ntg-display-cards`, so its cards are selected by their descriptive `.card-text` child. This leaves the title-only More updates cards unchanged. Production cards place the title, description, and link directly in `.card-body`; keep that body as a padded flex column and the link auto-spaced to the bottom. The section's content edges align with the featured-content card using the same 52px tablet and 56px desktop insets. Preserve the link's hover margin and padding to prevent the tallest card from resizing the section.
 
 The card content and destinations remain CMS-managed; the gitignored `SecureNT.html` capture is for local preview only. After changing the card styles, run `npm run build` and publish `dist/theme.css` with the source CSS, then refresh its Matrix cache reference.
 

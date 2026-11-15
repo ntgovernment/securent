@@ -1,4 +1,5 @@
-.active-recovery-programs .card {
+.active-recovery-programs .card,
+.ntg-display-cards .card:has(.card-text) {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -9,11 +10,12 @@
   background: var(--clr-bg-default, #fff);
   border: 0;
   border-radius: 0;
-  outline: 1px solid var(--clr-border-subtle, #d3d3d7);
+  outline: 1px solid var(--clr-border-subtle, #d3d3d7) !important;
   box-shadow: none;
 }
 
-.active-recovery-programs .card-body {
+.active-recovery-programs .card-body,
+.ntg-display-cards .card:has(.card-text) .card-body {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -22,6 +24,11 @@
   align-self: stretch;
   width: 100%;
   padding: 0 !important;
+}
+
+section.ntg-display-cards:not(.active-recovery-programs) .card:has(.card-text) .card-body {
+  gap: 12px;
+  padding: 24px !important;
 }
 
 .active-recovery-programs__content {
@@ -34,7 +41,8 @@
   padding: 24px 24px 0;
 }
 
-.active-recovery-programs .card-title {
+.active-recovery-programs .card-title,
+.ntg-display-cards .card:has(.card-text) .card-title {
   display: block;
   align-self: stretch;
   margin: 0;
@@ -46,11 +54,13 @@
   overflow-wrap: break-word;
 }
 
-.active-recovery-programs .card-title::after {
+.active-recovery-programs .card-title::after,
+.ntg-display-cards .card:has(.card-text) .card-title::after {
   content: none;
 }
 
-.active-recovery-programs .card-text {
+.active-recovery-programs .card-text,
+.ntg-display-cards .card:has(.card-text) .card-text {
   align-self: stretch;
   margin: 0;
   color: var(--clr-text-default, #1f1e27);
@@ -72,13 +82,14 @@
   padding: 8px 24px 24px;
 }
 
-.active-recovery-programs .card-link {
+.active-recovery-programs .card-link,
+.ntg-display-cards .card:has(.card-text) .card-link {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   margin: 0;
   padding: 8px 0;
-  color: var(--clr-link-default, #174c4e);
+  color: var(--clr-link-default, #174c4e) !important;
   font-family: Lato, sans-serif;
   font-size: 14px;
   font-weight: 700;
@@ -91,19 +102,34 @@
   padding-bottom: 8px;
 }
 
-.active-recovery-programs .card-link i {
+section.ntg-display-cards:not(.active-recovery-programs) .card:has(.card-text) .card-link {
+  margin: 0 !important;
+  margin-top: auto !important;
+  padding: 8px 0 !important;
+}
+
+section.ntg-display-cards:not(.active-recovery-programs) .card:has(.card-text) a.card-link:hover {
+  margin: 0 !important;
+  margin-top: auto !important;
+  padding-bottom: 8px !important;
+}
+
+.active-recovery-programs .card-link i,
+.ntg-display-cards .card:has(.card-text) .card-link i {
   color: var(--clr-link-default, #174c4e);
 }
 
 /* Match the featured card's responsive horizontal margins. */
 @media (min-width: 768px) and (max-width: 991.98px) {
-  .active-recovery-programs .container-xl {
+  .active-recovery-programs .container-xl,
+  .ntg-display-cards:has(.card-text) .container-xl {
     padding-inline: 64px;
   }
 }
 
 @media (min-width: 992px) {
-  .active-recovery-programs .container-xl {
+  .active-recovery-programs .container-xl,
+  .ntg-display-cards:has(.card-text) .container-xl {
     padding-inline: 68px;
   }
 }
