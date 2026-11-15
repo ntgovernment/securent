@@ -358,9 +358,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex: 0 0 40px;
-  width: 40px;
-  height: 40px;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -714,7 +714,7 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-emergency-
 
   .mobile-main-nav li.has-children {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 40px;
+    grid-template-columns: minmax(0, 1fr) 44px;
     align-items: start;
   }
 
@@ -744,8 +744,8 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-emergency-
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     margin: 0;
     padding: 0;
     border: 0;

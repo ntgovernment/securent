@@ -167,7 +167,8 @@ No additional nested listing is needed.
   Level 2 groups and Level 3 links remain expanded inside each open panel.
 - Desktop panel links keep a white background on hover and keyboard focus. A text
   underline supplies the hover/focus cue without changing borders or moving links.
-- Mobile: parent links navigate; separate 40px buttons expand their children.
+- Mobile: parent links navigate; separate buttons with 44px minimum targets
+  expand their children.
   Opening a sibling resets the previous branch. Escape closes and returns focus.
 - Without JavaScript, the links and nested lists remain visible in normal flow.
 - While JavaScript is loading, panels stay collapsed. The expanded fallback is
@@ -213,6 +214,9 @@ Verified locally on 10 November 2026:
   the disabled-scripting media rules still exposes the fallback links.
 - The migrated alerts capture uses theme CSS version `41` and theme JS version `31`.
   Other captures have not been migrated and must not be treated as enhanced-menu fixtures.
+- Mobile target sizing rechecked on 15 November 2026: the menu trigger and submenu
+  buttons measured 44 by 44px at 320px, 374px and 766px viewport widths; the drawer
+  close control measured 256 by 52px at 320px and 270 by 52px at wider mobile widths.
 
 These are local results, not confirmation of production publication. Apply the
 Bodycopy in Matrix and verify the ordinary published page after publishing the
