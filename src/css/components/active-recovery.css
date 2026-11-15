@@ -9,7 +9,7 @@
   height: 100%;
   background: var(--clr-bg-default, #fff);
   border: 0;
-  border-radius: 0;
+  border-radius: 0 !important;
   outline: 1px solid var(--clr-border-subtle, #d3d3d7) !important;
   box-shadow: none;
 }
