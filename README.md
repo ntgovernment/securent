@@ -229,6 +229,7 @@ Outputs to `dist/`:
 - `SecureNT_files/*.webp` — generated AWS hazard pictograms imported by the Media releases bundle
 - `pagination.css` — shared pagination styling and list-marker overrides for both listing pages
 - `more-updates-cards.css` — styles for the bottom update cards on the Alerts and warnings page
+- `link-group-grid.css` — standalone styles for reusable groups of links
 - `event.css` and `social-share.css` — standalone event page and share nester styles
 - `social-share.js` — standalone event share popup and copy-link behavior
 - `local-conditions.js` — standalone location catalog and condition-card behavior; its CSS is included in `theme.css`
@@ -238,6 +239,22 @@ Outputs to `dist/`:
 The build redirects the captured homepage's previous `dist/theme.css` reference to the generated `/theme.css`. Capture-only vendor styles are kept separate so the source theme bundle retains the expected `dist/theme.css` filename for the git file bridge.
 
 Theme CSS has an explicit `theme-styles` entry pointing to `src/css/main.css` in `vite.config.mjs`; the optional, gitignored homepage capture is not required to generate the theme bundle. Keep that capture and its local dependencies available when building or previewing the captured homepage. After building, confirm both theme assets exist before committing file-bridge updates.
+
+## Link group grid
+
+Build and publish `dist/link-group-grid.css` through the Squiz Matrix git file bridge, and reference it after the existing Bootstrap/NTG and theme styles wherever the component is used:
+
+```html
+<link rel="stylesheet" href="PUBLISHED-URL-OF-link-group-grid.css">
+```
+
+The component uses `.link-group-grid`, `.link-group-grid__groups`, and `.link-group-grid__group` with the supplied Bootstrap `row`, `col-md-4`, and `list-group` markup. Three groups appear side by side from 768px; below that they stack. Links underline on hover without moving; keyboard focus remains visible. Standard links require no JavaScript.
+
+Each component's `aria-labelledby` must match its own heading ID. For the supplied markup, use `aria-labelledby="essential-resources-and-websites"`; each group must likewise reference its own heading. Use unique IDs for all headings and their corresponding references when there are multiple components on a page. Link text and destinations remain CMS-managed.
+
+After changes, run `npm run build`, publish the generated stylesheet, and refresh its Matrix cache reference.
+
+The local homepage capture includes the component and its stylesheet reference, but `SecureNT.html` is Git-ignored; apply the markup and reference separately in Matrix. A build recreates JSON outputs in `dist/` from project inputs and the Cloudflare build plugin, even if those outputs have been removed from the working tree.
 
 ## Shared Theme Overrides
 

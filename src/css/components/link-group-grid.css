@@ -1,0 +1,84 @@
+@import "../tokens.css";
+
+.link-group-grid {
+  padding: 32px 0 40px;
+  font-family: Lato, sans-serif;
+}
+
+.link-group-grid h2 {
+  margin: 0 0 48px;
+  color: var(--clr-text-default);
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.link-group-grid__group {
+  min-width: 0;
+}
+
+.link-group-grid__group h3 {
+  margin: 0 0 24px;
+  color: var(--clr-text-default);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.link-group-grid__group .list-group,
+.link-group-grid__group .list-group > li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link-group-grid__group .list-group > li {
+  border: 0;
+  border-radius: 0;
+  background-color: #f3f3f5 !important;
+}
+
+.link-group-grid__group .list-group > li + li {
+  border-top: 1px solid #fff;
+}
+
+.link-group-grid__group .list-group > li::before,
+.link-group-grid__group .list-group > li::marker {
+  content: none;
+}
+
+.link-group-grid__group .list-group > li::before {
+  display: none;
+}
+
+.link-group-grid__group .list-group > li > a,
+main#content .link-group-grid__group .list-group > li > a {
+  display: block;
+  padding: 16px 20px !important;
+  border: 0;
+  color: #174c4e;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 24px;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.link-group-grid__group .list-group > li > a:hover,
+main#content .link-group-grid__group .list-group > li > a:hover {
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.link-group-grid__group .list-group > li > a:focus-visible {
+  outline: 2px solid #174c4e;
+  outline-offset: -3px;
+}
+
+@media (max-width: 767.98px) {
+  .link-group-grid h2 {
+    margin-bottom: 32px;
+    font-size: 28px;
+  }
+}

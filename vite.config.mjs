@@ -256,6 +256,7 @@ export default defineConfig({
         pagination: "./src/pagination/pagination.css",
         "more-updates-cards": "./src/alerts-listing/more-updates-cards.css",
         "warning-accordion": "./src/css/components/warning-accordion.css",
+        "link-group-grid": "./src/css/components/link-group-grid.css",
         "theme-styles": "./src/css/main.css",
         "event-styles": "./src/events/event.css",
         "social-share-styles": "./src/social-share/social-share.css",
@@ -297,6 +298,9 @@ export default defineConfig({
           }
           if (assetInfo.name === "warning-accordion.css") {
             return "warning-accordion.css";
+          }
+          if (assetInfo.name === "link-group-grid.css") {
+            return "link-group-grid.css";
           }
           if (assetInfo.name === "alerts-listing.css") {
             return "alerts-listing.css";
