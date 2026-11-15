@@ -1,5 +1,6 @@
 #latest-warnings .warning-banner {
   --warning-accent: var(--clr-status-neutral);
+  --warning-link-color: #174c4e;
 
   display: flex;
   align-items: flex-start;
@@ -12,16 +13,25 @@
   color: var(--clr-text-default);
 }
 
+.warning-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
 #latest-warnings .warning-banner[data-warning-level="advice"] {
   --warning-accent: var(--clr-status-advice);
+  --warning-link-color: #716309;
 }
 
 #latest-warnings .warning-banner[data-warning-level="watch_act"] {
   --warning-accent: var(--clr-status-watch-act);
+  --warning-link-color: #9c3d00;
 }
 
 #latest-warnings .warning-banner[data-warning-level="emergency_warning"] {
   --warning-accent: var(--clr-status-emergency-warning);
+  --warning-link-color: #b0001a;
 }
 
 #latest-warnings .warning-banner > img {
@@ -33,6 +43,7 @@
 }
 
 #latest-warnings .warning-banner__content {
+  width: 100%;
   min-width: 0;
 }
 
@@ -52,9 +63,36 @@
 }
 
 #latest-warnings .warning-banner a {
-  color: #174c4e;
+  color: var(--warning-link-color);
   font-weight: 700;
   text-decoration: underline;
+}
+
+#latest-warnings .warning-banner a::after {
+  display: inline-block;
+  margin-left: 0.5rem;
+  color: inherit;
+  content: "\f061";
+  font-family: "Font Awesome 6 Pro";
+  font-size: 0.875em;
+  font-weight: 300;
+  transition: transform 160ms ease;
+}
+
+#latest-warnings .warning-banner a:hover::after,
+#latest-warnings .warning-banner a:focus-visible::after {
+  transform: translateX(3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #latest-warnings .warning-banner a::after {
+    transition: none;
+  }
+
+  #latest-warnings .warning-banner a:hover::after,
+  #latest-warnings .warning-banner a:focus-visible::after {
+    transform: none;
+  }
 }
 
 #latest-events-intro {

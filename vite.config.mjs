@@ -116,7 +116,7 @@ const pagePreview = {
       const currentWarningsCapture = "Current warnings _ SecureNT.html";
       const eventCapture = "Severe Storm \u2013 Alice Springs _ SecureNT.html";
       const captures = new Map([
-        ["/", eventCapture],
+        ["/", homepageCapture],
         ["/" + encodeURIComponent(currentWarningsCapture), currentWarningsCapture],
         ["/" + encodeURIComponent(eventCapture), eventCapture],
       ]);
