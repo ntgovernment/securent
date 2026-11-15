@@ -57,6 +57,7 @@ securent/
 │   │       ├── mainmenu-dropdown.css # Content-width desktop mega-menu and mobile drawer styles
 │   │       ├── header-footer.css     # Header/footer brand colour overrides; background: Charcoal (#343741)
 │   │       ├── homepage-featured-content.css # CMS homepage feature cards: responsive image/text layout and CTA styling
+│   │       ├── active-recovery.css   # Homepage Active recovery programs card layout and interaction styling
 │   │       ├── statistics.css        # Statistics section styles
 │   │       └── main.css              # Breadcrumbs, side-nav colours, editorial links/bullets, display cards and homepage-news overrides
 │   ├── data/
@@ -350,6 +351,12 @@ Latest Events uses a pale-grey container capped at 1280px, 32px desktop containe
 Homepage featured-content cards use `src/css/components/homepage-featured-content.css`, imported by `src/css/main.css`. The stylesheet targets the CMS `.ntg-featured-content-small` markup and styles its visible `.card-link` as the orange CTA; card copy, destinations, and photos remain CMS-managed. The pale-teal card is inset 52px at tablet widths and 56px on desktop to align with the homepage content column. Cards use a text/image split at those sizes, while narrow layouts stack the image below the text. The `ntg-featured-content-small--image-left` modifier retains image-first ordering on desktop.
 
 The local `SecureNT.html` capture is gitignored. For local preview, its feature-card image URLs can point to matching files in the also-gitignored `SecureNT_files/` directory; production CMS image URLs are unchanged. After changing featured-content styles, run `npm run build` and deploy the updated `dist/theme.css` with the source CSS.
+
+### Homepage active recovery programs
+
+The homepage Active recovery programs display cards use `src/css/components/active-recovery.css`, imported through `src/css/main.css`. Keep these styles scoped to `.active-recovery-programs` so the More updates cards and other display-card components are unaffected. The section's content edges align with the featured-content card using the same 52px tablet and 56px desktop insets. Card bodies fill equal-height cards so each **Find out more** action stays at the bottom. Preserve the link's hover margin and padding to prevent the tallest card from resizing the section.
+
+The card content and destinations remain CMS-managed; the gitignored `SecureNT.html` capture is for local preview only. After changing the card styles, run `npm run build` and publish `dist/theme.css` with the source CSS, then refresh its Matrix cache reference.
 
 ### Footer
 
