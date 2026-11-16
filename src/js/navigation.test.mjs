@@ -243,6 +243,38 @@ test("tablet search breakpoint uses the icon and the banner shares desktop field
   }
 });
 
+test("navigation and header links suppress external icons and underline without a hover border", async () => {
+  const menuCss = await readFile(new URL("../css/components/mainmenu-dropdown.css", import.meta.url), "utf8");
+  const headerCss = await readFile(new URL("../css/components/header-footer.css", import.meta.url), "utf8");
+  const window = new Window();
+  try {
+    const menuSheet = new window.CSSStyleSheet();
+    menuSheet.replaceSync(menuCss);
+    const menuRules = [...menuSheet.cssRules];
+    const menuIcons = menuRules.find((rule) => rule.selectorText?.includes(".ntg-main-nav__links a.external::after"));
+    assert.ok(menuIcons.selectorText.includes(".ntg-main-nav__links a.external::before"));
+    assert.equal(menuIcons.style.display, "none");
+    const rootLink = menuRules.find((rule) => rule.selectorText === "nav.nav-masthead .ntg-main-nav__links > li > a");
+    assert.equal(rootLink.style.getPropertyValue("border-bottom"), "0px");
+    const menuHover = menuRules.find((rule) => rule.selectorText?.includes(".ntg-main-nav__links a:hover"));
+    assert.equal(menuHover.style.getPropertyValue("text-decoration"), "underline");
+    assert.ok(menuHover.selectorText.includes("a:focus-visible .ntg-main-nav__label"));
+    assert.ok(menuHover.selectorText.includes(".desktop-main-nav__toggle:hover > span:first-child"));
+
+    const headerSheet = new window.CSSStyleSheet();
+    headerSheet.replaceSync(headerCss);
+    const headerRules = [...headerSheet.cssRules];
+    const headerIcons = headerRules.find((rule) => rule.selectorText?.includes(".header-tools a.external::after"));
+    assert.ok(headerIcons.selectorText.includes(".header-tools a.external::before"));
+    assert.equal(headerIcons.style.display, "none");
+    const headerHover = headerRules.find((rule) => rule.selectorText?.includes(".header-tools a:hover"));
+    assert.equal(headerHover.style.getPropertyValue("text-decoration"), "underline");
+    assert.ok(headerHover.selectorText.includes(".header-tools a:focus-visible"));
+  } finally {
+    await window.happyDOM.close();
+  }
+});
+
 test("missing navigation is a no-op", async () => {
   const window = new Window();
   try {

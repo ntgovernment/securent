@@ -165,8 +165,9 @@ No additional nested listing is needed.
   The original top-level destination link is hidden, not rewritten; the overview
   retains its CMS-generated destination link. Items without children remain links.
   Level 2 groups and Level 3 links remain expanded inside each open panel.
-- Desktop panel links keep a white background on hover and keyboard focus. A text
-  underline supplies the hover/focus cue without changing borders or moving links.
+- Navigation and header-tools links have no external-link icons and use an underline
+  on hover and keyboard focus without moving. Desktop panel links retain a white
+  background; disclosure arrows remain visible.
 - Mobile: parent links navigate; separate buttons with 44px minimum targets
   expand their children.
   Opening a sibling resets the previous branch. Escape closes and returns focus.

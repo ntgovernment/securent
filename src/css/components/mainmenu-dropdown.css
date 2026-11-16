@@ -896,6 +896,25 @@ nav.nav-masthead .cms-main-nav li > a::after {
   display: none !important;
 }
 
+nav.nav-masthead .ntg-main-nav__links a.external::before,
+nav.nav-masthead .ntg-main-nav__links a.external::after {
+  display: none !important;
+}
+
+nav.nav-masthead .ntg-main-nav__links > li > a {
+  border-bottom: 0 !important;
+}
+
+nav.nav-masthead .ntg-main-nav__links a:hover,
+nav.nav-masthead .ntg-main-nav__links a:focus-visible,
+nav.nav-masthead .ntg-main-nav__links a:hover .ntg-main-nav__label,
+nav.nav-masthead .ntg-main-nav__links a:focus-visible .ntg-main-nav__label,
+nav.nav-masthead .desktop-main-nav__toggle:hover > span:first-child,
+nav.nav-masthead .desktop-main-nav__toggle:focus-visible > span:first-child {
+  text-decoration: underline !important;
+  text-underline-offset: 0.15em;
+}
+
 .cms-main-nav .ntg-main-nav__groups {
   display: block !important;
   margin: 0;

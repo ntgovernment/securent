@@ -97,6 +97,17 @@ header.ntg-header .header-tools > a[aria-current="page"] {
   background-color: #424550 !important;
 }
 
+header.ntg-header .header-tools a.external::before,
+header.ntg-header .header-tools a.external::after {
+  display: none !important;
+}
+
+header.ntg-header .header-tools a:hover,
+header.ntg-header .header-tools a:focus-visible {
+  text-decoration: underline !important;
+  text-underline-offset: 0.15em;
+}
+
 @media (min-width: 768px) and (max-width: 1199.98px) {
   header.ntg-header .header-tools > a {
     padding-right: 0.5rem;
