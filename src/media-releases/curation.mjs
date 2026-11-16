@@ -111,7 +111,7 @@ export function filterAndSortNotices(items, {
     const groups = [[sources, item.sources], [regions, item.regions],
       [emergencyTypes, item.emergencyTypes], [declarations, item.declarations || []],
       [warningLevels, item.declarations?.length ? [] : [item.warningLevel]]];
-    const searchable = [item.title, item.name, item.fromName, ...(item.locationTerms || []), ...item.sources,
+    const searchable = [item.title, item.originalTitle, item.name, item.fromName, ...(item.locationTerms || []), ...item.sources,
       ...item.regions, ...item.emergencyTypes, ...(item.declarations || []), item.warningLevel].filter(Boolean).join(" ").toLocaleLowerCase();
     return (!search || searchable.includes(search)) && groups.every(([selected, values]) =>
       !selected.length || selected.some((value) => values.includes(value)));
@@ -165,7 +165,81 @@ export function isOperationalNotice(record) {
   return hazardLanguage.test(content) || operationalSender.test(sender);
 }
 
-export function curateFeeds(feeds) {
+const mappedTypes = new Map([
+  ["bushfire", "Bushfire"], ["cyclone", "Cyclone"], ["flood", "Flooding"],
+  ["flooding", "Flooding"], ["storm", "Storm"], ["heatwave", "Heatwave"],
+  ["health emergency", "Health emergency"], ["hazardous materials", "Hazardous materials"],
+  ["tsunami", "Tsunami"],
+]);
+const mappedLevels = new Map([
+  ["advice", "Advice"], ["watch and act", "Watch and act"], ["watch act", "Watch and act"],
+  ["emergency warning", "Emergency warning"],
+]);
+
+function mappedKey(value) {
+  return cleanText(value).toLocaleLowerCase("en").replace(/[_-]+/g, " ").replace(/\s+/g, " ");
+}
+
+function mappedRegions(value) {
+  if (!Array.isArray(value)) return null;
+  const knownRegions = regionPatterns.map(([region]) => region);
+  const regions = value.map(cleanText).filter(Boolean).map((region) => {
+    if (mappedKey(region) === "greater darwin, palmerston and litchfield") return "Greater Darwin";
+    return knownRegions.find((known) => mappedKey(known) === mappedKey(region)) || region;
+  });
+  return regions.length ? [...new Set(regions)] : null;
+}
+
+function indexMappedWarnings(mappedWarnings) {
+  const groups = new Map();
+  for (const mapping of mappedWarnings) {
+    if (!mapping || typeof mapping !== "object") continue;
+    const campaignId = cleanText(mapping.campaignId);
+    if (!campaignId) continue;
+    const group = groups.get(campaignId) || [];
+    group.push(mapping);
+    groups.set(campaignId, group);
+  }
+  return groups;
+}
+
+function mappedField(mappings, field, normalize) {
+  const values = mappings.map((mapping) => normalize(mapping[field])).filter(Boolean);
+  const distinct = new Map(values.map((value) => [JSON.stringify(value), value]));
+  if (distinct.size > 1) {
+    console.warn(`Conflicting mapped warning ${field}; using existing classification`);
+    return null;
+  }
+  return distinct.values().next().value || null;
+}
+
+function enrichNotice(item, mappings) {
+  if (!mappings?.length) return item;
+  const type = mappedField(mappings, "emergencyType", (value) => mappedTypes.get(mappedKey(value)));
+  const level = mappedField(mappings, "warningLevel", (value) => mappedLevels.get(mappedKey(value)));
+  const location = mappedField(mappings, "location", cleanText);
+  const regions = mappedField(mappings, "region", mappedRegions);
+  if (regions) item.regions = regions;
+  if (location) item.locationTerms = [...new Set([...(item.locationTerms || []), location])];
+  if (item.declarations.length) {
+    if (location) {
+      item.originalTitle = item.title;
+      item.title = `${item.declarations.join(", ")} for ${location}`;
+    }
+    return item;
+  }
+  if (type) item.emergencyTypes = [type];
+  if (level) item.warningLevel = level;
+  const titleType = item.emergencyTypes.length === 1 && item.emergencyTypes[0] !== "Not identified"
+    ? item.emergencyTypes[0] : "";
+  if (location && titleType && item.warningLevel !== "Not identified") {
+    item.originalTitle = item.title;
+    item.title = `${titleType} ${item.warningLevel} for ${location}`;
+  }
+  return item;
+}
+
+export function curateFeeds(feeds, mappedWarnings = []) {
   const records = new Map();
   let sequence = 0;
 
@@ -190,7 +264,8 @@ export function curateFeeds(feeds) {
     }
   }
 
-  return [...records.values()].sort((first, second) => {
+  const mappings = indexMappedWarnings(mappedWarnings);
+  return [...records.values()].map((item) => enrichNotice(item, mappings.get(item.campaignId))).sort((first, second) => {
     const firstTime = updatedTimestamp(first.publishedAt);
     const secondTime = updatedTimestamp(second.publishedAt);
     if (firstTime === null) return secondTime === null ? 0 : 1;

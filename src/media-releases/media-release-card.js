@@ -102,7 +102,7 @@ export function renderCard(item, { compact = false, featured = false } = {}) {
   const severity = document.createElement("span");
   severity.className = "media-releases__severity";
   const isDecreasingThreat = item.warningLevel === "Advice"
-    && /\bdecreasing[\s_-]+threats?\b/i.test([item.title, item.name].filter(Boolean).join(" "));
+    && /\bdecreasing[\s_-]+threats?\b/i.test([item.title, item.originalTitle, item.name].filter(Boolean).join(" "));
   const isGeneralInformation = item.declarations.length
     ? item.declarations.some((declaration) => declaration !== "Planned burn advice")
     : !["Emergency warning", "Watch and act", "Advice"].includes(item.warningLevel) && !isDecreasingThreat;

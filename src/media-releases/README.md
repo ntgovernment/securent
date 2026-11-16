@@ -25,6 +25,25 @@ timestamps are stored as ISO values in the time element's `data-time`
 attribute, and the relative labels refresh every minute using minutes, hours,
 or days ago.
 
+Both warning displays also request the `mapped-warnings` integration and match
+its `campaignId` to the release `CampaignID`. Mapped warning titles use
+**[Type] [Level] for [Location]** when those values are available; missing or
+invalid fields use the existing classification, and an unavailable location
+leaves the original title unchanged. Mapped regions replace inferred regions
+and can include multiple regions. The full Greater Darwin region name maps to
+the existing **Greater Darwin** label. Mapped locations are searchable.
+Declarations retain their existing type, filters and styling, with mapped
+locations and regions where available.
+
+If the mapped feed fails, returns an invalid response or times out after eight seconds, both pages
+show the existing warnings and an accessible notice; source-feed errors remain
+separately reported. Production hosts must be able to fetch the integration
+from their origin, with CORS configured when cross-origin. The localhost
+preview serves `mapped-warnings.preview.json` at
+`/api/media-releases/mapped-warnings` for representative synthetic and
+local-source campaigns; unmatched records use the existing logic. Vite loads
+both warning scripts from source during local development.
+
 Featured warning titles use an `h3` styled at 20px bold with a 24px line
 height. Severity badges use 12px bold Lato, 16px line height, 1px letter
 spacing, and 4px by 8px padding. Emergency uses the danger background/text

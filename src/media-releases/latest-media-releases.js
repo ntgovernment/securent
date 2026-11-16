@@ -1,5 +1,5 @@
 import { curateFeeds } from "./curation.mjs";
-import { latestMediaReleaseEndpoint } from "./feeds.mjs";
+import { latestMediaReleaseEndpoint, loadMappedWarnings, mappedWarningsEndpoint } from "./feeds.mjs";
 import { createCardSkeleton, renderCard, startRelativeTimeUpdates } from "./media-release-card.js";
 
 const listing = document.querySelector("[data-latest-media-releases]");
@@ -14,19 +14,24 @@ if (listing) {
   status.classList.add("media-releases__status--loading");
   status.textContent = "Loading current warnings...";
   results.replaceChildren(...Array.from({ length: 3 }, () => createCardSkeleton({ featured: true })));
-  fetch(isLocalPreview ? "/api/media-releases/latest" : latestMediaReleaseEndpoint,
+  const releases = fetch(isLocalPreview ? "/api/media-releases/latest" : latestMediaReleaseEndpoint,
     { headers: { Accept: "application/json" }, credentials: "same-origin" })
     .then((response) => {
       if (!response.ok) throw new Error(`Request failed (${response.status})`);
       return response.json();
-    })
-    .then((records) => {
+    });
+  Promise.all([
+    releases,
+    loadMappedWarnings(fetch, isLocalPreview ? "/api/media-releases/mapped-warnings" : mappedWarningsEndpoint),
+  ])
+    .then(([records, { mappedWarnings, mappingFailed }]) => {
       if (!Array.isArray(records)) throw new TypeError("Warnings endpoint returned an unsupported response shape");
-      const items = curateFeeds([{ source: "Merged", items: records }]).slice(0, 3);
+      const items = curateFeeds([{ source: "Merged", items: records }], mappedWarnings).slice(0, 3);
       results.replaceChildren(...items.map((item) => renderCard(item, { featured: true })));
       status.textContent = items.length ? "" : "There are no current warnings.";
-      feedNote.hidden = true;
-      feedNote.textContent = "";
+      feedNote.hidden = !mappingFailed;
+      feedNote.textContent = mappingFailed
+        ? "Mapped warning details are unavailable; existing warning details are shown." : "";
     })
     .catch((error) => {
       results.replaceChildren();

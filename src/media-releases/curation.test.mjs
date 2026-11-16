@@ -12,6 +12,73 @@ const record = (overrides = {}) => ({
   ...overrides,
 });
 
+test("enriches a matched campaign with mapped title, classifications and multiple regions", () => {
+  const items = curateFeeds([{ source: "NTES", items: [
+    record(), record({ CampaignID: "unmapped", Subject: "Storm Advice - Darwin" }),
+  ] }], [{
+    campaignId: "campaign-1", emergencyType: "storm", warningLevel: "watch_act",
+    location: "Parts of Daly and Arnhem Districts", region: ["Top End", "East Arnhem", "Big Rivers", "Top End"],
+  }]);
+  const notice = items.find((item) => item.campaignId === "campaign-1");
+  const untouched = items.find((item) => item.campaignId === "unmapped");
+
+  assert.equal(notice.title, "Storm Watch and act for Parts of Daly and Arnhem Districts");
+  assert.deepEqual(notice.emergencyTypes, ["Storm"]);
+  assert.equal(notice.warningLevel, "Watch and act");
+  assert.deepEqual(notice.regions, ["Top End", "East Arnhem", "Big Rivers"]);
+  assert.ok(notice.locationTerms.includes("Parts of Daly and Arnhem Districts"));
+  assert.deepEqual(filterAndSortNotices([notice], { regions: ["East Arnhem"] }), [notice]);
+  assert.deepEqual(filterAndSortNotices([notice], { query: "daly river" }), [notice]);
+  assert.deepEqual(filterAndSortNotices([notice], { query: "arnhem districts" }), [notice]);
+  assert.equal(untouched.title, "Storm Advice - Darwin");
+});
+
+test("uses existing values for incomplete, invalid and conflicting mapped fields", () => {
+  const feeds = [{ source: "NTES", items: [record()] }];
+  const baseline = curateFeeds(feeds)[0];
+  const [partial] = curateFeeds(feeds, [{
+    campaignId: "campaign-1", emergencyType: null, warningLevel: "invalid",
+    location: "Remote place", region: ["Greater Darwin, Palmerston and Litchfield"],
+  }]);
+  assert.equal(partial.title, "Flooding Advice for Remote place");
+  assert.deepEqual(partial.regions, ["Greater Darwin"]);
+  const [missingLocation] = curateFeeds(feeds, [{
+    campaignId: "campaign-1", emergencyType: "storm", warningLevel: null, location: null, region: [],
+  }]);
+  assert.equal(missingLocation.title, baseline.title);
+  assert.deepEqual(missingLocation.emergencyTypes, ["Storm"]);
+  assert.deepEqual(missingLocation.regions, baseline.regions);
+  const originalWarn = console.warn;
+  const warnings = [];
+  console.warn = (...args) => warnings.push(args);
+  try {
+    const [conflicted] = curateFeeds(feeds, [
+      { campaignId: "campaign-1", emergencyType: "storm", location: "A" },
+      { campaignId: "campaign-1", emergencyType: "bushfire", location: "B" },
+      { docid: "campaign-1", emergencyType: "cyclone", location: "C" },
+    ]);
+    assert.equal(conflicted.title, baseline.title);
+    assert.deepEqual(conflicted.emergencyTypes, baseline.emergencyTypes);
+    assert.equal(warnings.length, 2);
+  } finally {
+    console.warn = originalWarn;
+  }
+});
+
+test("retains declaration semantics while applying mapped location and regions", () => {
+  const [notice] = curateFeeds([{ source: "Bushfires NT", items: [record({
+    Name: "Planned burn advice - Darwin", Subject: "Planned burn advice - Darwin",
+  })] }], [{
+    campaignId: "campaign-1", emergencyType: "bushfire", warningLevel: "advice",
+    location: "Old Bynoe Road", region: ["Top End", "Big Rivers"],
+  }]);
+  assert.equal(notice.title, "Planned burn advice for Old Bynoe Road");
+  assert.deepEqual(notice.declarations, ["Planned burn advice"]);
+  assert.deepEqual(notice.emergencyTypes, []);
+  assert.equal(notice.warningLevel, "Not identified");
+  assert.deepEqual(notice.regions, ["Top End", "Big Rivers"]);
+});
+
 test("includes operational warning and public health alert language", () => {
   assert.equal(isOperationalNotice(record()), true);
   assert.equal(isOperationalNotice(record({

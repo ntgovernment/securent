@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { fetchAirQuality, fetchAirQualityStations } from "./src/local-conditions/air-quality.mjs";
 import { FIRE_AREA_CODES, readFireDanger } from "./src/local-conditions/fire-danger.mjs";
-import { latestMediaReleaseEndpoint, mediaReleaseSources } from "./src/media-releases/feeds.mjs";
+import { latestMediaReleaseEndpoint, mappedWarningsEndpoint, mediaReleaseSources } from "./src/media-releases/feeds.mjs";
 import { randomizePreviewWarnings } from "./src/media-releases/preview-warnings.mjs";
 
 const sourceThemePreview = {
@@ -16,10 +16,15 @@ const sourceThemePreview = {
   transformIndexHtml: {
     order: "pre",
     handler(html) {
-      return html.replace(
-        /href=(["'])(?:\.\/|\/)dist\/theme\.css(?:\?[^"']*)?\1/g,
-        'href="/src/css/main.css"',
-      );
+      return html
+        .replace(
+          /href=(["'])(?:\.\/|\/)dist\/theme\.css(?:\?[^"']*)?\1/g,
+          'href="/src/css/main.css"',
+        )
+        .replace(
+          /src=(["'])(?:\.\/|\/)dist\/(latest-media-releases|media-releases)\.js(?:\?[^"']*)?\1/g,
+          'src="/src/media-releases/$2.js"',
+        );
     },
   },
 };
@@ -212,6 +217,7 @@ const mediaReleaseFeedProxy = {
   configureServer(server) {
     const feeds = new Map(mediaReleaseSources.map((source) => [source.id, source.endpoint]));
     feeds.set("latest", latestMediaReleaseEndpoint);
+    feeds.set("mapped-warnings", mappedWarningsEndpoint);
 
     server.middlewares.use("/api/media-releases", async (req, res) => {
       const sourceId = new URL(req.url, "http://localhost").pathname.replace(/^\//, "");
@@ -231,6 +237,9 @@ const mediaReleaseFeedProxy = {
           payload = JSON.parse(await readFile(new URL("./src/media-releases/latest-warnings.preview.json", import.meta.url), "utf8"));
           if (!Array.isArray(payload)) throw new TypeError("Local warning preview must be an array");
           payload = randomizePreviewWarnings(payload);
+        } else if (sourceId === "mapped-warnings") {
+          payload = JSON.parse(await readFile(new URL("./src/media-releases/mapped-warnings.preview.json", import.meta.url), "utf8"));
+          if (!Array.isArray(payload)) throw new TypeError("Local mapped warnings preview must be an array");
         } else {
           const response = await fetch(endpoint, { headers: { Accept: "application/json" } });
           if (!response.ok) throw new Error(`Feed request failed (${response.status})`);

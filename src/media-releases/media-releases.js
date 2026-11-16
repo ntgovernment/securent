@@ -1,7 +1,7 @@
 import "./media-releases.css";
 import { attachAutocomplete, getAutocompleteCandidates } from "../search/autocomplete.mjs";
 import { curateFeeds, filterAndSortNotices, warningLevelOrder } from "./curation.mjs";
-import { fetchMediaReleaseFeeds, mediaReleaseSources } from "./feeds.mjs";
+import { fetchMediaReleaseFeeds, loadMappedWarnings, mappedWarningsEndpoint, mediaReleaseSources } from "./feeds.mjs";
 import { getPageWindow } from "../pagination/page-window.mjs";
 import { createCardSkeleton, renderCard, startRelativeTimeUpdates } from "./media-release-card.js";
 const listing = document.querySelector("[data-media-releases]");
@@ -74,7 +74,7 @@ if (listing) {
 
   const searchAutocomplete = attachAutocomplete(search, searchSuggestions, () => items
     .flatMap((item) => getAutocompleteCandidates([
-      item.title, item.name, ...item.regions, ...(item.locationTerms || []),
+      item.title, item.originalTitle, item.name, ...item.regions, ...(item.locationTerms || []),
     ])));
 
   function selectedValues(name) {
@@ -241,11 +241,12 @@ if (listing) {
     renderPagination(pageCount);
   }
 
-  function showFeedNotes(failedSources) {
+  function showFeedNotes(failedSources, mappingFailed) {
     const messages = [];
     if (failedSources.length) {
       messages.push(`Some feeds are unavailable: ${failedSources.join(", ")}.`);
     }
+    if (mappingFailed) messages.push("Mapped warning details are unavailable; existing warning details are shown.");
     feedNote.hidden = messages.length === 0;
     feedNote.textContent = messages.join(" ");
   }
@@ -275,17 +276,18 @@ if (listing) {
   });
 
   setLoading(true);
-  fetchMediaReleaseFeeds(
-    fetch,
-    (source) => isLocalPreview
-      ? `/${source.id}.json`
-      : source.endpoint,
-  )
-    .then(({ feeds, failedSources }) => {
-      items = curateFeeds(feeds);
+  Promise.all([
+    fetchMediaReleaseFeeds(
+      fetch,
+      (source) => isLocalPreview ? `/${source.id}.json` : source.endpoint,
+    ),
+    loadMappedWarnings(fetch, isLocalPreview ? "/api/media-releases/mapped-warnings" : mappedWarningsEndpoint),
+  ])
+    .then(([{ feeds, failedSources }, { mappedWarnings, mappingFailed }]) => {
+      items = curateFeeds(feeds, mappedWarnings);
       renderFilters();
       searchAutocomplete.refresh();
-      showFeedNotes(failedSources);
+      showFeedNotes(failedSources, mappingFailed);
       render();
     })
     .catch((error) => {

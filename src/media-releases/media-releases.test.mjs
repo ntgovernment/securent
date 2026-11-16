@@ -301,7 +301,7 @@ for (const scenario of ["populated", "empty", "partial failure", "total failure"
         ["[data-region-filters]", 4],
         ["[data-source-filters]", 3],
       ];
-      assert.equal(requests.length, 3);
+      assert.equal(requests.length, 4);
       assert.equal(loadingStatus.getAttribute("role"), "status");
       assert.equal(loadingStatus.getAttribute("aria-live"), "polite");
       assert.equal(loadingStatus.textContent, "Loading current warnings...");
@@ -343,7 +343,9 @@ for (const scenario of ["populated", "empty", "partial failure", "total failure"
         };
       }
       requests.forEach((request, index) => {
-        if (scenario === "total failure" || (scenario === "partial failure" && index === 0)) {
+        if (index === 3) {
+          request.resolve({ ok: true, json: async () => [] });
+        } else if (scenario === "total failure" || (scenario === "partial failure" && index === 0)) {
           request.reject(new Error("Feed offline"));
         } else {
           request.resolve({ ok: true, json: async () => scenario === "empty" ? [] : [notice] });
@@ -374,6 +376,130 @@ for (const scenario of ["populated", "empty", "partial failure", "total failure"
     }
   });
 }
+
+for (const page of ["listing", "homepage"]) {
+  test(`${page} renders the same mapped warning details`, async () => {
+    const window = new Window({ url: "http://localhost/" });
+    window.document.write(page === "listing" ? html : `<section data-latest-media-releases>
+      <p data-results-status role="status"></p><p data-feed-note hidden></p>
+      <div data-results></div></section>`);
+    const originals = { window: globalThis.window, document: globalThis.document, fetch: globalThis.fetch };
+    globalThis.window = window;
+    globalThis.document = window.document;
+    globalThis.fetch = async (url) => ({
+      ok: true,
+      json: async () => url === "/api/media-releases/mapped-warnings" ? [{
+        campaignId: "campaign-1", emergencyType: "storm", warningLevel: "watch_and_act",
+        location: "Daly and Arnhem Districts", region: ["Top End", "East Arnhem", "Big Rivers"],
+      }] : page === "homepage" || url === "/ntes.json" ? [notice] : [],
+    });
+    try {
+      await import(`../../dist/${page === "homepage" ? "latest-media-releases" : "media-releases"}.js?mapped-${page}`);
+      await new Promise((resolve) => setImmediate(resolve));
+      const listing = window.document.querySelector(page === "homepage" ? "[data-latest-media-releases]" : "[data-media-releases]");
+      const card = listing.querySelector(".media-releases__item");
+      assert.equal(card.querySelector("h3").textContent, "Storm Watch and act for Daly and Arnhem Districts");
+      assert.match(card.querySelector(".media-releases__region").textContent, /Top End, East Arnhem, Big Rivers/);
+      assert.equal(card.dataset.warningLevel, "watch_act");
+      assert.match(card.querySelector("img").src, /storm-watch_act\.webp/);
+      assert.equal(listing.querySelector("[data-feed-note]").hidden, true);
+      if (page === "homepage") {
+        assert.equal(card.querySelector(".media-releases__severity").textContent, "Watch and act");
+      } else {
+        const region = listing.querySelector('[data-region-filters] input[value="East Arnhem"]');
+        assert.equal(region.parentElement.textContent, "East Arnhem (1)");
+        region.checked = true;
+        region.dispatchEvent(new window.Event("change", { bubbles: true }));
+        assert.equal(listing.querySelectorAll(".media-releases__item").length, 1);
+        const search = listing.querySelector("[data-search]");
+        search.value = "Arnhem Districts";
+        search.dispatchEvent(new window.Event("input"));
+        assert.equal(listing.querySelectorAll(".media-releases__item").length, 1);
+      }
+    } finally {
+      Object.assign(globalThis, originals);
+      await window.happyDOM.close();
+    }
+  });
+}
+
+test("listing retains warnings and reports source and mapping failures together", async () => {
+  const window = new Window({ url: "http://localhost/" });
+  window.document.write(html);
+  const originals = { window: globalThis.window, document: globalThis.document, fetch: globalThis.fetch };
+  const originalError = console.error;
+  const errors = [];
+  globalThis.window = window;
+  globalThis.document = window.document;
+  globalThis.fetch = async (url) => {
+    if (url === "/api/media-releases/mapped-warnings" || url === "/bushfires-nt.json") throw new Error("offline");
+    return { ok: true, json: async () => url === "/ntes.json" ? [notice] : [] };
+  };
+  console.error = (...args) => errors.push(args);
+  try {
+    await import("../../dist/media-releases.js?mapping-failure");
+    await new Promise((resolve) => setImmediate(resolve));
+    const listing = window.document.querySelector("[data-media-releases]");
+    assert.equal(listing.querySelector(".media-releases__title").textContent, notice.Subject);
+    assert.match(listing.querySelector("[data-feed-note]").textContent, /Bushfires NT.*Mapped warning details are unavailable/);
+    assert.ok(errors.some(([message]) => message === "Unable to load mapped warnings"));
+  } finally {
+    console.error = originalError;
+    Object.assign(globalThis, originals);
+    await window.happyDOM.close();
+  }
+});
+
+test("homepage preserves decreasing-threat badge when mapping replaces the subject", async () => {
+  const window = new Window({ url: "http://localhost/" });
+  window.document.write(`<section data-latest-media-releases>
+    <p data-results-status></p><p data-feed-note hidden></p><div data-results></div></section>`);
+  const originals = { window: globalThis.window, document: globalThis.document, fetch: globalThis.fetch };
+  globalThis.window = window;
+  globalThis.document = window.document;
+  globalThis.fetch = async (url) => ({
+    ok: true,
+    json: async () => url === "/api/media-releases/mapped-warnings"
+      ? [{ campaignId: "campaign-1", emergencyType: "flood", warningLevel: "advice", location: "Katherine", region: ["Big Rivers"] }]
+      : [{ ...notice, Name: "Flood advice", Subject: "Flood advice - Decreasing threat - Katherine" }],
+  });
+  try {
+    await import("../../dist/latest-media-releases.js?mapped-decreasing-threat");
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.equal(window.document.querySelector(".media-releases__title").textContent, "Flooding Advice for Katherine");
+    assert.equal(window.document.querySelector(".media-releases__severity").textContent, "Decreasing threat");
+  } finally {
+    Object.assign(globalThis, originals);
+    await window.happyDOM.close();
+  }
+});
+
+test("homepage displays existing warnings when mapped warnings fail", async () => {
+  const window = new Window({ url: "http://localhost/" });
+  window.document.write(`<section data-latest-media-releases>
+    <p data-results-status></p><p data-feed-note hidden></p><div data-results></div></section>`);
+  const originals = { window: globalThis.window, document: globalThis.document, fetch: globalThis.fetch };
+  const originalError = console.error;
+  const errors = [];
+  globalThis.window = window;
+  globalThis.document = window.document;
+  globalThis.fetch = async (url) => {
+    if (url === "/api/media-releases/mapped-warnings") throw new Error("offline");
+    return { ok: true, json: async () => [notice] };
+  };
+  console.error = (...args) => errors.push(args);
+  try {
+    await import("../../dist/latest-media-releases.js?mapped-failure");
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.equal(window.document.querySelector(".media-releases__title").textContent, notice.Subject);
+    assert.match(window.document.querySelector("[data-feed-note]").textContent, /Mapped warning details are unavailable/);
+    assert.ok(errors.some(([message]) => message === "Unable to load mapped warnings"));
+  } finally {
+    console.error = originalError;
+    Object.assign(globalThis, originals);
+    await window.happyDOM.close();
+  }
+});
 
 for (const scenario of ["latest three", "production endpoint", "fewer than three", "missing icon", "unknown region", "empty", "invalid response", "http failure", "total failure"]) {
   test(`homepage warning cards handle ${scenario}`, async () => {
@@ -410,7 +536,7 @@ for (const scenario of ["latest three", "production endpoint", "fewer than three
       assert.ok(results.querySelector(".media-releases__skeleton--featured"));
       assert.equal(listing.querySelector("[data-results-status]").textContent, "Loading current warnings...");
       assert.ok(listing.querySelector("[data-results-status]").classList.contains("media-releases__status--loading"));
-      assert.equal(requests.length, 1);
+      assert.equal(requests.length, 2);
       assert.equal(requests[0].url, scenario === "production endpoint"
         ? "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor"
         : "/api/media-releases/latest");
@@ -420,8 +546,10 @@ for (const scenario of ["latest three", "production endpoint", "fewer than three
         Subject: `Flood Advice - Daly River - ${day}`,
         SentDate: `2026-11-0${day} 09:00:00`,
       }));
-      requests.forEach((request) => {
-        if (scenario === "total failure") {
+      requests.forEach((request, index) => {
+        if (index === 1) {
+          request.resolve({ ok: true, json: async () => [] });
+        } else if (scenario === "total failure") {
           request.reject(new Error("Feed offline"));
         } else if (scenario === "http failure") {
           request.resolve({ ok: false, status: 503 });

@@ -1,0 +1,37 @@
+[
+  {
+    "campaignId": "preview-storm-advice",
+    "emergencyType": "storm",
+    "warningLevel": "advice",
+    "location": "Parts of Daly and Arnhem Districts",
+    "region": ["Top End", "East Arnhem", "Big Rivers"]
+  },
+  {
+    "campaignId": "preview-cyclone-emergency",
+    "emergencyType": "cyclone",
+    "warningLevel": "emergency_warning",
+    "location": "Darwin",
+    "region": ["Greater Darwin, Palmerston and Litchfield"]
+  },
+  {
+    "campaignId": "preview-flood-decreasing-threat",
+    "emergencyType": "flood",
+    "warningLevel": "advice",
+    "location": "Katherine",
+    "region": ["Big Rivers"]
+  },
+  {
+    "campaignId": "preview-planned-burn",
+    "emergencyType": "bushfire",
+    "warningLevel": "advice",
+    "location": "Darwin",
+    "region": ["Greater Darwin, Palmerston and Litchfield"]
+  },
+  {
+    "campaignId": "06307b92915bcbf880dd45f3fd0b4217",
+    "emergencyType": "bushfire",
+    "warningLevel": "advice",
+    "location": "Jenkins Road, WEDDELL",
+    "region": ["Greater Darwin, Palmerston and Litchfield"]
+  }
+]

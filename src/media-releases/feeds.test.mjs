@@ -1,8 +1,47 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { fetchMediaReleaseFeeds, mediaReleaseSources, parseFeedPayload } from "./feeds.mjs";
+import { fetchMappedWarnings, fetchMediaReleaseFeeds, loadMappedWarnings, mappedWarningsEndpoint, mediaReleaseSources, parseFeedPayload } from "./feeds.mjs";
 
 const source = { name: "NTG agencies" };
+
+test("loads and validates the mapped warnings feed", async () => {
+  const records = [{ campaignId: "one", region: ["Top End", "Barkly"] }];
+  assert.deepEqual(await fetchMappedWarnings(async (url, options) => {
+    assert.equal(url, mappedWarningsEndpoint);
+    assert.equal(options.headers.Accept, "application/json");
+    assert.ok(options.signal);
+    return { ok: true, json: async () => records };
+  }), records);
+  await assert.rejects(fetchMappedWarnings(async () => ({ ok: false, status: 503 })), /503/);
+  await assert.rejects(fetchMappedWarnings(async () => ({ ok: true, json: async () => ({}) })), /unsupported response shape/);
+});
+
+test("reports mapping failures while allowing warnings to fall back", async () => {
+  const originalError = console.error;
+  const errors = [];
+  console.error = (...args) => errors.push(args);
+  try {
+    assert.deepEqual(await loadMappedWarnings(async () => { throw new Error("offline"); }), {
+      mappedWarnings: [], mappingFailed: true,
+    });
+    assert.match(String(errors[0][1]), /offline/);
+  } finally {
+    console.error = originalError;
+  }
+});
+
+test("times out even if the mapping request does not respond to cancellation", async () => {
+  const originalSetTimeout = globalThis.setTimeout;
+  globalThis.setTimeout = (callback) => {
+    queueMicrotask(callback);
+    return undefined;
+  };
+  try {
+    await assert.rejects(fetchMappedWarnings(() => new Promise(() => {})), /timed out/);
+  } finally {
+    globalThis.setTimeout = originalSetTimeout;
+  }
+});
 
 test("uses the configured integration URLs and supports localhost proxy overrides", async () => {
   const requested = [];
