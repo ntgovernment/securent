@@ -22,7 +22,7 @@ test("enriches a matched campaign with mapped title, classifications and multipl
   const notice = items.find((item) => item.campaignId === "campaign-1");
   const untouched = items.find((item) => item.campaignId === "unmapped");
 
-  assert.equal(notice.title, "Storm watch and act for Parts of Daly and Arnhem Districts");
+  assert.equal(notice.title, "Storm watch and act for parts of Daly and Arnhem Districts");
   assert.deepEqual(notice.emergencyTypes, ["Storm"]);
   assert.equal(notice.warningLevel, "Watch and act");
   assert.deepEqual(notice.regions, ["Top End", "East Arnhem", "Big Rivers"]);
@@ -31,6 +31,20 @@ test("enriches a matched campaign with mapped title, classifications and multipl
   assert.deepEqual(filterAndSortNotices([notice], { query: "daly river" }), [notice]);
   assert.deepEqual(filterAndSortNotices([notice], { query: "arnhem districts" }), [notice]);
   assert.equal(untouched.title, "Storm Advice - Darwin");
+});
+
+test("lowercases only a leading part-of phrase in mapped locations", () => {
+  for (const [location, expected] of [
+    ["Part of Darwin", "part of Darwin"],
+    ["PARTS OF Daly and Arnhem", "parts of Daly and Arnhem"],
+    ["Darwin Parts of Town", "Darwin Parts of Town"],
+    ["Part ofTown", "Part ofTown"],
+  ]) {
+    const [notice] = curateFeeds([{ source: "NTES", items: [record()] }], [{
+      campaignId: "campaign-1", emergencyType: "storm", warningLevel: "advice", location,
+    }]);
+    assert.equal(notice.title, `Storm advice for ${expected}`);
+  }
 });
 
 test("uses existing values for incomplete, invalid and conflicting mapped fields", () => {
@@ -79,9 +93,9 @@ test("retains declaration semantics while applying mapped location and regions",
     Name: "Planned burn advice - Darwin", Subject: "Planned burn advice - Darwin",
   })] }], [{
     campaignId: "campaign-1", emergencyType: "bushfire", warningLevel: "advice",
-    location: "Old Bynoe Road", region: ["Top End", "Big Rivers"],
+    location: "Part of Old Bynoe Road", region: ["Top End", "Big Rivers"],
   }]);
-  assert.equal(notice.title, "Planned burn advice for Old Bynoe Road");
+  assert.equal(notice.title, "Planned burn advice for part of Old Bynoe Road");
   assert.deepEqual(notice.declarations, ["Planned burn advice"]);
   assert.deepEqual(notice.emergencyTypes, []);
   assert.equal(notice.warningLevel, "Not identified");

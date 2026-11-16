@@ -218,13 +218,14 @@ function enrichNotice(item, mappings) {
   const type = mappedField(mappings, "emergencyType", (value) => mappedTypes.get(mappedKey(value)));
   const level = mappedField(mappings, "warningLevel", (value) => mappedLevels.get(mappedKey(value)));
   const location = mappedField(mappings, "location", cleanText);
+  const titleLocation = location && location.replace(/^parts? of\b/i, (prefix) => prefix.toLocaleLowerCase("en"));
   const regions = mappedField(mappings, "region", mappedRegions);
   if (regions) item.regions = regions;
   if (location) item.locationTerms = [...new Set([...(item.locationTerms || []), location])];
   if (item.declarations.length) {
     if (location) {
       item.originalTitle = item.title;
-      item.title = `${item.declarations.join(", ")} for ${location}`;
+      item.title = `${item.declarations.join(", ")} for ${titleLocation}`;
     }
     return item;
   }
@@ -234,7 +235,7 @@ function enrichNotice(item, mappings) {
     ? item.emergencyTypes[0] : "";
   if (location && titleType && item.warningLevel !== "Not identified") {
     item.originalTitle = item.title;
-    item.title = `${titleType} ${item.warningLevel.toLocaleLowerCase("en")} for ${location}`;
+    item.title = `${titleType} ${item.warningLevel.toLocaleLowerCase("en")} for ${titleLocation}`;
   }
   return item;
 }

@@ -390,7 +390,7 @@ for (const page of ["listing", "homepage"]) {
       ok: true,
       json: async () => url === "/api/media-releases/mapped-warnings" ? [{
         campaignId: "campaign-1", emergencyType: "storm", warningLevel: "watch_and_act",
-        location: "Daly and Arnhem Districts", region: ["Top End", "East Arnhem", "Big Rivers"],
+        location: "Parts of Daly and Arnhem Districts", region: ["Top End", "East Arnhem", "Big Rivers"],
       }] : page === "homepage" || url === "/ntes.json" ? [notice] : [],
     });
     try {
@@ -398,7 +398,7 @@ for (const page of ["listing", "homepage"]) {
       await new Promise((resolve) => setImmediate(resolve));
       const listing = window.document.querySelector(page === "homepage" ? "[data-latest-media-releases]" : "[data-media-releases]");
       const card = listing.querySelector(".media-releases__item");
-      assert.equal(card.querySelector("h3").textContent, "Storm watch and act for Daly and Arnhem Districts");
+      assert.equal(card.querySelector("h3").textContent, "Storm watch and act for parts of Daly and Arnhem Districts");
       assert.match(card.querySelector(".media-releases__region").textContent, /Top End, East Arnhem, Big Rivers/);
       assert.equal(card.dataset.warningLevel, "watch_act");
       assert.match(card.querySelector("img").src, /storm-watch_act\.webp/);
