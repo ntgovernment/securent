@@ -261,6 +261,7 @@ export default defineConfig({
         "event-styles": "./src/events/event.css",
         "social-share-styles": "./src/social-share/social-share.css",
         "social-share": "./src/social-share/social-share.js",
+        "search-results": "./src/search/results-entry.ts",
         theme: "./src/js/main.js",
         "local-conditions": "./src/local-conditions/local-conditions.js",
       },
@@ -272,6 +273,7 @@ export default defineConfig({
           chunk.name === "media-releases" ||
           chunk.name === "latest-media-releases" ||
           chunk.name === "social-share" ||
+          chunk.name === "search-results" ||
           chunk.name === "local-conditions"
             ? "[name].js"
             : "SecureNT_files/[name].js",

@@ -47,6 +47,13 @@ securent/
 │   ├── social-share/
 │   │   ├── social-share.css          # Standalone styles for the Squiz share nester
 │   │   └── social-share.js           # Share popups and copy-link behavior
+│   ├── search/
+│   │   ├── README.md                 # Coveo presentation, CMS script order and publication
+│   │   ├── results.css               # Scoped result cards, controls and pagination styling
+│   │   ├── results.ts                # JSON-title breadcrumbs and updated-date enhancement
+│   │   ├── results-entry.ts          # Standalone search presentation entry point
+│   │   ├── results.test.mjs          # Search rendering and title-lookup regressions
+│   │   └── autocomplete.mjs          # Shared listing autocomplete helper
 │   ├── css/
 │   │   ├── main.css                  # CSS entry point — add @imports here
 │   │   └── components/
@@ -85,6 +92,8 @@ securent/
 │   ├── social-share.css
 │   ├── social-share.js
 │   ├── local-conditions.js
+│   ├── search-results.js             # Search-page-only Coveo presentation enhancer
+│   ├── *.json                        # Copied public feed snapshots and generated Wrangler config
 │   ├── theme.css
 │   └── theme.js
 ├── assets/hazard-icons/              # Shared hazard alert pictograms
@@ -93,12 +102,18 @@ securent/
 ├── Content page _ SecureNT.html      # Local emergency-plans content capture (gitignored)
 ├── alerts-and-warnings.html          # Alerts and warnings page capture
 ├── media-releases.html                # Current warnings preview page
+├── Search _ SecureNT.html            # Archived search-page browser capture
+├── Search _ SecureNT_files/          # Dependencies retained with the search capture
 ├── Severe Storm – Alice Springs _ SecureNT.html   # Default development event capture
 ├── vite.config.mjs
 └── package.json
 ```
 
 The homepage capture (`SecureNT.html`), emergency-plans content capture (`Content page _ SecureNT.html`), and shared `SecureNT_files/` assets are excluded from Git. Local captures use built page-specific styles and scripts from `dist/`; captured upstream dependencies and static assets may remain in `SecureNT_files/`. The event capture uses shared local assets, hazard icons from `assets/hazard-icons/`, and standalone `dist/event.css`, `dist/social-share.css`, and `dist/social-share.js` assets; it no longer has a separate asset folder. The content-page capture uses the same standalone event and share assets. On desktop, the event share panel aligns with the first content section after the event H1; on content pages, `content-page.css` aligns the first content block with the share panel when there is no in-page navigation. The local captures share the same two-row header: `.header-top` holds the logo, emergency contacts, and desktop search, while `.header-navigation` holds the primary navigation. The separate mobile search banner remains below the header. `vite.config.mjs` includes `SecureNT.html` as the build HTML entry when that optional capture exists; its production HTML transform removes references to the two local WEBP photos so they are not emitted in `dist/`, while development preview retains them. The event preview does not change production build inputs. The `dist/` files are tracked because they are consumed by the Squiz Matrix file bridge.
+
+The tracked search capture and its companion assets are archived browser snapshots, not production build entries. They retain the original captured theme and template rather than automatically loading the new search enhancer. See [the search guide](src/search/README.md) for the live CMS integration and validation steps. Captured vendor files retain their existing license notices.
+
+The JSON feed files in `dist/` are build copies of the tracked snapshots in `public/`; edit the source snapshots, not the copies. They are not evidence of current emergency conditions. `dist/wrangler.json` is generated from `wrangler.jsonc` and can contain machine-specific source paths; regenerate it with the build rather than editing it manually.
 
 Primary navigation is rendered by Squiz Matrix, not rebuilt from `src/data/navigation.js`. Use the [Main, Level 2 and Level 3 asset-listing templates](src/navigation/README.md), preserving `%asset_short_name_linked%` and the existing dynamic-root nesting calls. `src/js/main.js` binds the `.cms-main-nav` tree without replacing links or changing URLs. Publish the matching listing markup, `dist/theme.js` and `dist/theme.css` together and refresh their CMS cache versions. Older captures without `.cms-main-nav` retain their original links in a static fallback instead of receiving hard-coded replacements.
 
@@ -147,6 +162,14 @@ The Level filter uses severity order: Emergency warning, Watch and act, Advice, 
 The shared **Sort by** dropdown offers Current order (the default feed order), Warning level, Newest updated, Location A-Z, and Title A-Z. Sorting applies to combined search/filter matches before pagination; changing sort resets to page 1. Equal values retain feed order. Warning levels sort Emergency warning, Watch and act, Advice, then Decreasing threat, with unknown levels last. Empty locations and invalid or missing update dates sort last. Timezone-less CMS `updatedAt` timestamps are interpreted as Northern Territory time (UTC+09:30); ISO timestamps with explicit offsets retain their offsets. Confirm this timezone assumption against the production endpoint before rollout.
 
 The controls enhance existing `.alerts-listing__filters` markup automatically, so no extra CMS control markup is needed. Rebuild and refresh the listing CSS/JS asset versions in both the local capture and CMS references after changes. The local listing references currently use CSS version `19` and JavaScript version `11`. Run focused sorting regressions with `node --test src/alerts-listing/sorting.test.mjs`.
+
+### Site search
+
+The [search guide](src/search/README.md) covers the Coveo presentation patch and its required CMS script ordering. Cards use Lato, teal title links, subtle separators and responsive padding, followed by JSON-title breadcrumb paths, existing descriptions and last-updated metadata. The patch also styles search controls and any existing pagination.
+
+Publish `dist/theme.css` and `dist/search-results.js` together, refresh their CMS cache references, and replace the old inline initialization with the guide's module import plus initialization block. Adding an independent module script beside the old classic initialization can run too late. Searching, corrections, filtering, result destinations and the existing 200-results-per-page setting remain owned by the CMS controller; no pagination is activated by this patch.
+
+Run `node --test src/search/results.test.mjs` with a Node.js release supporting native TypeScript stripping (Node.js 22.18+ or 24+), then `npm run build`. The focused regressions cover title lookups and caching, missing metadata, lookup failures and stale async responses. Deployment verification should include keyboard focus, type filtering and 375px, 768px and 1280px layouts. A local build or Git push does not update the CMS initialization markup or cache references automatically.
 
 ### Current Warnings
 
