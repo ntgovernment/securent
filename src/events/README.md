@@ -2,11 +2,33 @@
 
 This directory holds page-specific styles for event and recovery pages referenced directly by the CMS.
 
-The event page asset is `event.css`, which controls the warning-level header accent and responsive content widths. The reusable share nester lives in `src/social-share/`: `social-share.css` contains its styles and `social-share.js` handles popups and copy-link behavior.
+The event page asset is `event.css`, which controls the warning-level header accent and responsive content widths. The reusable share nester lives in `src/social-share/`: `social-share.css` contains its styles and `social-share.js` handles social popups, native sharing and the copy fallback.
 
 Reference `dist/social-share.css` from the Squiz Matrix share nester/page after the global theme, so its styles are loaded wherever that nester is used. Reference `dist/event.css` on event pages and `dist/social-share.js` for the share behavior. These assets are standalone and are not imported into the global theme bundle. On desktop, the share panel aligns with the first content section below the event H1; it stays in normal flow on smaller screens.
 
-The local Severe Storm - Alice Springs capture loads rebuilt `dist/event.css` and `dist/theme.js`. Its captured theme, vendor dependencies and social-share assets remain in the gitignored `Severe Storm – Alice Springs _ SecureNT_files/` directory. Run `npm run build` before previewing at `/` or `/Severe%20Storm%20%E2%80%93%20Alice%20Springs%20_%20SecureNT.html`. The page has a prominent synthetic-content notice; its sample text and captured warning panels are not live emergency information.
+The local Severe Storm - Alice Springs capture loads the rebuilt standalone social-share assets from `dist/`. Run `npm run build` before previewing at `/Severe%20Storm%20%E2%80%93%20Alice%20Springs%20_%20SecureNT.html`. The page has a prominent synthetic-content notice; its sample text and captured warning panels are not live emergency information.
+
+## Social-share paint layout
+
+Replace the existing copy-link list item with the following, keeping the other social links and the surrounding share section and list:
+
+```html
+<li class="list-group-item border-0 px-0">
+  <button type="button" class="ntg-social-share__link ntg-social-share--native"
+          aria-label="Share this page" title="Share this page">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <line x1="7" y1="12" x2="17" y2="6" stroke="currentColor" stroke-width="2"></line>
+      <line x1="7" y1="12" x2="17" y2="18" stroke="currentColor" stroke-width="2"></line>
+      <circle cx="5" cy="12" r="3" fill="currentColor"></circle>
+      <circle cx="19" cy="5" r="3" fill="currentColor"></circle>
+      <circle cx="19" cy="19" r="3" fill="currentColor"></circle>
+    </svg>
+  </button>
+  <div class="ntg-social-share__status" role="status" aria-live="polite"></div>
+</li>
+```
+
+The button shares the page title and URL using the Web Share API. When unavailable, it copies the URL and announces success or failure. Cancelling the native share sheet does nothing; other sharing errors are announced. Existing copy-link markup continues to work during rollout. Build with `npm run build`, publish `dist/social-share.css` and `dist/social-share.js` through the Git file bridge, and update the paint layout and cached asset references together. Run `node --test src/social-share/social-share.test.mjs` for the targeted tests.
 
 Warning accordions use the standalone stylesheet `dist/warning-accordion.css`, built from `src/css/components/warning-accordion.css`. Publish and reference that asset on event pages wherever the warning accordion markup is used.
 

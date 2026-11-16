@@ -53,6 +53,11 @@
   background-color: transparent !important;
 }
 
+button.ntg-social-share__link {
+  border: 0;
+  cursor: pointer;
+}
+
 .ntg-social-share__link i,
 .ntg-social-share__link i::before,
 .ntg-social-share__link svg {
@@ -82,11 +87,19 @@
   fill: currentColor !important;
 }
 
-.ntg-social-share #fade-text {
+.ntg-social-share #fade-text,
+.ntg-social-share__status {
   position: absolute;
   left: 1.5rem;
   top: 100%;
   z-index: 1;
+}
+
+.ntg-social-share__status:not(:empty) {
+  padding: 0.5rem;
+  background-color: #fff;
+  border: 1px solid var(--clr-text-default);
+  color: var(--clr-text-default);
 }
 
 @container (min-width: 500px) {

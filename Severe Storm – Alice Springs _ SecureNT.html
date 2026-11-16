@@ -764,7 +764,7 @@
                                 
                 <!-- Social share -->
                 <div class="float-right mt-5 d-print-none">
-                    <link rel="stylesheet" href="./Severe Storm – Alice Springs _ SecureNT_files/social-share.css"><section class="ntg-social-share">
+                    <link rel="stylesheet" href="./dist/social-share.css"><section class="ntg-social-share">
   <p class="mt-2 mb-0">Share this page</p>
   <ul class="list-group list-group-horizontal">
     <li class="list-group-item border-0 px-0 ntg-social-share--enabled" title="Share this page on Facebook">
@@ -793,17 +793,21 @@
         <span class="sr-only">Instagram</span>
       </a>
     </li>
-    <li class="list-group-item border-0 px-0" title="Copy URL of this page">
-      <a class="ntg-social-share__link ntg-social-share--copy" href="https://cmsexternal.nt.gov.au/securent/events/severe-storm-alice-springs/_nocache#void" role="button">
-        <i class="fal fa-copy"></i>
-        <span class="sr-only">Copy link</span>
-      </a>
-      <div id="fade-text" class="d-none">
-        <span class="d-inline-block p-2 bg-success text-white mt-3">URL copied!</span>
-      </div>
+    <li class="list-group-item border-0 px-0">
+      <button type="button" class="ntg-social-share__link ntg-social-share--native"
+              aria-label="Share this page" title="Share this page">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <line x1="7" y1="12" x2="17" y2="6" stroke="currentColor" stroke-width="2"></line>
+          <line x1="7" y1="12" x2="17" y2="18" stroke="currentColor" stroke-width="2"></line>
+          <circle cx="5" cy="12" r="3" fill="currentColor"></circle>
+          <circle cx="19" cy="5" r="3" fill="currentColor"></circle>
+          <circle cx="19" cy="19" r="3" fill="currentColor"></circle>
+        </svg>
+      </button>
+      <div class="ntg-social-share__status" role="status" aria-live="polite"></div>
     </li>
   </ul>
-</section><script type="module" src="./Severe Storm – Alice Springs _ SecureNT_files/social-share.js.download"></script> 
+</section><script type="module" src="./dist/social-share.js"></script>
                 </div>
 
                               </div>

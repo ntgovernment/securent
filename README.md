@@ -46,7 +46,7 @@ securent/
 │   │   └── wrangler.toml             # Worker deployment configuration
 │   ├── social-share/
 │   │   ├── social-share.css          # Standalone styles for the Squiz share nester
-│   │   └── social-share.js           # Share popups and copy-link behavior
+│   │   └── social-share.js           # Share popups, native sharing and copy fallback
 │   ├── search/
 │   │   ├── README.md                 # Coveo presentation, CMS script order and publication
 │   │   ├── results.css               # Scoped result cards, controls and pagination styling
@@ -254,10 +254,12 @@ Outputs to `dist/`:
 - `more-updates-cards.css` — styles for the bottom update cards on the Alerts and warnings page
 - `link-group-grid.css` — standalone styles for reusable groups of links
 - `event.css` and `social-share.css` — standalone event page and share nester styles
-- `social-share.js` — standalone event share popup and copy-link behavior
+- `social-share.js` — standalone social popups, native sharing and copy fallback
 - `local-conditions.js` — standalone location catalog and condition-card behavior; its CSS is included in `theme.css`
 
 `theme.css`, `theme.js`, `alerts-listing.css`, `alerts-listing.js`, `pagination.css`, `more-updates-cards.css`, `event.css`, `social-share.css`, `social-share.js`, and `local-conditions.js` are referenced in Squiz Matrix via the git file bridge. Reference `dist/social-share.css` from the Squiz share nester after the global theme; it remains a standalone asset rather than part of `dist/theme.css`. Captured HTML uses `SecureNT_files/print.css` for local print preview; Vite does not generate it under `dist/`.
+
+The share button uses the Web Share API when available and copies the URL otherwise. See [social-share paint layout guidance](src/events/README.md#social-share-paint-layout) for markup, fallback behavior and deployment.
 
 The build redirects the captured homepage's previous `dist/theme.css` reference to the generated `/theme.css`. Capture-only vendor styles are kept separate so the source theme bundle retains the expected `dist/theme.css` filename for the git file bridge.
 

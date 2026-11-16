@@ -37,6 +37,58 @@
     });
   });
 
+  Array.prototype.forEach.call(
+    document.querySelectorAll(".ntg-social-share--native"),
+    function (button) {
+      var item = button.closest("li");
+      var status = item && item.querySelector(".ntg-social-share__status");
+      if (!status) {
+        console.error("Share button is missing its status element.");
+        return;
+      }
+
+      button.addEventListener("click", function () {
+        var url = new URL(window.location.href);
+        if (url.hash === "#void") url.hash = "";
+        var shareUrl = url.href;
+        status.textContent = "";
+
+        if (typeof navigator.share === "function") {
+          try {
+            navigator.share({ title: document.title, url: shareUrl }).catch(function (error) {
+              if (!error || error.name !== "AbortError") {
+                status.textContent = "Unable to share this page.";
+              }
+            });
+          } catch (error) {
+            if (!error || error.name !== "AbortError") {
+              status.textContent = "Unable to share this page.";
+            }
+          }
+          return;
+        }
+
+        function showCopyResult(copied) {
+          status.textContent = copied ? "URL copied!" : "Unable to copy the page link.";
+        }
+
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+          try {
+            navigator.clipboard.writeText(shareUrl).then(function () {
+              showCopyResult(true);
+            }, function () {
+              showCopyResult(copyWithExecCommand(shareUrl));
+            });
+          } catch (error) {
+            showCopyResult(copyWithExecCommand(shareUrl));
+          }
+        } else {
+          showCopyResult(copyWithExecCommand(shareUrl));
+        }
+      });
+    },
+  );
+
   var copyButton = document.querySelector(".ntg-social-share--copy");
   if (!copyButton) return;
 
@@ -56,6 +108,7 @@
   });
 
   function copyWithExecCommand(text) {
+    var previousFocus = document.activeElement;
     var input = document.createElement("input");
     input.value = text;
     input.setAttribute("readonly", "");
@@ -73,6 +126,7 @@
     }
 
     document.body.removeChild(input);
+    if (previousFocus && typeof previousFocus.focus === "function") previousFocus.focus();
     return copied;
   }
 
