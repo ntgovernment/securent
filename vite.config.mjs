@@ -10,6 +10,20 @@ import { FIRE_AREA_CODES, readFireDanger } from "./src/local-conditions/fire-dan
 import { latestMediaReleaseEndpoint, mediaReleaseSources } from "./src/media-releases/feeds.mjs";
 import { randomizePreviewWarnings } from "./src/media-releases/preview-warnings.mjs";
 
+const sourceThemePreview = {
+  name: "source-theme-preview",
+  apply: "serve",
+  transformIndexHtml: {
+    order: "pre",
+    handler(html) {
+      return html.replace(
+        /href=(["'])(?:\.\/|\/)dist\/theme\.css(?:\?[^"']*)?\1/g,
+        'href="/src/css/main.css"',
+      );
+    },
+  },
+};
+
 const sourceThemeOnly = {
   name: "source-theme-only",
   apply: "build",
@@ -236,6 +250,7 @@ const mediaReleaseFeedProxy = {
 export default defineConfig({
   root: ".",
   plugins: [
+    sourceThemePreview,
     sourceThemeOnly,
     resolveNtgLogoPath,
     excludeLocalCapturePhotos,
