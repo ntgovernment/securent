@@ -398,7 +398,7 @@ for (const page of ["listing", "homepage"]) {
       await new Promise((resolve) => setImmediate(resolve));
       const listing = window.document.querySelector(page === "homepage" ? "[data-latest-media-releases]" : "[data-media-releases]");
       const card = listing.querySelector(".media-releases__item");
-      assert.equal(card.querySelector("h3").textContent, "Storm Watch and act for Daly and Arnhem Districts");
+      assert.equal(card.querySelector("h3").textContent, "Storm watch and act for Daly and Arnhem Districts");
       assert.match(card.querySelector(".media-releases__region").textContent, /Top End, East Arnhem, Big Rivers/);
       assert.equal(card.dataset.warningLevel, "watch_act");
       assert.match(card.querySelector("img").src, /storm-watch_act\.webp/);
@@ -466,7 +466,7 @@ test("homepage preserves decreasing-threat badge when mapping replaces the subje
   try {
     await import("../../dist/latest-media-releases.js?mapped-decreasing-threat");
     await new Promise((resolve) => setImmediate(resolve));
-    assert.equal(window.document.querySelector(".media-releases__title").textContent, "Flooding Advice for Katherine");
+    assert.equal(window.document.querySelector(".media-releases__title").textContent, "Flooding advice for Katherine");
     assert.equal(window.document.querySelector(".media-releases__severity").textContent, "Decreasing threat");
   } finally {
     Object.assign(globalThis, originals);

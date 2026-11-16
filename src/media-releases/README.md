@@ -27,7 +27,8 @@ or days ago.
 
 Both warning displays also request the `mapped-warnings` integration and match
 its `campaignId` to the release `CampaignID`. Mapped warning titles use
-**[Type] [Level] for [Location]** when those values are available; missing or
+**[Type] [level] for [Location]** (for example, **Storm advice for Darwin**)
+when those values are available; missing or
 invalid fields use the existing classification, and an unavailable location
 leaves the original title unchanged. Mapped regions replace inferred regions
 and can include multiple regions. The full Greater Darwin region name maps to

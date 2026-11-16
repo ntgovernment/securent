@@ -234,7 +234,7 @@ function enrichNotice(item, mappings) {
     ? item.emergencyTypes[0] : "";
   if (location && titleType && item.warningLevel !== "Not identified") {
     item.originalTitle = item.title;
-    item.title = `${titleType} ${item.warningLevel} for ${location}`;
+    item.title = `${titleType} ${item.warningLevel.toLocaleLowerCase("en")} for ${location}`;
   }
   return item;
 }

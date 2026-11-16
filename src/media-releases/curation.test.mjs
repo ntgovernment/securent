@@ -22,7 +22,7 @@ test("enriches a matched campaign with mapped title, classifications and multipl
   const notice = items.find((item) => item.campaignId === "campaign-1");
   const untouched = items.find((item) => item.campaignId === "unmapped");
 
-  assert.equal(notice.title, "Storm Watch and act for Parts of Daly and Arnhem Districts");
+  assert.equal(notice.title, "Storm watch and act for Parts of Daly and Arnhem Districts");
   assert.deepEqual(notice.emergencyTypes, ["Storm"]);
   assert.equal(notice.warningLevel, "Watch and act");
   assert.deepEqual(notice.regions, ["Top End", "East Arnhem", "Big Rivers"]);
@@ -40,7 +40,7 @@ test("uses existing values for incomplete, invalid and conflicting mapped fields
     campaignId: "campaign-1", emergencyType: null, warningLevel: "invalid",
     location: "Remote place", region: ["Greater Darwin, Palmerston and Litchfield"],
   }]);
-  assert.equal(partial.title, "Flooding Advice for Remote place");
+  assert.equal(partial.title, "Flooding advice for Remote place");
   assert.deepEqual(partial.regions, ["Greater Darwin"]);
   const [missingLocation] = curateFeeds(feeds, [{
     campaignId: "campaign-1", emergencyType: "storm", warningLevel: null, location: null, region: [],
@@ -63,6 +63,15 @@ test("uses existing values for incomplete, invalid and conflicting mapped fields
   } finally {
     console.warn = originalWarn;
   }
+});
+
+test("lowercases emergency warning in mapped titles without changing the level", () => {
+  const [notice] = curateFeeds([{ source: "NTES", items: [record()] }], [{
+    campaignId: "campaign-1", emergencyType: "cyclone", warningLevel: "emergency_warning",
+    location: "Darwin",
+  }]);
+  assert.equal(notice.title, "Cyclone emergency warning for Darwin");
+  assert.equal(notice.warningLevel, "Emergency warning");
 });
 
 test("retains declaration semantics while applying mapped location and regions", () => {
