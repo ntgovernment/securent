@@ -65,6 +65,8 @@
 
 #latest-warnings .warning-banner__actions {
   display: flex;
+  height: 48px;
+  align-items: center;
   flex-wrap: wrap;
   gap: 1.5rem;
 }
