@@ -688,6 +688,80 @@ test("geolocation finds the nearest station across the antimeridian", async () =
   assert.equal(context.select.value, "nearest");
 });
 
+for (const [scenario, geolocation] of [
+  ["blocked", { getCurrentPosition: (_, error) => error({ code: 1 }) }],
+  ["unavailable", undefined],
+  ["exception", { getCurrentPosition: () => { throw new Error("unavailable"); } }],
+  ["invalid coordinates", { getCurrentPosition: (success) => success({ coords: { latitude: NaN, longitude: 130 } }) }],
+]) {
+  test(`geolocation falls back to Darwin Airport when ${scenario}`, async () => {
+    const context = await widget({ saved: "014272", geolocation });
+    const button = context.window.document.querySelector(".lc-use-location");
+    assert.equal(button.hidden, false);
+    assert.equal(button.disabled, false);
+    button.click();
+    await settle();
+    assert.equal(context.select.value, "014015");
+    assert.equal(context.window.localStorage.getItem("securent.localConditions.location"), "014015");
+    assert.equal(context.window.document.querySelector(".lc-status").textContent, "");
+    assert.match(cardFor(context, "Temperature").textContent, /36 °C/);
+  });
+}
+
+test("geolocation falls back when Darwin Airport has no coordinates", async () => {
+  const feed = `<product><observations>
+    <station bom-id="darwin" description="Darwin Airport" />
+    <station bom-id="other" description="Other" />
+  </observations></product>`;
+  const context = await widget({ feed, saved: "other",
+    geolocation: { getCurrentPosition: (success) => success({ coords: { latitude: -12, longitude: 130 } }) } });
+  const button = context.window.document.querySelector(".lc-use-location");
+  assert.equal(button.disabled, false);
+  button.click();
+  assert.equal(context.select.value, "darwin");
+  assert.equal(context.window.document.querySelector(".lc-status").textContent, "");
+});
+
+test("geolocation timeout falls back and ignores a late result", async () => {
+  let success;
+  let timeout;
+  const context = await widget({ saved: "014272",
+    geolocation: { getCurrentPosition: (callback) => { success = callback; } } });
+  context.window.setTimeout = (callback) => { timeout = callback; return 1; };
+  context.window.clearTimeout = () => {};
+  const button = context.window.document.querySelector(".lc-use-location");
+  button.click();
+  assert.equal(button.disabled, true);
+  timeout();
+  assert.equal(context.select.value, "014015");
+  assert.equal(button.disabled, false);
+  success({ coords: { latitude: -13.05, longitude: 131.02 } });
+  assert.equal(context.select.value, "014015");
+  assert.equal(context.window.document.querySelector(".lc-status").textContent, "");
+});
+
+test("a manual dropdown choice wins over a pending location request", async () => {
+  let success;
+  const context = await widget({ geolocation: { getCurrentPosition: (callback) => { success = callback; } } });
+  const button = context.window.document.querySelector(".lc-use-location");
+  button.click();
+  selectLocation(context, "015590");
+  success({ coords: { latitude: -13.05, longitude: 131.02 } });
+  assert.equal(context.select.value, "015590");
+  assert.equal(button.disabled, false);
+  assert.equal(context.window.document.querySelector(".lc-status").textContent, "");
+});
+
+test("geolocation failure reports when Darwin Airport is absent", async () => {
+  const feed = `<product><observations>
+    <station bom-id="other" description="Other" lat="-13" lon="131" />
+  </observations></product>`;
+  const context = await widget({ feed, geolocation: { getCurrentPosition: (_, error) => error({ code: 1 }) } });
+  context.window.document.querySelector(".lc-use-location").click();
+  assert.equal(context.select.value, "other");
+  assert.match(context.window.document.querySelector(".lc-status").textContent, /Darwin Airport is unavailable/);
+});
+
 test("geolocation is disabled when no stations have usable coordinates", async () => {
   const geolocation = { getCurrentPosition: (success) => success({ coords: { latitude: 0, longitude: 0 } }) };
   const feed = '<product><observations><station bom-id="missing" description="Missing coordinates" /></observations></product>';

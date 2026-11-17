@@ -58,6 +58,9 @@
   var activeData = null;
   var activePendingFields = [];
   var userSelected = false;
+  var locationPending = false;
+  var locationRequestId = 0;
+  var locationTimer;
 
   var oldAttribution = root.querySelector(".lc-attribution");
   if (oldAttribution && !cards.contains(oldAttribution)) oldAttribution.remove();
@@ -268,7 +271,6 @@
     cards.replaceChildren.apply(cards, groups);
     if (waiting.length) cards.setAttribute("aria-busy", "true");
     else cards.removeAttribute("aria-busy");
-    status.textContent = "";
   }
 
   function readFireDanger(feed, areaCode) {
@@ -381,31 +383,69 @@
     return best;
   }
 
+  function darwinAirport() {
+    return locations.find(function (location) { return location.name === "Darwin Airport"; });
+  }
+
+  function updateLocationButton() {
+    useBtn.disabled = locationPending ||
+      !(darwinAirport() || (navigator.geolocation && locations.some(hasCoordinates)));
+  }
+
   select.addEventListener("change", function () {
+    ++locationRequestId;
+    clearTimeout(locationTimer);
+    locationPending = false;
+    updateLocationButton();
     userSelected = true;
     setLocation(select.value);
+    status.textContent = "";
   });
 
-  if (!navigator.geolocation) {
-    useBtn.hidden = true;
-  } else {
-    useBtn.addEventListener("click", function () {
-      status.textContent = "Finding your location…";
+  useBtn.addEventListener("click", function () {
+    var id = ++locationRequestId;
+    locationPending = true;
+    updateLocationButton();
+    status.textContent = "Finding your location…";
+
+    function finish(location) {
+      if (id !== locationRequestId || !locationPending) return;
+      clearTimeout(locationTimer);
+      locationPending = false;
+      updateLocationButton();
+      var fallback = !location;
+      location = location || darwinAirport();
+      if (!location) {
+        status.textContent = "Darwin Airport is unavailable.";
+        return;
+      }
+      userSelected = true;
+      setLocation(location.key);
+      status.textContent = fallback
+        ? ""
+        : "Showing " + location.name + ".";
+    }
+
+    if (!navigator.geolocation) {
+      finish(null);
+      return;
+    }
+    locationTimer = setTimeout(function () { finish(null); }, 10000);
+    try {
       navigator.geolocation.getCurrentPosition(
         function (pos) {
-          var location = nearest(pos.coords.latitude, pos.coords.longitude);
-          if (location) {
-            userSelected = true;
-            setLocation(location.key);
-          }
-          else status.textContent = "No locations with coordinates are available.";
+          var lat = pos && pos.coords && pos.coords.latitude;
+          var lon = pos && pos.coords && pos.coords.longitude;
+          finish(Number.isFinite(lat) && Number.isFinite(lon) &&
+            Math.abs(lat) <= 90 && Math.abs(lon) <= 180 ? nearest(lat, lon) : null);
         },
-        function () {
-          status.textContent = "Your location could not be determined.";
-        },
+        function () { finish(null); },
+        { timeout: 10000 },
       );
-    });
-  }
+    } catch (error) {
+      finish(null);
+    }
+  });
 
   function numberAttribute(node, attribute) {
     var value = node.getAttribute(attribute);
@@ -561,7 +601,7 @@
         select.appendChild(option);
       });
       select.disabled = false;
-      useBtn.disabled = !locations.some(hasCoordinates);
+      updateLocationButton();
 
       if (previous === initial && activeLocation.workerKey === initial.workerKey &&
           activeLocation.epaStation === initial.epaStation) {
