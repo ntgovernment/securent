@@ -39,14 +39,13 @@
   var fireDangerUrl = "https://cmsexternal.nt.gov.au/securent/_design/integrations/fire-danger-ratings";
   var locations = [];
 
-  var FIRE_COLOURS = ["#999999", "#5fb830", "#f4d63a", "#f28100", "#a80a0a"];
+  var FIRE_COLOURS = ["#5fb830", "#f4d63a", "#f28100", "#a80a0a"];
   var AQI_LEVELS = [
-    { min: 0, max: 33, range: "0–33", label: "Very good", colour: "#7ed5e6" },
-    { min: 34, max: 66, range: "34–66", label: "Good", colour: "#c4e177" },
-    { min: 67, max: 99, range: "67–99", label: "Fair", colour: "#f9ca3c" },
-    { min: 100, max: 149, range: "100–149", label: "Poor", colour: "#ee892d" },
-    { min: 150, max: 200, range: "150–200", label: "Very poor", colour: "#451c62" },
-    { min: 201, max: Infinity, range: "200+", label: "Hazardous", colour: "#5c2415" },
+    { min: 0, max: 50, range: "0–50", label: "Good", colour: "#61b92f" },
+    { min: 51, max: 100, range: "51–100", label: "Fair", colour: "#f5d639" },
+    { min: 101, max: 150, range: "101–150", label: "Poor", colour: "#f07e01" },
+    { min: 151, max: 300, range: "151–300", label: "Very poor", colour: "#a60f37" },
+    { min: 301, max: Infinity, range: "301+", label: "Extremely poor", colour: "#590019" },
   ];
 
   var select = root.querySelector(".lc-select");
@@ -119,8 +118,9 @@
     return clockTimeElement(relativeTimeText(date, value), date);
   }
 
-  function card(title, iconClass) {
+  function card(title, iconClass, cardClass) {
     var c = el("div", "lc-card");
+    if (cardClass) c.classList.add(cardClass);
     c.appendChild(el("h3", "lc-card__title", title));
     var icon = el("span", "lc-card__icon");
     icon.setAttribute("aria-hidden", "true");
@@ -143,51 +143,69 @@
     return group;
   }
 
-  function ratingChart(className, label, levels, selectedIndex) {
+  function ratingChart(className, label, levels, selectedIndex, markerPosition) {
     var chart = el("div", "lc-rating-chart " + className);
     chart.setAttribute("role", "img");
     chart.setAttribute("aria-label", label);
     levels.forEach(function (level, index) {
       var segment = el("span", "lc-rating-chart__segment");
       segment.style.backgroundColor = level.colour;
-      segment.style.flexGrow = index === selectedIndex ? "2" : "1";
+      if (selectedIndex != null) segment.style.flexGrow = index === selectedIndex ? "2" : "1";
       chart.appendChild(segment);
     });
-    var marker = el("span", "lc-rating-chart__marker");
-    marker.setAttribute("aria-hidden", "true");
-    marker.style.left = (selectedIndex + 1) / (levels.length + 1) * 100 + "%";
-    chart.appendChild(marker);
+    if (selectedIndex != null || markerPosition != null) {
+      var marker = el("span", "lc-rating-chart__marker");
+      marker.setAttribute("aria-hidden", "true");
+      marker.style.left = (markerPosition == null
+        ? (selectedIndex + 1) / (levels.length + 1) * 100
+        : markerPosition) + "%";
+      chart.appendChild(marker);
+    }
     return chart;
   }
 
   function fireCard(data) {
-    var c = card("Bushfire danger rating", "fa-fire-flame-curved");
+    var c = card("Bushfire danger rating", "fa-fire-flame-curved", "lc-card--bushfire");
     if (!data) return null;
 
-    var fireLevelsForChart = fireLevels.map(function (label, index) {
+    var fireLevelsForChart = fireLevels.slice(1).map(function (label, index) {
       return { label: label, colour: FIRE_COLOURS[index] };
     });
-    c.appendChild(ratingChart("lc-fire", "Fire danger rating: " + data.label, fireLevelsForChart, data.level));
+    var selectedIndex = data.level - 1;
+    var markerPosition = selectedIndex < 0
+      ? 0
+      : selectedIndex < fireLevelsForChart.length
+        ? (selectedIndex + 0.5) / fireLevelsForChart.length * 100
+        : null;
+    c.appendChild(ratingChart("lc-fire", "Fire danger rating: " + data.label,
+      fireLevelsForChart, null, markerPosition));
     c.appendChild(el("p", "lc-card__label", data.label));
     return c;
   }
 
   function airCard(data) {
-    var c = card("Air quality index", "fa-fan");
+    var c = card("Air quality", "fa-fan", "lc-card--air-quality");
     if (!data || !Number.isFinite(data.index)) return null;
 
     var level = AQI_LEVELS.find(function (item) {
       return data.index >= item.min && data.index <= item.max;
     });
     if (!level) return null;
-    var row = el("div", "lc-card__row");
+    var row = el("div", "lc-card__row lc-air-row");
     var value = el("span", "lc-card__value", String(data.index));
-    value.appendChild(el("span", "lc-card__unit", " Index"));
+    value.appendChild(el("span", "lc-card__unit", " AQI"));
     row.appendChild(value);
-    row.appendChild(el("span", "lc-air", level.label));
-    var chartLabel = "Australia AQI: current index " + data.index + ", " + level.label + ". "
+    var status = el("span", "lc-air");
+    var dot = el("span", "lc-air__dot");
+    dot.setAttribute("aria-hidden", "true");
+    dot.style.backgroundColor = level.colour;
+    status.appendChild(dot);
+    status.appendChild(document.createTextNode(level.label));
+    row.appendChild(status);
+    var chartLabel = "NT EPA air quality index: current index " + data.index + ", " + level.label + ". "
       + AQI_LEVELS.map(function (item) { return item.label + " " + item.range; }).join("; ");
-    c.appendChild(ratingChart("lc-air-chart", chartLabel, AQI_LEVELS, AQI_LEVELS.indexOf(level)));
+    var markerPosition = Math.max(0, Math.min(data.index, 700)) / 700 * 100;
+    c.appendChild(ratingChart("lc-air-chart", chartLabel, AQI_LEVELS, null, markerPosition));
     c.appendChild(row);
     return c;
   }
@@ -228,26 +246,29 @@
     var timestamp = reading && (reading.time || reading.issuedAt);
     var time = timestamp && relativeTimeElement(timestamp);
     if (!time && showTodayIfMissing) time = clockTimeElement("Today");
+    var footer = el("div", "lc-card__footer");
+    footer.appendChild(source);
     if (time) {
       var timestampRow = el("p", "lc-card__timestamp");
       timestampRow.appendChild(time);
-      var title = cardNode.querySelector(".lc-card__title");
-      cardNode.insertBefore(timestampRow, title.nextSibling);
+      footer.appendChild(timestampRow);
     }
-    cardNode.appendChild(source);
+    cardNode.appendChild(footer);
     group.appendChild(cardNode);
     return group;
   }
 
-  function cardWithoutData(title, iconClass) {
+  function cardWithoutData(title, iconClass, cardClass) {
     var group = el("div", "lc-card-group");
-    var cardNode = card(title, iconClass);
+    var cardNode = card(title, iconClass, cardClass);
     var source = el("p", "lc-attribution lc-attribution--unavailable");
     var icon = el("i", "fa-light fa-circle-exclamation");
     icon.setAttribute("aria-hidden", "true");
     source.appendChild(icon);
     source.appendChild(document.createTextNode(" Data not available."));
-    cardNode.appendChild(source);
+    var footer = el("div", "lc-card__footer");
+    footer.appendChild(source);
+    cardNode.appendChild(footer);
     group.appendChild(cardNode);
     return group;
   }
@@ -264,7 +285,7 @@
     else groups.push(cardWithoutData("Bushfire danger rating", "fa-fire-flame-curved"));
     if (air) groups.push(cardWithSource(air, "NTEPA", "https://ntepa.nt.gov.au/", data.airQuality));
     else if (waiting.indexOf("airQuality") >= 0) groups.push(skeletonGroup());
-    else groups.push(cardWithoutData("Air quality index", "fa-fan"));
+    else groups.push(cardWithoutData("Air quality", "fa-fan", "lc-card--air-quality"));
     if (temperature) groups.push(cardWithSource(temperature, "Bureau of Meteorology",
       "https://www.bom.gov.au/location/australia/northern-territory#observations", data.temperature, true));
     else if (waiting.indexOf("temperature") < 0) groups.push(cardWithoutData("Temperature", "fa-temperature-half"));

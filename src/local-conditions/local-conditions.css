@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .local-conditions {
-  background: #f4f4f6;
+  background: var(--clr-bg-shade, #F5F5F7);
 }
 
 main.ntg-body--homepage #current-conditions > #local-conditions {
@@ -33,7 +33,7 @@ main.ntg-body--homepage #current-conditions > #local-conditions > .container-xl 
   font-size: 1rem;
   line-height: 1.5rem;
   margin: 0;
-  color: #174c4e;
+  color: #174C4E;
 }
 
 .lc-select {
@@ -101,32 +101,37 @@ main.ntg-body--homepage #current-conditions > #local-conditions > .container-xl 
 }
 
 .lc-card-group .lc-card {
-  flex: 1;
+  flex: 0 0 175px;
 }
 
 .lc-card {
+  box-sizing: border-box;
   position: relative;
   overflow: hidden;
-  min-height: 190px;
-  padding: 1.5rem 1.5rem 1.25rem;
-  background: #fff;
+  height: 175px;
+  min-height: 175px;
+  padding: 16px 24px;
+  outline: 1px solid var(--clr-border-subtle, #D3D3D7);
+  outline-offset: -1px;
+  background: var(--clr-bg-shade, #F5F5F7);
   display: flex;
   flex-direction: column;
 }
 
 .lc-card__title {
   margin: 0 3.5rem 0 0;
+  color: #174C4E;
   font-size: 1.25rem;
   font-weight: 700;
 }
 
 .lc-card__icon {
   position: absolute;
-  top: -1.75rem;
-  right: -1.75rem;
-  width: 6rem;
-  height: 6rem;
-  border-radius: 50%;
+  top: -8px;
+  right: -11px;
+  width: 76px;
+  height: 70px;
+  border-radius: 64px;
   background: #d5eaeb;
   color: #4a4a57;
   font-size: 2rem;
@@ -134,8 +139,8 @@ main.ntg-body--homepage #current-conditions > #local-conditions > .container-xl 
 
 .lc-card__icon i {
   position: absolute;
-  left: 1.75rem;
-  bottom: 1.75rem;
+  left: 22px;
+  bottom: 19px;
   transform: translate(-0%, 0);
 }
 
@@ -165,6 +170,13 @@ main.ntg-body--homepage #current-conditions > #local-conditions > .container-xl 
   color: var(--clr-text-default);
 }
 
+.lc-card--bushfire .lc-card__label {
+  color: var(--clr-text-alt, #666774);
+  font-family: Lato, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+}
+
 .lc-card__timestamp {
   margin: 0.25rem 3.5rem 0.5rem 0;
   color: var(--clr-text-default);
@@ -174,6 +186,26 @@ main.ntg-body--homepage #current-conditions > #local-conditions > .container-xl 
 .lc-card__none {
   margin: auto 0 0;
   color: var(--clr-text-default);
+}
+
+.lc-card--air-quality,
+.lc-card--bushfire {
+  border: 0;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.lc-card--air-quality .lc-card__title,
+.lc-card--bushfire .lc-card__title {
+  margin-right: 5rem;
+  color: #174c4e;
+  font-size: 20px;
+  line-height: 24px;
+}
+
+.lc-card--air-quality .lc-card__icon,
+.lc-card--bushfire .lc-card__icon {
+  color: var(--clr-text-alt, #666774);
 }
 
 .lc-relative-time {
@@ -247,15 +279,77 @@ main.ntg-body--homepage #current-conditions > #local-conditions > .container-xl 
   border-left: 0.6rem solid transparent;
 }
 
-.lc-air-chart {
-  margin-top: 0.75rem;
+.lc-air-chart,
+.lc-fire {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 331px;
+  height: 37px;
+  flex: 0 0 37px;
+  margin: 12px 0 0;
+  padding-top: 12px;
+  border-radius: 12px;
+}
+
+.lc-card--air-quality .lc-air-chart .lc-rating-chart__segment,
+.lc-card--bushfire .lc-fire .lc-rating-chart__segment {
+  height: 25px;
+}
+
+.lc-card--air-quality .lc-rating-chart__segment:first-child,
+.lc-card--bushfire .lc-fire .lc-rating-chart__segment:first-child {
+  border-radius: 17px 0 0 17px;
+}
+
+.lc-card--air-quality .lc-rating-chart__segment:nth-last-child(2),
+.lc-card--bushfire .lc-fire .lc-rating-chart__segment:nth-last-child(2) {
+  border-radius: 0 17px 17px 0;
+}
+
+.lc-card--air-quality .lc-rating-chart__marker,
+.lc-card--bushfire .lc-rating-chart__marker {
+  top: 0.05px;
+  margin-left: -11.25px;
+  border-right-width: 11.25px;
+  border-top: 24.68px solid var(--clr-text-default, #1f1e27);
+  border-left-width: 11.25px;
+}
+
+.lc-air-row {
+  align-self: stretch;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.lc-card--air-quality .lc-card__value {
+  color: var(--clr-text-alt, #666774);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 28px;
+}
+
+.lc-card--air-quality .lc-card__unit {
+  color: var(--clr-text-alt, #666774);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 24px;
 }
 
 .lc-air {
   display: inline-flex;
   align-items: center;
-  font-size: 1.25rem;
-  font-weight: 500;
+  gap: 10px;
+  color: var(--clr-text-alt, #666774);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 24px;
+}
+
+.lc-air__dot {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  border-radius: 50%;
 }
 
 .lc-temp-row {
@@ -266,15 +360,25 @@ main.ntg-body--homepage #current-conditions > #local-conditions > .container-xl 
 .lc-temp {
   display: inline-flex;
   flex: 0 0 auto;
-  align-items: baseline;
+  align-items: center;
+  gap: 10px;
   white-space: nowrap;
-  font-size: 2.25rem;
-  font-weight: 500;
+  color: var(--clr-text-alt, #666774);
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 44px;
 }
 
 .lc-temp__arrow {
-  margin-right: 0.5rem;
-  font-size: 1.5rem;
+  display: inline-flex;
+  flex: 0 0 16px;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: var(--clr-text-alt, #666774);
+  font-size: 16px;
+  line-height: 16px;
 }
 
 .lc-status {
@@ -286,6 +390,33 @@ main.ntg-body--homepage #current-conditions > #local-conditions > .container-xl 
   padding-top: 0.5rem;
   font-size: 0.875rem;
   color: #8b8b96;
+}
+
+.lc-card__footer {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+.lc-card__footer .lc-attribution {
+  flex: 0 1 auto;
+  margin: 0;
+  padding: 0;
+  color: var(--clr-text-muted, #9d9da7);
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.lc-card__footer .lc-card__timestamp {
+  flex: 0 0 auto;
+  margin: 0;
+  color: var(--clr-text-muted, #9d9da7);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  white-space: nowrap;
 }
 
 .lc-attribution--unavailable i {
@@ -328,9 +459,22 @@ main.ntg-body--homepage #current-conditions > #local-conditions > .container-xl 
   }
 
   .lc-card {
-    min-height: 12rem;
-    border: 1px solid #d3d3d7;
-    background: #f4f4f6;
+    height: 175px;
+    min-height: 175px;
+    background: var(--clr-bg-shade, #F5F5F7);
+  }
+
+  .lc-card--air-quality {
+    padding: 16px 24px;
+  }
+
+  .lc-card--air-quality .lc-card__title {
+    margin-right: 5rem;
+  }
+
+  .lc-card--air-quality .lc-card__row {
+    flex-wrap: wrap;
+    gap: 0.75rem;
   }
 
 }
