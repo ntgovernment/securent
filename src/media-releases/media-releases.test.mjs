@@ -17,6 +17,23 @@ const notice = {
   WebVersionURL: "http://createsend.com/campaign-1",
 };
 
+test("location button and search have the same outer height", async () => {
+  const window = new Window();
+  window.document.write(html);
+  const style = window.document.createElement("style");
+  style.textContent = css;
+  window.document.head.append(style);
+  try {
+    const search = window.getComputedStyle(window.document.querySelector("[data-search]"));
+    const button = window.getComputedStyle(window.document.querySelector("[data-use-location]"));
+    assert.equal(button.height, search.height);
+    assert.equal(button.boxSizing, search.boxSizing);
+    assert.equal(button.boxSizing, "border-box");
+  } finally {
+    await window.happyDOM.close();
+  }
+});
+
 test("homepage warning-card styles match the reference layout", () => {
   assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__link\{padding:24px\}/);
   assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__content\{gap:12px\}/);

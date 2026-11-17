@@ -83,13 +83,14 @@ section.media-releases__hero {
 }
 
 .media-releases__use-location {
+  box-sizing: border-box;
   display: inline-flex;
   flex: none;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 48px;
-  padding: 16px 24px;
+  height: 48px;
+  padding: 0 24px;
   border: 1px solid #267e82;
   border-radius: 0;
   background: #fff;

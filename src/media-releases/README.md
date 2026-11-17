@@ -111,9 +111,10 @@ preserving the search text and sort order.
 
 **Use location** requests the device's coordinates and searches for the NT
 locality containing them. The lookup runs locally; coordinates are not sent to
-a geocoding service. If location permission is blocked, the request fails or
-times out, or the coordinates have no matching NT locality, the search uses
-Darwin. Typing in the search while a lookup is pending takes precedence.
+a geocoding service. The button and search field are both 48px high. If
+location permission is blocked, the request fails or times out, or the
+coordinates have no matching NT locality, the search uses Darwin. Typing in
+the search while a lookup is pending takes precedence.
 The search remains a text filter, not a geographic warning-area match.
 
 The bundled locality boundaries are the NT subset of the Digital Atlas of
