@@ -144,7 +144,7 @@ if (listing) {
       const secondLabel = filterDisplayLabel(second.value);
       if (firstLabel === "Other") return secondLabel === "Other" ? 0 : 1;
       if (secondLabel === "Other") return -1;
-      return firstLabel.localeCompare(secondLabel, "en");
+      return second.count - first.count || firstLabel.localeCompare(secondLabel, "en");
     });
     const filterLabels = entries.map((entry, index) => {
       const label = document.createElement("label");

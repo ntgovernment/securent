@@ -184,8 +184,16 @@ test("renders declaration-only cards with their accent colors and checkbox style
     assert.ok(unknownTypeFilter);
     assert.equal(unknownTypeFilter.parentElement.textContent, "Other (1)");
     const incidentOptions = [...incidentNoticeFilters.querySelectorAll(".media-releases__filter")];
-    assert.equal(incidentOptions.length, 8);
-    assert.equal(incidentOptions.at(-1).textContent, "Other (1)");
+    assert.deepEqual(incidentOptions.map((option) => option.textContent), [
+      "Cyclone (2)",
+      "Flooding (2)",
+      "Boil water notice (1)",
+      "Fire ban notices (1)",
+      "Heatwave (1)",
+      "Planned burn advice (1)",
+      "Storm (1)",
+      "Other (1)",
+    ]);
     assert.equal(incidentOptions.filter((option) => option.hidden).length, 2);
     const expandFilters = incidentNoticeFilters.querySelector("[data-expand-filters]");
     assert.equal(expandFilters.textContent, "Show all (2)");

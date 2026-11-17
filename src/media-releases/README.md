@@ -102,7 +102,9 @@ The Incident or notice type list includes emergency types plus Fire ban,
 planned burn, and boil-water declarations. It shows six options initially;
 **Show all (N)** expands the remaining options, and **Show less** collapses
 them again. The count in **Show all (N)** is the number of hidden options.
-**Other**, for internally **Not identified** emergency types, sorts last.
+Options sort by result count from highest to lowest, with alphabetical order
+for equal counts. **Other**, for internally **Not identified** emergency
+types, always sorts last.
 
 Checkbox labels display **Other** for values internally classified as
 **Not identified**. The checkbox values remain unchanged so filtering behavior
