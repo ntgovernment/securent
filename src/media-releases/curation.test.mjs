@@ -55,6 +55,40 @@ test("enriches a matched campaign with mapped title, classifications and multipl
   assert.equal(untouched.title, "Storm Advice - Darwin");
 });
 
+test("uses a matched Squiz decreasing-threat level ahead of the mapped Advice level", () => {
+  const items = curateFeeds([{ source: "NTES", items: [
+    record(), record({ CampaignID: "unmapped", Subject: "Storm Advice - Darwin" }),
+  ] }], [{
+    campaignId: "campaign-1", emergencyType: "flood", warningLevel: "advice",
+    location: "Katherine", region: ["Big Rivers"],
+  }], [{
+    campaignId: "campaign-1", warningLevel: "decreasing_threat",
+  }]);
+  const decreasingThreat = items.find((item) => item.campaignId === "campaign-1");
+  const untouched = items.find((item) => item.campaignId === "unmapped");
+
+  assert.equal(decreasingThreat.warningLevel, "Decreasing threat");
+  assert.equal(decreasingThreat.title, "Flooding decreasing threat for Katherine");
+  assert.deepEqual(filterAndSortNotices(items, { warningLevels: ["Decreasing threat"] }), [decreasingThreat]);
+  assert.equal(untouched.warningLevel, "Advice");
+});
+
+test("matches decreasing-threat data by WebVersionURL when campaign IDs differ", () => {
+  const webVersionUrl = "http://createsend.com/t/t-40ED51F18548F2482540EF23F30FEDED";
+  const [notice] = curateFeeds([{ source: "NTES", items: [record({
+    CampaignID: "different-campaign-id",
+    Name: "AWS Flood #8 Advice Decreasing Threat - Alice Springs",
+    Subject: "AWS Flood #8 Advice Decreasing Threat - Alice Springs",
+    WebVersionURL: webVersionUrl,
+  })] }], [], [{
+    campaignId: "d477d8d525910ac3392725e36b49d5d5",
+    WebVersionURL: webVersionUrl,
+    warningLevel: "decreasing_threat",
+  }]);
+
+  assert.equal(notice.warningLevel, "Decreasing threat");
+});
+
 test("lowercases only a leading part-of phrase in mapped locations", () => {
   for (const [location, expected] of [
     ["Part of Darwin", "part of Darwin"],

@@ -425,6 +425,10 @@ section.media-releases__hero {
   --media-releases-accent: var(--clr-status-emergency-warning);
 }
 
+.media-releases__item[data-warning-level="decreasing_threat"] {
+  --media-releases-accent: #343741;
+}
+
 .media-releases__item[data-general-information="true"] {
   --media-releases-accent: #1f1f5f;
 }
@@ -473,7 +477,8 @@ section.media-releases__hero {
   color: #716309;
 }
 
-.media-releases__item[data-general-information="true"] .media-releases__severity {
+.media-releases__item[data-general-information="true"] .media-releases__severity,
+.media-releases__item[data-warning-level="decreasing_threat"] .media-releases__severity {
   background: var(--clr-bg-shade-alt, #e7e7ea);
   color: var(--clr-text-default, #1f1e27);
 }

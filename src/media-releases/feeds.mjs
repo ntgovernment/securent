@@ -1,5 +1,6 @@
 export const latestMediaReleaseEndpoint = "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor";
 export const mappedWarningsEndpoint = "https://cmsexternal.nt.gov.au/securent/_design/integrations/mapped-warnings";
+export const emergencyWarningsEndpoint = "https://au-ad0720ef.datastore.squiz.cloud/emergency-warnings";
 
 export const mediaReleaseSources = [
   {
@@ -96,5 +97,40 @@ export async function loadMappedWarnings(fetcher = fetch, endpoint = mappedWarni
   } catch (error) {
     console.error("Unable to load mapped warnings", error);
     return { mappedWarnings: [], mappingFailed: true };
+  }
+}
+
+export async function fetchEmergencyWarnings(fetcher = fetch, endpoint = emergencyWarningsEndpoint) {
+  const controller = new AbortController();
+  let timeout;
+  try {
+    const request = (async () => {
+      const response = await fetcher(endpoint, {
+        headers: { Accept: "application/json" },
+        credentials: "same-origin",
+        signal: controller.signal,
+      });
+      if (!response.ok) throw new Error(`Emergency warnings request failed (${response.status})`);
+      const payload = await response.json();
+      if (!Array.isArray(payload)) throw new TypeError("Emergency warnings feed has an unsupported response shape");
+      return payload;
+    })();
+    return await Promise.race([request, new Promise((_, reject) => {
+      timeout = setTimeout(() => {
+        controller.abort();
+        reject(new Error("Emergency warnings request timed out"));
+      }, 8000);
+    })]);
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+export async function loadEmergencyWarnings(fetcher = fetch, endpoint = emergencyWarningsEndpoint) {
+  try {
+    return { emergencyWarnings: await fetchEmergencyWarnings(fetcher, endpoint), emergencyWarningsFailed: false };
+  } catch (error) {
+    console.error("Unable to load emergency warnings", error);
+    return { emergencyWarnings: [], emergencyWarningsFailed: true };
   }
 }

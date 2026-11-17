@@ -39,21 +39,32 @@ normalized to the displayed labels **Greater Darwin**, **Top End**,
 Declarations retain their existing type, filters and styling, with mapped
 locations and regions where available.
 
-If the mapped feed fails, returns an invalid response or times out after eight seconds, both pages
-show the existing warnings and an accessible notice; source-feed errors remain
-separately reported. Production hosts must be able to fetch the integration
-from their origin, with CORS configured when cross-origin. The localhost
-preview serves `mapped-warnings.preview.json` at
-`/api/media-releases/mapped-warnings` for representative synthetic and
-local-source campaigns; unmatched records use the existing logic. Vite loads
-both warning scripts from source during local development.
+Both warning displays also request the Squiz `emergency-warnings` feed and
+match its `campaignId` to `CampaignID`, falling back to the normalized
+`WebVersionURL` when the IDs differ. A matching `warningLevel` of
+`decreasing_threat` overrides the mapped or inferred level with **Decreasing
+threat**. The level is available in the Current Warnings filter and appears as
+the severity badge on homepage cards. Its icon uses the generic
+`fa-triangle-exclamation` treatment used for Other, not a hazard-specific Advice
+image. Its badge and card accent use the same neutral colors as Other. Advice
+classifications without a matching Squiz record are unchanged.
+
+If either mapping feed fails, returns an invalid response, or times out after
+eight seconds, both pages show the existing warnings and an accessible notice;
+source-feed errors remain separately reported. Production hosts must be able
+to fetch the integrations from their origin, with CORS configured when
+cross-origin. The localhost preview serves `mapped-warnings.preview.json` at
+`/api/media-releases/mapped-warnings`; the Squiz emergency-warnings endpoint is
+fetched directly so local current-warning records can be classified against
+the live dataset. Unmatched records use the existing logic. Vite loads both
+warning scripts from source during local development.
 
 Featured warning titles use an `h3` styled at 20px bold with a 24px line
 height. Severity badges use 12px bold Lato, 16px line height, 1px letter
 spacing, and 4px by 8px padding. Emergency uses the danger background/text
-tokens; Watch and act uses `#FFE4CC` / `#9E4B00`; Advice and Decreasing threat
-use `#FDF4B9` / `#716309`; Planned burn uses `#DBCDE4` / `#634578`; and
-General information uses the neutral background/text tokens.
+tokens; Watch and act uses `#FFE4CC` / `#9E4B00`; Advice uses `#FDF4B9` /
+`#716309`; Planned burn uses `#DBCDE4` / `#634578`; and General information and
+Decreasing threat use the neutral background/text tokens.
 
 Include the existing site theme and icon fonts, `media-releases.css`, and the
 standalone module. Deploy `dist/SecureNT_files/media-release-card.js`,

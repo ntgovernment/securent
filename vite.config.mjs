@@ -7,7 +7,9 @@ import { fileURLToPath } from "node:url";
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { fetchAirQuality, fetchAirQualityStations } from "./src/local-conditions/air-quality.mjs";
 import { FIRE_AREA_CODES, readFireDanger } from "./src/local-conditions/fire-danger.mjs";
-import { latestMediaReleaseEndpoint, mappedWarningsEndpoint, mediaReleaseSources } from "./src/media-releases/feeds.mjs";
+import {
+  latestMediaReleaseEndpoint, mappedWarningsEndpoint, mediaReleaseSources,
+} from "./src/media-releases/feeds.mjs";
 import { randomizePreviewWarnings } from "./src/media-releases/preview-warnings.mjs";
 
 const sourceThemePreview = {

@@ -1,7 +1,10 @@
 import "./media-releases.css";
 import { attachAutocomplete, getAutocompleteCandidates } from "../search/autocomplete.mjs";
 import { curateFeeds, filterAndSortNotices, warningLevelOrder } from "./curation.mjs";
-import { fetchMediaReleaseFeeds, loadMappedWarnings, mappedWarningsEndpoint, mediaReleaseSources } from "./feeds.mjs";
+import {
+  emergencyWarningsEndpoint, fetchMediaReleaseFeeds, loadEmergencyWarnings,
+  loadMappedWarnings, mappedWarningsEndpoint, mediaReleaseSources,
+} from "./feeds.mjs";
 import { getPageWindow } from "../pagination/page-window.mjs";
 import { createCardSkeleton, renderCard, startRelativeTimeUpdates } from "./media-release-card.js";
 const listing = document.querySelector("[data-media-releases]");
@@ -185,7 +188,8 @@ if (listing) {
     renderFilterGroup("region", filters.querySelector("[data-region-filters]"), (item) => item.regions);
     renderIncidentNoticeTypeFilters(filters.querySelector("[data-type-filters]"));
     renderFilterGroup("warningLevel", filters.querySelector("[data-level-filters]"),
-      (item) => item.declarations?.length ? [] : [item.warningLevel], warningLevelOrder);
+      (item) => item.declarations?.length ? [] : [item.warningLevel],
+      warningLevelOrder, ["Decreasing threat"]);
   }
 
   function renderPagination(pageCount) {
@@ -241,12 +245,13 @@ if (listing) {
     renderPagination(pageCount);
   }
 
-  function showFeedNotes(failedSources, mappingFailed) {
+  function showFeedNotes(failedSources, mappingFailed, emergencyWarningsFailed) {
     const messages = [];
     if (failedSources.length) {
       messages.push(`Some feeds are unavailable: ${failedSources.join(", ")}.`);
     }
     if (mappingFailed) messages.push("Mapped warning details are unavailable; existing warning details are shown.");
+    if (emergencyWarningsFailed) messages.push("Decreasing threat warning levels are unavailable; existing warning levels are shown.");
     feedNote.hidden = messages.length === 0;
     feedNote.textContent = messages.join(" ");
   }
@@ -282,12 +287,13 @@ if (listing) {
       (source) => isLocalPreview ? `/${source.id}.json` : source.endpoint,
     ),
     loadMappedWarnings(fetch, isLocalPreview ? "/api/media-releases/mapped-warnings" : mappedWarningsEndpoint),
+    loadEmergencyWarnings(fetch, emergencyWarningsEndpoint),
   ])
-    .then(([{ feeds, failedSources }, { mappedWarnings, mappingFailed }]) => {
-      items = curateFeeds(feeds, mappedWarnings);
+    .then(([{ feeds, failedSources }, { mappedWarnings, mappingFailed }, { emergencyWarnings, emergencyWarningsFailed }]) => {
+      items = curateFeeds(feeds, mappedWarnings, emergencyWarnings);
       renderFilters();
       searchAutocomplete.refresh();
-      showFeedNotes(failedSources, mappingFailed);
+      showFeedNotes(failedSources, mappingFailed, emergencyWarningsFailed);
       render();
     })
     .catch((error) => {

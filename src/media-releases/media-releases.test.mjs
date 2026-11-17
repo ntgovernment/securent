@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { Window } from "happy-dom";
+import { emergencyWarningsEndpoint } from "./feeds.mjs";
 
 const html = await readFile(new URL("../../media-releases.html", import.meta.url), "utf8");
 const css = await readFile(new URL("../../dist/media-releases.css", import.meta.url), "utf8");
@@ -25,7 +26,7 @@ test("homepage warning-card styles match the reference layout", () => {
   assert.match(css, /\.media-releases__item\[data-warning-level=emergency_warning\] \.media-releases__severity\{background:var\(--clr-status-danger-bg,\s*#f7e7eb\);color:var\(--clr-status-danger,\s*#a60f37\)\}/);
   assert.match(css, /\.media-releases__item\[data-warning-level=watch_act\] \.media-releases__severity\{background:#ffe4cc;color:#9e4b00\}/);
   assert.match(css, /\.media-releases__item\[data-warning-level=advice\] \.media-releases__severity\{background:#fdf4b9;color:#716309\}/);
-  assert.match(css, /\.media-releases__item\[data-general-information=true\] \.media-releases__severity\{background:var\(--clr-bg-shade-alt,\s*#e7e7ea\);color:var\(--clr-text-default,\s*#1f1e27\)\}/);
+  assert.match(css, /\.media-releases__item\[data-general-information=true\] \.media-releases__severity,.media-releases__item\[data-warning-level=decreasing_threat\] \.media-releases__severity\{background:var\(--clr-bg-shade-alt,\s*#e7e7ea\);color:var\(--clr-text-default,\s*#1f1e27\)\}/);
   assert.match(css, /\.media-releases__item--planned-burn \.media-releases__severity\{background:#dbcde4;color:#634578\}/);
   assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__card-heading\{gap:4px;min-height:24px\}/);
   assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__hazard-icon,\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__notice-icon\{width:24px;height:24px;font-size:24px\}/);
@@ -250,7 +251,8 @@ test("renders declaration-only cards with their accent colors and checkbox style
     assert.match(css, /\.media-releases__item--formatted \.media-releases__hazard-icon\{width:48px;height:48px\}/);
     assert.match(css, /\.media-releases__item\[data-declaration~=fire-ban-declaration\][^{]*\{--media-releases-accent:\s*#1f1f5f\}/);
     assert.match(css, /\.media-releases__item\[data-general-information=true\][^{]*\{--media-releases-accent:\s*#1f1f5f\}/);
-    assert.match(css, /\.media-releases__item\[data-general-information=true\] \.media-releases__severity\{background:var\(--clr-bg-shade-alt,\s*#e7e7ea\);color:var\(--clr-text-default,\s*#1f1e27\)\}/);
+    assert.match(css, /\.media-releases__item\[data-general-information=true\] \.media-releases__severity,.media-releases__item\[data-warning-level=decreasing_threat\] \.media-releases__severity\{background:var\(--clr-bg-shade-alt,\s*#e7e7ea\);color:var\(--clr-text-default,\s*#1f1e27\)\}/);
+    assert.match(css, /\.media-releases__item\[data-warning-level=decreasing_threat\]\{--media-releases-accent:\s*#343741\}/);
     assert.match(css, /\.media-releases__item\[data-warning-level=advice\]\{--media-releases-accent:\s*#fadf31\}/);
     assert.match(css, /\.media-releases__item\[data-warning-level=advice\] \.media-releases__severity\{background:#fdf4b9;color:#716309\}/);
     assert.match(css, /\.media-releases__item:hover\{box-shadow:0 4px 16px #0f0f2f26\}/);
@@ -309,7 +311,7 @@ for (const scenario of ["populated", "empty", "partial failure", "total failure"
         ["[data-region-filters]", 4],
         ["[data-source-filters]", 3],
       ];
-      assert.equal(requests.length, 4);
+      assert.equal(requests.length, 5);
       assert.equal(loadingStatus.getAttribute("role"), "status");
       assert.equal(loadingStatus.getAttribute("aria-live"), "polite");
       assert.equal(loadingStatus.textContent, "Loading current warnings...");
@@ -351,7 +353,7 @@ for (const scenario of ["populated", "empty", "partial failure", "total failure"
         };
       }
       requests.forEach((request, index) => {
-        if (index === 3) {
+        if (index === 3 || index === 4) {
           request.resolve({ ok: true, json: async () => [] });
         } else if (scenario === "total failure" || (scenario === "partial failure" && index === 0)) {
           request.reject(new Error("Feed offline"));
@@ -440,7 +442,8 @@ test("listing retains warnings and reports source and mapping failures together"
   globalThis.window = window;
   globalThis.document = window.document;
   globalThis.fetch = async (url) => {
-    if (url === "/api/media-releases/mapped-warnings" || url === "/bushfires-nt.json") throw new Error("offline");
+    if (url === "/api/media-releases/mapped-warnings" || url === emergencyWarningsEndpoint
+      || url === "/bushfires-nt.json") throw new Error("offline");
     return { ok: true, json: async () => url === "/ntes.json" ? [notice] : [] };
   };
   console.error = (...args) => errors.push(args);
@@ -449,8 +452,11 @@ test("listing retains warnings and reports source and mapping failures together"
     await new Promise((resolve) => setImmediate(resolve));
     const listing = window.document.querySelector("[data-media-releases]");
     assert.equal(listing.querySelector(".media-releases__title").textContent, notice.Subject);
-    assert.match(listing.querySelector("[data-feed-note]").textContent, /Bushfires NT.*Mapped warning details are unavailable/);
+    assert.match(listing.querySelector("[data-feed-note]").textContent, /Bushfires NT.*Mapped warning details are unavailable.*Decreasing threat warning levels are unavailable/);
     assert.ok(errors.some(([message]) => message === "Unable to load mapped warnings"));
+    assert.ok(errors.some(([message]) => message === "Unable to load emergency warnings"));
+    const decreasingThreatLevel = listing.querySelector('[data-level-filters] input[value="Decreasing threat"]');
+    assert.equal(decreasingThreatLevel.parentElement.textContent, "Decreasing threat (0)");
   } finally {
     console.error = originalError;
     Object.assign(globalThis, originals);
@@ -458,29 +464,51 @@ test("listing retains warnings and reports source and mapping failures together"
   }
 });
 
-test("homepage preserves decreasing-threat badge when mapping replaces the subject", async () => {
-  const window = new Window({ url: "http://localhost/" });
-  window.document.write(`<section data-latest-media-releases>
-    <p data-results-status></p><p data-feed-note hidden></p><div data-results></div></section>`);
-  const originals = { window: globalThis.window, document: globalThis.document, fetch: globalThis.fetch };
-  globalThis.window = window;
-  globalThis.document = window.document;
-  globalThis.fetch = async (url) => ({
-    ok: true,
-    json: async () => url === "/api/media-releases/mapped-warnings"
-      ? [{ campaignId: "campaign-1", emergencyType: "flood", warningLevel: "advice", location: "Katherine", region: ["Big Rivers"] }]
-      : [{ ...notice, Name: "Flood advice", Subject: "Flood advice - Decreasing threat - Katherine" }],
+for (const page of ["listing", "homepage"]) {
+  test(`${page} renders a Squiz decreasing-threat level when campaign IDs differ`, async () => {
+    const window = new Window({ url: "http://localhost/" });
+    window.document.write(page === "listing" ? html : `<section data-latest-media-releases>
+      <p data-results-status></p><p data-feed-note hidden></p><div data-results></div></section>`);
+    const originals = { window: globalThis.window, document: globalThis.document, fetch: globalThis.fetch };
+    const webVersionUrl = "http://createsend.com/t/t-40ED51F18548F2482540EF23F30FEDED";
+    globalThis.window = window;
+    globalThis.document = window.document;
+    globalThis.fetch = async (url) => ({
+      ok: true,
+      json: async () => url === "/api/media-releases/mapped-warnings"
+        ? [{ campaignId: "campaign-1", emergencyType: "flood", warningLevel: "advice", location: "Katherine", region: ["Big Rivers"] }]
+        : url === emergencyWarningsEndpoint
+          ? [{ campaignId: "d477d8d525910ac3392725e36b49d5d5", WebVersionURL: webVersionUrl, warningLevel: "decreasing_threat" }]
+          : page === "homepage" || url === "/ntes.json"
+            ? [{ ...notice, WebVersionURL: webVersionUrl, Name: "Flood advice", Subject: "Flood advice - Decreasing threat - Katherine" }]
+            : [],
+    });
+    try {
+      await import(`../../dist/${page === "homepage" ? "latest-media-releases" : "media-releases"}.js?squiz-decreasing-threat-${page}`);
+      await new Promise((resolve) => setImmediate(resolve));
+      const listing = window.document.querySelector(page === "homepage" ? "[data-latest-media-releases]" : "[data-media-releases]");
+      const card = listing.querySelector(".media-releases__item");
+      assert.equal(card.querySelector(".media-releases__title").textContent, "Flooding decreasing threat for Katherine");
+      assert.equal(card.dataset.warningLevel, "decreasing_threat");
+      assert.equal(card.querySelector(".media-releases__notice-icon").className,
+        "fa-light fa-triangle-exclamation media-releases__notice-icon");
+      assert.equal(card.querySelector(".media-releases__hazard-icon"), null);
+      assert.equal(listing.querySelector("[data-feed-note]").hidden, true);
+      if (page === "homepage") {
+        assert.equal(card.querySelector(".media-releases__severity").textContent, "Decreasing threat");
+      } else {
+        const level = listing.querySelector('[data-level-filters] input[value="Decreasing threat"]');
+        assert.equal(level.parentElement.textContent, "Decreasing threat (1)");
+        level.checked = true;
+        level.dispatchEvent(new window.Event("change", { bubbles: true }));
+        assert.equal(listing.querySelectorAll(".media-releases__item").length, 1);
+      }
+    } finally {
+      Object.assign(globalThis, originals);
+      await window.happyDOM.close();
+    }
   });
-  try {
-    await import("../../dist/latest-media-releases.js?mapped-decreasing-threat");
-    await new Promise((resolve) => setImmediate(resolve));
-    assert.equal(window.document.querySelector(".media-releases__title").textContent, "Flooding advice for Katherine");
-    assert.equal(window.document.querySelector(".media-releases__severity").textContent, "Decreasing threat");
-  } finally {
-    Object.assign(globalThis, originals);
-    await window.happyDOM.close();
-  }
-});
+}
 
 test("homepage displays existing warnings when mapped warnings fail", async () => {
   const window = new Window({ url: "http://localhost/" });
@@ -492,7 +520,7 @@ test("homepage displays existing warnings when mapped warnings fail", async () =
   globalThis.window = window;
   globalThis.document = window.document;
   globalThis.fetch = async (url) => {
-    if (url === "/api/media-releases/mapped-warnings") throw new Error("offline");
+    if (url === "/api/media-releases/mapped-warnings" || url === emergencyWarningsEndpoint) throw new Error("offline");
     return { ok: true, json: async () => [notice] };
   };
   console.error = (...args) => errors.push(args);
@@ -544,7 +572,7 @@ for (const scenario of ["latest three", "production endpoint", "fewer than three
       assert.ok(results.querySelector(".media-releases__skeleton--featured"));
       assert.equal(listing.querySelector("[data-results-status]").textContent, "Loading current warnings...");
       assert.ok(listing.querySelector("[data-results-status]").classList.contains("media-releases__status--loading"));
-      assert.equal(requests.length, 2);
+      assert.equal(requests.length, 3);
       assert.equal(requests[0].url, scenario === "production endpoint"
         ? "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor"
         : "/api/media-releases/latest");
@@ -555,7 +583,7 @@ for (const scenario of ["latest three", "production endpoint", "fewer than three
         SentDate: `2026-11-0${day} 09:00:00`,
       }));
       requests.forEach((request, index) => {
-        if (index === 1) {
+        if (index === 1 || index === 2) {
           request.resolve({ ok: true, json: async () => [] });
         } else if (scenario === "total failure") {
           request.reject(new Error("Feed offline"));

@@ -6,9 +6,10 @@ import { curateFeeds } from "./curation.mjs";
 import { randomizePreviewWarnings } from "./preview-warnings.mjs";
 
 const preview = JSON.parse(await readFile(new URL("./latest-warnings.preview.json", import.meta.url), "utf8"));
+const emergencyWarnings = JSON.parse(await readFile(new URL("./emergency-warnings.preview.json", import.meta.url), "utf8"));
 
 test("local preview covers each hazard type and warning level", () => {
-  const warnings = curateFeeds([{ source: "Merged", items: preview }]);
+  const warnings = curateFeeds([{ source: "Merged", items: preview }], [], emergencyWarnings);
   const combinations = new Set(warnings.map((warning) => `${warning.emergencyTypes[0]}|${warning.warningLevel}`));
 
   assert.equal(warnings.length, 18);
@@ -19,6 +20,7 @@ test("local preview covers each hazard type and warning level", () => {
   }
   assert.ok(warnings.some((warning) => warning.declarations.includes("Planned burn advice")));
   assert.ok(warnings.some((warning) => warning.declarations.includes("Boil water notice")));
+  assert.ok(warnings.some((warning) => warning.warningLevel === "Decreasing threat"));
   assert.ok(warnings.some((warning) => /decreasing threat/i.test(warning.title)));
 });
 

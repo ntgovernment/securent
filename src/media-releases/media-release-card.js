@@ -101,17 +101,18 @@ export function renderCard(item, { compact = false, featured = false } = {}) {
 
   const severity = document.createElement("span");
   severity.className = "media-releases__severity";
-  const isDecreasingThreat = item.warningLevel === "Advice"
-    && /\bdecreasing[\s_-]+threats?\b/i.test([item.title, item.originalTitle, item.name].filter(Boolean).join(" "));
+  const hasDecreasingThreatLevel = item.warningLevel === "Decreasing threat";
+  const isDecreasingThreat = hasDecreasingThreatLevel || (item.warningLevel === "Advice"
+    && /\bdecreasing[\s_-]+threats?\b/i.test([item.title, item.originalTitle, item.name].filter(Boolean).join(" ")));
   const isGeneralInformation = item.declarations.length
     ? item.declarations.some((declaration) => declaration !== "Planned burn advice")
-    : !["Emergency warning", "Watch and act", "Advice"].includes(item.warningLevel) && !isDecreasingThreat;
+    : !["Emergency warning", "Watch and act", "Advice", "Decreasing threat"].includes(item.warningLevel) && !isDecreasingThreat;
   if (isGeneralInformation) article.dataset.generalInformation = "true";
   const isGeneralInformationCard = !compact
     && (isGeneralInformation || item.emergencyTypes.includes("Not identified"));
-  const iconUrl = hazardIconFor(item);
+  const iconUrl = hasDecreasingThreatLevel ? "" : hazardIconFor(item);
   const isEmergencyTypeCard = !compact && Boolean(iconUrl);
-  const isFormattedCard = featured || isPlannedBurn || isGeneralInformationCard || isEmergencyTypeCard;
+  const isFormattedCard = featured || isPlannedBurn || isGeneralInformationCard || isEmergencyTypeCard || hasDecreasingThreatLevel;
   if (isFormattedCard) article.classList.add("media-releases__item--formatted");
   if (featured) article.classList.add("media-releases__item--featured");
   if (isPlannedBurn) article.classList.add("media-releases__item--planned-burn");

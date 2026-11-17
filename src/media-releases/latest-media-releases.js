@@ -1,5 +1,8 @@
 import { curateFeeds } from "./curation.mjs";
-import { latestMediaReleaseEndpoint, loadMappedWarnings, mappedWarningsEndpoint } from "./feeds.mjs";
+import {
+  emergencyWarningsEndpoint, latestMediaReleaseEndpoint, loadEmergencyWarnings,
+  loadMappedWarnings, mappedWarningsEndpoint,
+} from "./feeds.mjs";
 import { createCardSkeleton, renderCard, startRelativeTimeUpdates } from "./media-release-card.js";
 
 const listing = document.querySelector("[data-latest-media-releases]");
@@ -23,15 +26,18 @@ if (listing) {
   Promise.all([
     releases,
     loadMappedWarnings(fetch, isLocalPreview ? "/api/media-releases/mapped-warnings" : mappedWarningsEndpoint),
+    loadEmergencyWarnings(fetch, emergencyWarningsEndpoint),
   ])
-    .then(([records, { mappedWarnings, mappingFailed }]) => {
+    .then(([records, { mappedWarnings, mappingFailed }, { emergencyWarnings, emergencyWarningsFailed }]) => {
       if (!Array.isArray(records)) throw new TypeError("Warnings endpoint returned an unsupported response shape");
-      const items = curateFeeds([{ source: "Merged", items: records }], mappedWarnings).slice(0, 3);
+      const items = curateFeeds([{ source: "Merged", items: records }], mappedWarnings, emergencyWarnings).slice(0, 3);
       results.replaceChildren(...items.map((item) => renderCard(item, { featured: true })));
       status.textContent = items.length ? "" : "There are no current warnings.";
-      feedNote.hidden = !mappingFailed;
-      feedNote.textContent = mappingFailed
-        ? "Mapped warning details are unavailable; existing warning details are shown." : "";
+      const notes = [];
+      if (mappingFailed) notes.push("Mapped warning details are unavailable; existing warning details are shown.");
+      if (emergencyWarningsFailed) notes.push("Decreasing threat warning levels are unavailable; existing warning levels are shown.");
+      feedNote.hidden = notes.length === 0;
+      feedNote.textContent = notes.join(" ");
     })
     .catch((error) => {
       results.replaceChildren();

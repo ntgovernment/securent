@@ -11,7 +11,7 @@ const generalNews = /\b(?:awards?|recruit(?:ment|ing)?|ceremon(?:y|ies)|outlook|
 const operationalSender = /\b(?:ntes|northern territory emergency service|territory emergency operations centre|nt fire and emergency services|bushfires? nt|securent)\b|territorydutyofficer\.ntes@pfes\.nt\.gov\.au/i;
 const approvedDutyOfficer = /\bterritorydutyofficer\.ntes@pfes\.nt\.gov\.au\b/i;
 
-export const warningLevelOrder = ["Emergency warning", "Watch and act", "Advice", "Not identified"];
+export const warningLevelOrder = ["Emergency warning", "Watch and act", "Advice", "Decreasing threat", "Not identified"];
 
 const regionPatterns = [
   ["Greater Darwin", /\b(?:darwin|palmerston|litchfield|humpty doo|howard springs|acacia hills|berry springs|coolalinga|nightcliff|casuarina)\b/i],
@@ -147,6 +147,18 @@ function cleanText(value) {
     : "";
 }
 
+function normalizedWebVersionUrl(value) {
+  const cleaned = cleanText(value);
+  if (!cleaned) return "";
+  try {
+    const url = new URL(cleaned);
+    if (!["http:", "https:"].includes(url.protocol)) return "";
+    return `${url.origin}${url.pathname.replace(/\/+$/, "") || "/"}`;
+  } catch {
+    return "";
+  }
+}
+
 function normalizeRecord(record, source, index) {
   const name = cleanText(record.Name);
   const subject = cleanText(record.Subject);
@@ -228,8 +240,8 @@ function mappedField(mappings, field, normalize) {
   return distinct.values().next().value || null;
 }
 
-function enrichNotice(item, mappings) {
-  if (!mappings?.length) return item;
+function enrichNotice(item, mappings = [], isDecreasingThreat = false) {
+  if (!mappings.length && !isDecreasingThreat) return item;
   const type = mappedField(mappings, "emergencyType", (value) => mappedTypes.get(mappedKey(value)));
   const level = mappedField(mappings, "warningLevel", (value) => mappedLevels.get(mappedKey(value)));
   const location = mappedField(mappings, "location", cleanText);
@@ -245,7 +257,8 @@ function enrichNotice(item, mappings) {
     return item;
   }
   if (type) item.emergencyTypes = [type];
-  if (level) item.warningLevel = level;
+  if (isDecreasingThreat) item.warningLevel = "Decreasing threat";
+  else if (level) item.warningLevel = level;
   const titleType = item.emergencyTypes.length === 1 && item.emergencyTypes[0] !== "Not identified"
     ? item.emergencyTypes[0] : "";
   if (location && titleType && item.warningLevel !== "Not identified") {
@@ -255,7 +268,7 @@ function enrichNotice(item, mappings) {
   return item;
 }
 
-export function curateFeeds(feeds, mappedWarnings = []) {
+export function curateFeeds(feeds, mappedWarnings = [], emergencyWarnings = []) {
   const records = new Map();
   let sequence = 0;
 
@@ -281,7 +294,21 @@ export function curateFeeds(feeds, mappedWarnings = []) {
   }
 
   const mappings = indexMappedWarnings(mappedWarnings);
-  return [...records.values()].map((item) => enrichNotice(item, mappings.get(item.campaignId))).sort((first, second) => {
+  const decreasingThreatCampaigns = new Set();
+  const decreasingThreatUrls = new Set();
+  for (const warning of emergencyWarnings) {
+    if (typeof warning?.warningLevel !== "string"
+      || warning.warningLevel.trim().toLocaleLowerCase("en") !== "decreasing_threat") continue;
+    const campaignId = cleanText(warning.campaignId);
+    if (campaignId) decreasingThreatCampaigns.add(campaignId);
+    const webVersionUrl = normalizedWebVersionUrl(warning.WebVersionURL);
+    if (webVersionUrl) decreasingThreatUrls.add(webVersionUrl);
+  }
+  return [...records.values()].map((item) => {
+    const isDecreasingThreat = decreasingThreatCampaigns.has(item.campaignId)
+      || decreasingThreatUrls.has(normalizedWebVersionUrl(item.url));
+    return enrichNotice(item, mappings.get(item.campaignId), isDecreasingThreat);
+  }).sort((first, second) => {
     const firstTime = updatedTimestamp(first.publishedAt);
     const secondTime = updatedTimestamp(second.publishedAt);
     if (firstTime === null) return secondTime === null ? 0 : 1;

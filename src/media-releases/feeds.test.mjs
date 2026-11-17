@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { fetchMappedWarnings, fetchMediaReleaseFeeds, loadMappedWarnings, mappedWarningsEndpoint, mediaReleaseSources, parseFeedPayload } from "./feeds.mjs";
+import {
+  emergencyWarningsEndpoint, fetchEmergencyWarnings, fetchMappedWarnings, fetchMediaReleaseFeeds,
+  loadMappedWarnings, mappedWarningsEndpoint, mediaReleaseSources, parseFeedPayload,
+} from "./feeds.mjs";
 
 const source = { name: "NTG agencies" };
 
@@ -14,6 +17,18 @@ test("loads and validates the mapped warnings feed", async () => {
   }), records);
   await assert.rejects(fetchMappedWarnings(async () => ({ ok: false, status: 503 })), /503/);
   await assert.rejects(fetchMappedWarnings(async () => ({ ok: true, json: async () => ({}) })), /unsupported response shape/);
+});
+
+test("loads the emergency warnings feed for campaign-level classification", async () => {
+  const records = [{ campaignId: "campaign-1", warningLevel: "decreasing_threat" }];
+  assert.deepEqual(await fetchEmergencyWarnings(async (url, options) => {
+    assert.equal(url, emergencyWarningsEndpoint);
+    assert.equal(options.headers.Accept, "application/json");
+    assert.ok(options.signal);
+    return { ok: true, json: async () => records };
+  }), records);
+  await assert.rejects(fetchEmergencyWarnings(async () => ({ ok: false, status: 503 })), /503/);
+  await assert.rejects(fetchEmergencyWarnings(async () => ({ ok: true, json: async () => ({}) })), /unsupported response shape/);
 });
 
 test("reports mapping failures while allowing warnings to fall back", async () => {
