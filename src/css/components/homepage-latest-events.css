@@ -71,10 +71,12 @@
 
 #latest-warnings .warning-banner__action {
   display: inline-flex;
+  box-sizing: border-box;
+  height: 48px;
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  padding: 0.875rem 1.5rem;
+  padding: 0 1.5rem;
   border: 1px solid var(--warning-accent);
   font-weight: 700;
   line-height: 16px;
@@ -305,7 +307,7 @@
   }
 
   #latest-warnings .warning-banner__action {
-    padding: 0.75rem 1rem;
+    padding: 0 1rem;
   }
 
   #latest-events-intro {
