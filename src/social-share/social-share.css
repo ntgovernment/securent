@@ -65,7 +65,6 @@
   min-height: 32px !important;
   max-height: 32px !important;
   padding: 4px;
-  background-color: var(--clr-bg-shade-alt, #e7e7ea) !important;
 }
 
 button.ntg-social-share__link {
