@@ -6,6 +6,8 @@ The event page asset is `event.css`, which controls the warning-level header acc
 
 Reference `dist/social-share.css` from the Squiz Matrix share nester/page after the global theme, so its styles are loaded wherever that nester is used. Reference `dist/event.css` on event pages and `dist/social-share.js` for the share behavior. These assets are standalone and are not imported into the global theme bundle. On desktop, the share panel aligns with the first content section below the event H1; it stays in normal flow on smaller screens.
 
+The share panel is 298px × 92px at all viewport widths. Its title and icon row share the same shade background with no divider; use 12px top padding and 4px bottom padding for the title, then 12px vertical padding for the icons. The first icon control is 32px square with 4px inset padding, and the remaining controls are 24px square.
+
 The local Severe Storm - Alice Springs capture loads the rebuilt standalone social-share assets from `dist/`. Run `npm run build` before previewing at `/Severe%20Storm%20%E2%80%93%20Alice%20Springs%20_%20SecureNT.html`. The page has a prominent synthetic-content notice; its sample text and captured warning panels are not live emergency information.
 
 ## Social-share paint layout
