@@ -68,6 +68,7 @@ securent/
 │   │       ├── mainmenu-dropdown.css # Content-width desktop mega-menu and mobile drawer styles
 │   │       ├── header-footer.css     # Header/footer brand colour overrides; background: Charcoal (#343741)
 │   │       ├── homepage-featured-content.css # CMS homepage feature cards: responsive image/text layout and CTA styling
+│   │       ├── homepage-latest-events.css # Homepage warning banners (20px headings, 24px icon boxes) and event cards
 │   │       ├── active-recovery.css   # Homepage Active recovery programs card layout and interaction styling
 │   │       ├── statistics.css        # Statistics section styles
 │   │       └── main.css              # Breadcrumbs, side-nav colours, editorial links/bullets, display cards and homepage-news overrides
