@@ -1,5 +1,6 @@
 #latest-warnings .warning-banner {
-  --warning-accent: #d6410a;
+  --warning-accent: #55545c;
+  --warning-surface: #f0f0f2;
 
   display: flex;
   align-items: flex-start;
@@ -8,7 +9,7 @@
   padding: 1.5rem 1.75rem;
   border: 1px solid var(--warning-accent);
   border-left-width: 12px;
-  background: #fbebe6;
+  background: var(--warning-surface);
   color: var(--clr-text-default);
 }
 
@@ -19,15 +20,18 @@
 }
 
 #latest-warnings .warning-banner[data-warning-level="advice"] {
-  --warning-accent: var(--clr-status-advice);
+  --warning-accent: #716309;
+  --warning-surface: #fdf4b9;
 }
 
 #latest-warnings .warning-banner[data-warning-level="watch_act"] {
-  --warning-accent: var(--clr-status-watch-act);
+  --warning-accent: #9e4b00;
+  --warning-surface: #ffe4cc;
 }
 
 #latest-warnings .warning-banner[data-warning-level="emergency_warning"] {
-  --warning-accent: #d6410a;
+  --warning-accent: #a60f37;
+  --warning-surface: #f7e7eb;
 }
 
 #latest-warnings .warning-banner__icon {
@@ -89,9 +93,14 @@
 
 #latest-warnings .warning-banner__action:hover,
 #latest-warnings .warning-banner__action:focus-visible {
-  background: #b93609;
+  background: var(--warning-accent);
   color: #fff;
   text-decoration: underline;
+}
+
+#latest-warnings .warning-banner__action:focus-visible {
+  outline: 3px solid var(--warning-accent);
+  outline-offset: 3px;
 }
 
 #latest-warnings .warning-banner__action svg {
