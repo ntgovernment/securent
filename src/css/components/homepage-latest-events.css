@@ -71,13 +71,13 @@
 
 #latest-warnings .warning-banner__action {
   display: inline-flex;
-  min-height: 64px;
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
   padding: 0.875rem 1.5rem;
   border: 1px solid var(--warning-accent);
   font-weight: 700;
+  line-height: 16px;
   text-decoration: none;
 }
 
@@ -305,7 +305,6 @@
   }
 
   #latest-warnings .warning-banner__action {
-    min-height: 52px;
     padding: 0.75rem 1rem;
   }
 
