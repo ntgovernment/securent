@@ -394,7 +394,7 @@ After applying the listing markup, rebuilding and updating asset versions, verif
 
 ### Homepage Latest Events
 
-Within `#latest-warnings`, warning-banner headings are 20px at every breakpoint. A direct-child Font Awesome `<i>` uses a 24px-high box without changing its font size or natural width. These source changes must ship with the rebuilt, committed `dist/theme.css`; pushing source CSS alone does not update the Matrix file bridge. Refresh the Matrix stylesheet cache reference after publishing.
+Within `#latest-warnings`, warning-banner headings are 20px at every breakpoint. A direct-child Font Awesome `<i>` uses a 24px font size, line height, and box height while retaining its natural width. These source changes must ship with the rebuilt, committed `dist/theme.css`; pushing source CSS alone does not update the Matrix file bridge. Refresh the Matrix stylesheet cache reference after publishing.
 
 The homepage Latest Events section is styled in `src/css/components/homepage-latest-events.css`, imported by `src/css/main.css`. Each card uses `data-warning-level="advice"`, `"watch_act"`, or `"emergency_warning"` to select the shared `--clr-status-advice`, `--clr-status-watch-act`, or `--clr-status-emergency-warning` accent and tag tint. When `data-warning-level` is absent or empty, `data-emergency-type="storm"`, `"flooding"`, or `"flood"` selects the default alert orange, `--clr-status-warning` (`#d6410a`). Unrecognised status or hazard values remain neutral; `data-location` does not affect colour. Tags use a 14% tint of the selected accent, except Advice tags which use solid `#FBE032`.
 

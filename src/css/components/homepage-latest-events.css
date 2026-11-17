@@ -46,6 +46,8 @@
 #latest-warnings .warning-banner > i {
   display: block;
   height: 24px;
+  font-size: 24px;
+  line-height: 24px;
 }
 
 #latest-warnings .warning-banner__content {
