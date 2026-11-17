@@ -389,6 +389,30 @@ After applying the listing markup, rebuilding and updating asset versions, verif
 
 The homepage Latest Events section is styled in `src/css/components/homepage-latest-events.css`, imported by `src/css/main.css`. Each card uses `data-warning-level="advice"`, `"watch_act"`, or `"emergency_warning"` to select the shared `--clr-status-advice`, `--clr-status-watch-act`, or `--clr-status-emergency-warning` accent and tag tint. When `data-warning-level` is absent or empty, `data-emergency-type="storm"`, `"flooding"`, or `"flood"` selects the default alert orange, `--clr-status-warning` (`#d6410a`). Unrecognised status or hazard values remain neutral; `data-location` does not affect colour. Tags use a 14% tint of the selected accent, except Advice tags which use solid `#FBE032`.
 
+The homepage warning banner uses the same stylesheet but is a separate CMS asset-listing component. Its Matrix markup supplies the `event.warning-level`, `event.emergency-type`, `event.location`, `event.name`, and `event.message` metadata, plus the asset URL for **More information**. Add the warning triangle SVG with `.warning-banner__icon`, and group the two links in `.warning-banner__actions`: the filled **More information** button links to `%asset_url%`, while the outlined map button links to `%asset_metadata_event.map-button-url%`. Keep the inline SVGs decorative with `aria-hidden="true"`; the banner itself uses `role="alert"`. The map URL metadata is required for the second button. The CSS provides the orange panel and responsive button layout; the CMS template markup must be updated separately. After styling changes, run `npm run build` and publish `dist/theme.css` with the source stylesheet, then refresh the Matrix cache reference.
+
+```html
+<div class="warning-banner" role="alert" data-warning-level="%asset_metadata_event.warning-level%" data-emergency-type="%asset_metadata_event.emergency-type%" data-location="%asset_metadata_event.location%">
+  <svg class="warning-banner__icon" viewBox="0 0 32 32" aria-hidden="true">
+    <path d="M14.2 4.8a2.1 2.1 0 0 1 3.6 0l11.1 19.3a2.1 2.1 0 0 1-1.8 3.2H4.9a2.1 2.1 0 0 1-1.8-3.2L14.2 4.8Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
+    <path d="M16 11v7m0 4h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+  </svg>
+  <div class="warning-banner__content">
+    <h3>%asset_metadata_event.name%</h3>
+    %asset_metadata_event.message%
+    <div class="warning-banner__actions">
+      <a class="warning-banner__action warning-banner__action--primary" href="%asset_url%">
+        More information
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-7 7 7-7 7"></path></svg>
+      </a>
+      <a class="warning-banner__action warning-banner__action--secondary" href="%asset_metadata_event.map-button-url%">
+        View cyclone map
+      </a>
+    </div>
+  </div>
+</div>
+```
+
 Latest Events uses a pale-grey container capped at 1280px, 32px desktop container padding, and square cards with 24px padding, 240px minimum height, and 3px accent borders. The grid changes from three columns to two below 992px and one below 576px. Metadata can wrap, and cards expand for longer descriptions rather than clipping text. Tag text follows its warning accent, with Advice using dark yellow `#716309` for legibility. On mobile, the heading and card copy use the larger homepage type scale, event cards are separated by 32px, and “View all warnings” is hidden. The “Find out more” link keeps fixed padding while its arrow shifts 2px right on hover without vertical layout movement.
 
 ### Homepage featured content
