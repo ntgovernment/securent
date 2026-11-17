@@ -12,6 +12,28 @@ const record = (overrides = {}) => ({
   ...overrides,
 });
 
+test("normalizes legacy mapped regions to the current-warning labels", () => {
+  const [notice] = curateFeeds([{ source: "NTES", items: [record()] }], [{
+    campaignId: "campaign-1",
+    region: [
+      "Greater Darwin, Palmerston and Litchfield",
+      "Top End",
+      "East Arnhem",
+      "Big Rivers",
+      "Barkly",
+      "Central Australia",
+    ],
+  }]);
+  assert.deepEqual(notice.regions, [
+    "Greater Darwin",
+    "Top End",
+    "Nhulunbuy region",
+    "Katherine region",
+    "Tennant Creek region",
+    "Central Australia",
+  ]);
+});
+
 test("enriches a matched campaign with mapped title, classifications and multiple regions", () => {
   const items = curateFeeds([{ source: "NTES", items: [
     record(), record({ CampaignID: "unmapped", Subject: "Storm Advice - Darwin" }),
@@ -25,9 +47,9 @@ test("enriches a matched campaign with mapped title, classifications and multipl
   assert.equal(notice.title, "Storm watch and act for parts of Daly and Arnhem Districts");
   assert.deepEqual(notice.emergencyTypes, ["Storm"]);
   assert.equal(notice.warningLevel, "Watch and act");
-  assert.deepEqual(notice.regions, ["Top End", "East Arnhem", "Big Rivers"]);
+  assert.deepEqual(notice.regions, ["Top End", "Nhulunbuy region", "Katherine region"]);
   assert.ok(notice.locationTerms.includes("Parts of Daly and Arnhem Districts"));
-  assert.deepEqual(filterAndSortNotices([notice], { regions: ["East Arnhem"] }), [notice]);
+  assert.deepEqual(filterAndSortNotices([notice], { regions: ["Nhulunbuy region"] }), [notice]);
   assert.deepEqual(filterAndSortNotices([notice], { query: "daly river" }), [notice]);
   assert.deepEqual(filterAndSortNotices([notice], { query: "arnhem districts" }), [notice]);
   assert.equal(untouched.title, "Storm Advice - Darwin");
@@ -99,7 +121,7 @@ test("retains declaration semantics while applying mapped location and regions",
   assert.deepEqual(notice.declarations, ["Planned burn advice"]);
   assert.deepEqual(notice.emergencyTypes, []);
   assert.equal(notice.warningLevel, "Not identified");
-  assert.deepEqual(notice.regions, ["Top End", "Big Rivers"]);
+  assert.deepEqual(notice.regions, ["Top End", "Katherine region"]);
 });
 
 test("includes operational warning and public health alert language", () => {
@@ -110,7 +132,7 @@ test("includes operational warning and public health alert language", () => {
     FromName: "NT Health",
   })), true);
   assert.deepEqual(classifyNotice({ Subject: "Boil Water Alert - East Arnhem communities" }), {
-    regions: ["East Arnhem"], emergencyTypes: [], declarations: ["Boil water notice"], warningLevel: "Not identified",
+    regions: ["Nhulunbuy region"], emergencyTypes: [], declarations: ["Boil water notice"], warningLevel: "Not identified",
   });
   assert.equal(isOperationalNotice({
     Subject: "Boiling water notice - East Arnhem communities",
@@ -175,7 +197,7 @@ test("extracts multiple regions and hazards from names and subjects", () => {
     Name: "AWS Storm Watch and Act - Lasseter and Tanami districts",
     Subject: "Flooding - Katherine and Alice Springs",
   }), {
-    regions: ["Big Rivers", "Central Australia"],
+    regions: ["Katherine region", "Central Australia"],
     emergencyTypes: ["Flooding", "Storm"],
     declarations: [],
     warningLevel: "Watch and act",
@@ -206,11 +228,11 @@ test("keeps ambiguous classifications unknown and avoids highway region guesses"
 });
 
 test("uses dataset localities and structured place fields to identify regions", () => {
-  assert.deepEqual(classifyNotice({ title: "Flood Advice - Canteen Creek" }).regions, ["Barkly"]);
+  assert.deepEqual(classifyNotice({ title: "Flood Advice - Canteen Creek" }).regions, ["Tennant Creek region"]);
   assert.deepEqual(classifyNotice({ title: "Flood Advice - Daly River" }).regions, ["Top End"]);
   assert.deepEqual(classifyNotice({ title: "Flood Advice - Dundee Beach" }).regions, ["Greater Darwin"]);
-  assert.deepEqual(classifyNotice({ Suburb: "Anindilyakwa" }).regions, ["East Arnhem"]);
-  assert.deepEqual(classifyNotice({ Town: "  ali   curung " }).regions, ["Barkly"]);
+  assert.deepEqual(classifyNotice({ Suburb: "Anindilyakwa" }).regions, ["Nhulunbuy region"]);
+  assert.deepEqual(classifyNotice({ Town: "  ali   curung " }).regions, ["Tennant Creek region"]);
   assert.deepEqual(classifyNotice({ title: "Flood Advice - Alice Springs and Darwin" }).regions,
     ["Greater Darwin", "Central Australia"]);
 });
@@ -344,7 +366,7 @@ test("combines filter groups with OR within each group and AND between groups", 
     sources: ["NTES"], regions: ["Top End", "Central Australia"], emergencyTypes: ["Flooding"], warningLevels: ["Advice"],
   });
   assert.deepEqual(selected.map((item) => item.campaignId), ["daly"]);
-  assert.equal(filterAndSortNotices(items, { regions: ["East Arnhem"] }).length, 0);
+  assert.equal(filterAndSortNotices(items, { regions: ["Nhulunbuy region"] }).length, 0);
   assert.equal(filterAndSortNotices(items, { query: "central australia" }).length, 1);
 });
 

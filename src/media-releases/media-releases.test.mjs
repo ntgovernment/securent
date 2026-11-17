@@ -399,15 +399,15 @@ for (const page of ["listing", "homepage"]) {
       const listing = window.document.querySelector(page === "homepage" ? "[data-latest-media-releases]" : "[data-media-releases]");
       const card = listing.querySelector(".media-releases__item");
       assert.equal(card.querySelector("h3").textContent, "Storm watch and act for parts of Daly and Arnhem Districts");
-      assert.match(card.querySelector(".media-releases__region").textContent, /Top End, East Arnhem, Big Rivers/);
+      assert.match(card.querySelector(".media-releases__region").textContent, /Top End, Nhulunbuy region, Katherine region/);
       assert.equal(card.dataset.warningLevel, "watch_act");
       assert.match(card.querySelector("img").src, /storm-watch_act\.webp/);
       assert.equal(listing.querySelector("[data-feed-note]").hidden, true);
       if (page === "homepage") {
         assert.equal(card.querySelector(".media-releases__severity").textContent, "Watch and act");
       } else {
-        const region = listing.querySelector('[data-region-filters] input[value="East Arnhem"]');
-        assert.equal(region.parentElement.textContent, "East Arnhem (1)");
+        const region = listing.querySelector('[data-region-filters] input[value="Nhulunbuy region"]');
+        assert.equal(region.parentElement.textContent, "Nhulunbuy region (1)");
         region.checked = true;
         region.dispatchEvent(new window.Event("change", { bubbles: true }));
         assert.equal(listing.querySelectorAll(".media-releases__item").length, 1);

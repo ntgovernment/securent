@@ -16,9 +16,9 @@ export const warningLevelOrder = ["Emergency warning", "Watch and act", "Advice"
 const regionPatterns = [
   ["Greater Darwin", /\b(?:darwin|palmerston|litchfield|humpty doo|howard springs|acacia hills|berry springs|coolalinga|nightcliff|casuarina)\b/i],
   ["Top End", /\b(?:top end|tiwi|bathurst island|melville island|west arnhem|jabiru|gunbalanya|kakadu|adelaide river|batchelor|wagait|dundee)\b/i],
-  ["Big Rivers", /\b(?:big rivers|katherine|daly river|douglas daly|pine creek|mataranka|beswick|barunga|ngukurr|borroloola|roper|victoria river|timber creek|kalkarindji|lajamanu)\b/i],
-  ["East Arnhem", /\b(?:east arnhem|nhulunbuy|gove|yirrkala|alyangula|groote eylandt|galiwin['\u2019]?ku|elcho island|gapuwiyak|ramingining|milingimbi)\b/i],
-  ["Barkly", /\b(?:barkly(?!\s+highway)|tennant creek|elliott|renner springs|tablelands|costello)\b/i],
+  ["Nhulunbuy region", /\b(?:nhulunbuy region|east arnhem|nhulunbuy|gove|yirrkala|alyangula|groote eylandt|galiwin['\u2019]?ku|elcho island|gapuwiyak|ramingining|milingimbi)\b/i],
+  ["Katherine region", /\b(?:katherine region|big rivers|katherine|daly river|douglas daly|pine creek|mataranka|beswick|barunga|ngukurr|borroloola|roper|victoria river|timber creek|kalkarindji|lajamanu)\b/i],
+  ["Tennant Creek region", /\b(?:tennant creek region|barkly(?!\s+highway)|tennant creek|elliott|renner springs|tablelands|costello)\b/i],
   ["Central Australia", /\b(?:central australia|alice springs|lasseter|tanami|simpson|yulara|uluru|santa teresa|ltyentye apurte|hermannsburg|ntaria|papunya|yuendumu|nyirripi|chilla well|ti tree|harts range|hugh)\b/i],
 ];
 
@@ -27,11 +27,26 @@ function normalizePlace(value) {
     .replace(/[\p{P}\p{S}]+/gu, " ").replace(/\s+/g, " ").trim();
 }
 
+const regionAliases = new Map([
+  ["Greater Darwin, Palmerston and Litchfield", "Greater Darwin"],
+  ["Greater Darwin", "Greater Darwin"],
+  ["Top End", "Top End"],
+  ["East Arnhem", "Nhulunbuy region"],
+  ["Nhulunbuy region", "Nhulunbuy region"],
+  ["Big Rivers", "Katherine region"],
+  ["Katherine region", "Katherine region"],
+  ["Barkly", "Tennant Creek region"],
+  ["Tennant Creek region", "Tennant Creek region"],
+  ["Central Australia", "Central Australia"],
+].map(([source, label]) => [normalizePlace(source), label]));
+
+function normalizeRegion(value) {
+  return regionAliases.get(normalizePlace(value)) || value;
+}
+
 const localityRegions = new Map(localityData.localities.map((locality) => [
   normalizePlace(locality.suburb_or_locality),
-  locality.nt_government_region === "Greater Darwin, Palmerston and Litchfield"
-    ? "Greater Darwin"
-    : locality.nt_government_region,
+  normalizeRegion(locality.nt_government_region),
 ]));
 const localitiesByLength = [...localityRegions.keys()].sort((first, second) => second.length - first.length);
 
@@ -184,8 +199,8 @@ function mappedRegions(value) {
   if (!Array.isArray(value)) return null;
   const knownRegions = regionPatterns.map(([region]) => region);
   const regions = value.map(cleanText).filter(Boolean).map((region) => {
-    if (mappedKey(region) === "greater darwin, palmerston and litchfield") return "Greater Darwin";
-    return knownRegions.find((known) => mappedKey(known) === mappedKey(region)) || region;
+    const normalized = normalizeRegion(region);
+    return knownRegions.find((known) => mappedKey(known) === mappedKey(normalized)) || normalized;
   });
   return regions.length ? [...new Set(regions)] : null;
 }

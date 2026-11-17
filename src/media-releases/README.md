@@ -32,8 +32,10 @@ when those values are available. A leading **Part of** or **Parts of** in the
 location is lowercased in the title, preserving place-name capitalization; missing or
 invalid fields use the existing classification, and an unavailable location
 leaves the original title unchanged. Mapped regions replace inferred regions
-and can include multiple regions. The full Greater Darwin region name maps to
-the existing **Greater Darwin** label. Mapped locations are searchable.
+and can include multiple regions. Official and legacy region values are
+normalized to the displayed labels **Greater Darwin**, **Top End**,
+**Nhulunbuy region**, **Katherine region**, **Tennant Creek region**, and
+**Central Australia**. Mapped locations are searchable.
 Declarations retain their existing type, filters and styling, with mapped
 locations and regions where available.
 
