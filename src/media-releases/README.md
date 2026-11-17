@@ -8,8 +8,8 @@ filter group. It announces loading through a separate polite status. Results
 are marked busy and listing controls remain inert until the feeds finish.
 Skeletons are replaced by warning cards, an empty state, or the existing
 error message when loading completes. Reduced-motion preferences disable the
-shimmer. No additional Matrix markup is required; publish the rebuilt CSS and
-JavaScript together with their shared dependencies.
+shimmer. Loading skeletons require no additional Matrix markup; publish the
+rebuilt CSS and JavaScript together with their shared dependencies.
 
 ## Latest Three Warnings
 
@@ -108,6 +108,57 @@ The full Current Warnings page combines emergency types and declarations in one
 Warning level, Incident or notice type, Region, and Source. Selections use OR
 within a group and AND across groups. Clearing filters resets pagination while
 preserving the search text and sort order.
+
+**Use location** requests the device's coordinates and searches for the NT
+locality containing them. The lookup runs locally; coordinates are not sent to
+a geocoding service. If location permission is blocked, the request fails or
+times out, or the coordinates have no matching NT locality, the search uses
+Darwin. Typing in the search while a lookup is pending takes precedence.
+The search remains a text filter, not a geographic warning-area match.
+
+The bundled locality boundaries are the NT subset of the Digital Atlas of
+Australia's [Geoscape Administrative Boundaries localities](https://www.arcgis.com/home/item.html?id=370ff462e2c94b46995722887267f832),
+retrieved in November 2026 in EPSG:4326 with coordinates rounded to five
+decimal places. Incorporates or developed using Administrative Boundaries
+© Geoscape Australia licensed by the Commonwealth of Australia under
+[Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/).
+See the [copyright and disclaimer notice](https://geoscape.com.au/legal/data-copyright-and-disclaimer/).
+The subset and rounded coordinates are modifications to the original data.
+Publish the generated locality-data JavaScript chunk alongside the Current
+warnings bundle and its shared chunks in Matrix; it is loaded only on demand.
+The Current warnings Matrix markup must also include the `data-use-location`
+button, `data-location-status` live region, and `data-location-attribution`
+credit from the page template. Replace the existing search block with:
+
+```html
+<div class="media-releases__search">
+  <div class="media-releases__search-field">
+    <label class="visually-hidden" for="media-releases-search">Search current warnings</label>
+    <input id="media-releases-search" type="search" data-search
+      placeholder="Search for a location, incident type or keyword">
+    <span class="media-releases__search-icon" aria-hidden="true"><i class="fa-regular fa-magnifying-glass"></i></span>
+    <ul id="media-releases-search-suggestions" class="search-autocomplete" data-search-suggestions hidden></ul>
+  </div>
+  <button type="button" class="media-releases__use-location" data-use-location>
+    <i class="fa-light fa-location-dot" aria-hidden="true"></i><span>Use location</span>
+  </button>
+</div>
+<p class="visually-hidden" data-location-status role="status" aria-live="polite"></p>
+<p class="media-releases__location-attribution" data-location-attribution hidden>
+  Locality boundaries © <a href="https://www.arcgis.com/home/item.html?id=370ff462e2c94b46995722887267f832">Geoscape Australia</a>,
+  licensed by the Commonwealth of Australia under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
+  NT subset; coordinates rounded.
+</p>
+```
+
+Publish `dist/media-releases.css`, `dist/media-releases.js`,
+`dist/SecureNT_files/autocomplete.js`, and
+`dist/SecureNT_files/nt-localities.js` alongside the existing shared warning
+assets, preserving their relative paths. Refresh Matrix asset cache references.
+Geolocation requires a secure context such as HTTPS, or localhost for testing.
+Check a successful lookup, denied permission, an out-of-NT location, and typing
+during a pending lookup; verify the button on desktop and mobile. A Git push
+does not update Matrix markup or publish its asset references automatically.
 
 The Incident or notice type list includes emergency types plus Fire ban,
 planned burn, and boil-water declarations. It shows six options initially;

@@ -375,9 +375,95 @@ for (const scenario of ["populated", "empty", "partial failure", "total failure"
       assert.equal(listing.querySelector("[data-feed-note]").hidden, !failed && scenario !== "partial failure");
       if (failed) {
         assert.match(listing.querySelector("[data-results-status]").textContent, /temporarily unavailable/);
+      } else if (scenario === "empty") {
+        assert.equal(
+          listing.querySelector("[data-results-status]").textContent,
+          "No current warnings match your search or filters.",
+        );
       } else {
+        assert.equal(listing.querySelector("[data-results-status]").textContent, "");
         listing.querySelector("[data-search]").dispatchEvent(new window.Event("input"));
+        assert.equal(listing.querySelector("[data-results-status]").textContent, "");
         assert.equal(results.querySelectorAll(".media-releases__skeleton").length, 0);
+      }
+    } finally {
+      Object.assign(globalThis, originals);
+      console.error = originalConsoleError;
+      await window.happyDOM.close();
+    }
+  });
+}
+
+for (const scenario of ["success", "denied", "unavailable", "outside NT", "typing", "timeout"]) {
+  test(`use location updates search for ${scenario}`, async () => {
+    const window = new Window({ url: "http://localhost/media-releases.html" });
+    window.document.write(html);
+    const originals = { window: globalThis.window, document: globalThis.document, fetch: globalThis.fetch };
+    const originalConsoleError = console.error;
+    let finishPosition;
+    let timeoutLocation;
+    if (scenario === "timeout") {
+      const setTimeout = window.setTimeout.bind(window);
+      window.setTimeout = (callback, delay, ...args) => {
+        if (delay === 10000) {
+          timeoutLocation = callback;
+          return 0;
+        }
+        return setTimeout(callback, delay, ...args);
+      };
+    }
+    if (scenario !== "unavailable") {
+      Object.defineProperty(window.navigator, "geolocation", { value: {
+        getCurrentPosition(success, failure) {
+          if (scenario === "denied") failure(new Error("Permission denied"));
+          else if (scenario === "typing" || scenario === "timeout") finishPosition = success;
+          else success({ coords: scenario === "outside NT"
+            ? { latitude: -33.8688, longitude: 151.2093 }
+            : { latitude: -23.698, longitude: 133.8807 } });
+        },
+      } });
+    }
+    globalThis.window = window;
+    globalThis.document = window.document;
+    globalThis.fetch = async (url) => ({
+      ok: true,
+      json: async () => url === "/ntes.json" ? [
+        { ...notice, Name: "Flood advice - Alice Springs", Subject: "Flood advice - Alice Springs" },
+        { ...notice, CampaignID: "darwin", Name: "Flood advice - Darwin", Subject: "Flood advice - Darwin" },
+      ] : [],
+    });
+    console.error = () => {};
+    try {
+      await import(`../../dist/media-releases.js?location=${encodeURIComponent(scenario)}`);
+      await new Promise((resolve) => setImmediate(resolve));
+      const listing = window.document.querySelector("[data-media-releases]");
+      const search = listing.querySelector("[data-search]");
+      const button = listing.querySelector("[data-use-location]");
+      button.click();
+      if (scenario === "timeout") timeoutLocation();
+      if (scenario === "typing") {
+        search.value = "manual";
+        search.dispatchEvent(new window.Event("input", { bubbles: true }));
+        finishPosition({ coords: { latitude: -23.698, longitude: 133.8807 } });
+      }
+      for (let attempt = 0; button.disabled && attempt < 200; attempt += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      }
+      assert.equal(button.disabled, false);
+      assert.equal(search.value, scenario === "success" ? "Alice Springs" : scenario === "typing" ? "manual" : "Darwin");
+      assert.equal(listing.querySelector("[data-search-suggestions]").hidden, true);
+      assert.match(listing.querySelector("[data-location-status]").textContent,
+        scenario === "typing" ? /search text changed/ : scenario === "success" ? /Searching for Alice Springs/ : /Searching for Darwin/);
+      assert.equal(listing.querySelector("[data-location-attribution]").hidden, scenario !== "success");
+      if (scenario === "timeout") {
+        finishPosition({ coords: { latitude: -23.698, longitude: 133.8807 } });
+        await new Promise((resolve) => setTimeout(resolve, 30));
+        assert.equal(search.value, "Darwin");
+      }
+      if (scenario !== "typing") {
+        assert.equal(listing.querySelectorAll(".media-releases__item").length, 1);
+        assert.match(listing.querySelector(".media-releases__title").textContent,
+          scenario === "success" ? /Alice Springs/ : /Darwin/);
       }
     } finally {
       Object.assign(globalThis, originals);

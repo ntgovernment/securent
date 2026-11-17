@@ -105,6 +105,7 @@ export function attachAutocomplete(input, listbox, getCandidates) {
   input.addEventListener("blur", close);
 
   return {
+    close,
     refresh() {
       if (document.activeElement === input) update();
     },

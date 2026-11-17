@@ -7,12 +7,16 @@ import {
 } from "./feeds.mjs";
 import { getPageWindow } from "../pagination/page-window.mjs";
 import { createCardSkeleton, renderCard, startRelativeTimeUpdates } from "./media-release-card.js";
+import { findLocality } from "./locality-lookup.mjs";
 const listing = document.querySelector("[data-media-releases]");
 
 if (listing) {
   const isLocalPreview = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
   const search = listing.querySelector("[data-search]");
   const searchSuggestions = listing.querySelector("[data-search-suggestions]");
+  const useLocation = listing.querySelector("[data-use-location]");
+  const locationStatus = listing.querySelector("[data-location-status]");
+  const locationAttribution = listing.querySelector("[data-location-attribution]");
   const filters = listing.querySelector("[data-filters]");
   const sort = listing.querySelector("[data-sort]");
   const filterPanel = listing.querySelector("[data-filter-panel]");
@@ -27,6 +31,7 @@ if (listing) {
   const pageSize = 10;
   let items = [];
   let currentPage = 1;
+  let searchRevision = 0;
 
   const loadingContents = [...listing.children];
   const loadingMessage = document.createElement("span");
@@ -240,7 +245,7 @@ if (listing) {
     const pageItems = matches.slice(start, start + pageSize);
     results.replaceChildren(...pageItems.map(renderCard));
     status.textContent = matches.length
-      ? `Showing ${start + 1}-${Math.min(start + pageSize, matches.length)} of ${matches.length} current warnings. Sorted by ${sort.selectedOptions[0].textContent.toLowerCase()}.`
+      ? ""
       : "No current warnings match your search or filters.";
     renderPagination(pageCount);
   }
@@ -257,8 +262,53 @@ if (listing) {
   }
 
   search.addEventListener("input", () => {
+    searchRevision += 1;
     currentPage = 1;
     render();
+  });
+  useLocation?.addEventListener("click", async () => {
+    const revision = searchRevision;
+    useLocation.disabled = true;
+    if (locationStatus) locationStatus.textContent = "Finding your location.";
+    let name = "Darwin";
+    let fallback = false;
+    let timer;
+    try {
+      if (!window.navigator.geolocation) throw new Error("Geolocation is unavailable");
+      const locality = await Promise.race([
+        (async () => {
+          const position = await new Promise((resolve, reject) => {
+            window.navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
+          });
+          const { default: boundaries } = await import("./nt-localities.json");
+          return findLocality(boundaries, position.coords.latitude, position.coords.longitude);
+        })(),
+        new Promise((_, reject) => {
+          timer = window.setTimeout(() => reject(new Error("Location request timed out")), 10000);
+        }),
+      ]);
+      if (locality) name = locality;
+      else fallback = true;
+    } catch (error) {
+      fallback = true;
+      console.error("Unable to determine current location", error);
+    } finally {
+      window.clearTimeout(timer);
+      useLocation.disabled = false;
+    }
+    if (revision !== searchRevision) {
+      if (locationStatus) locationStatus.textContent = "Location search cancelled because the search text changed.";
+      return;
+    }
+    search.value = name;
+    search.dispatchEvent(new window.Event("input", { bubbles: true }));
+    searchAutocomplete.close();
+    if (locationAttribution && !fallback) locationAttribution.hidden = false;
+    if (locationStatus) {
+      locationStatus.textContent = fallback
+        ? "Your location could not be determined. Searching for Darwin."
+        : `Searching for ${name}.`;
+    }
   });
   filters.addEventListener("change", () => {
     currentPage = 1;

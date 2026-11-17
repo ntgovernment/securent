@@ -82,6 +82,41 @@ section.media-releases__hero {
   font-size: 20px;
 }
 
+.media-releases__use-location {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 16px 24px;
+  border: 1px solid #267e82;
+  border-radius: 0;
+  background: #fff;
+  color: #267e82;
+  font: 700 16px/16px Lato, sans-serif;
+  cursor: pointer;
+}
+
+.media-releases__use-location i {
+  font-size: 20px;
+}
+
+.media-releases__use-location:hover:not(:disabled) {
+  background: #ecf0f0;
+}
+
+.media-releases__use-location:disabled {
+  cursor: wait;
+}
+
+.media-releases__location-attribution {
+  margin: -16px 0 24px;
+  color: #555963;
+  font-size: 12px;
+  line-height: 16px;
+}
+
 .media-releases__sort {
   display: flex;
   flex-direction: column;
@@ -93,6 +128,7 @@ section.media-releases__hero {
 }
 
 .media-releases__search input:focus-visible,
+.media-releases__use-location:focus-visible,
 .media-releases__sort select:focus-visible,
 .media-releases__filter-panel summary:focus-visible,
 .media-releases__clear-filters:focus-visible,
