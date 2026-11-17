@@ -58,7 +58,7 @@
 
 #latest-warnings .warning-banner p {
   margin: 0 0 1rem;
-  font-size: 1.25rem;
+  font-size: 16px;
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
@@ -302,10 +302,6 @@
 
   #latest-warnings .warning-banner h3 {
     font-size: 1.25rem;
-  }
-
-  #latest-warnings .warning-banner p {
-    font-size: 1rem;
   }
 
   #latest-warnings .warning-banner__action {
