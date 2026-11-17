@@ -38,7 +38,7 @@ The Latest update callout uses the shared theme: a 1px strong border, an 8px lef
 
 ## Warning accordion paint layout
 
-Use native `<details>` and `<summary>` markup so the warning summary stays unchanged and the body is revealed when expanded. Leave off the `open` attribute for the collapsed default. The accordion has 24px of vertical margin so the surrounding content has consistent spacing. Hovering the accordion adds a shadow tinted with its warning-level accent without changing the container's dimensions. The chevron stays pinned to the summary's top-right corner as the locations wrap. Add the warning-level class to `<details>` so its accent matches the status: `warning-level-advice` (yellow, the default), `warning-level-watch_act` (orange), or `warning-level-emergency_warning` (red). Keep each pin and location name in the same `.warning-accordion__location` wrapper; long names may wrap without separating the icon from the label. The full-width More information link uses a 14px label, 16px right-arrow icon, and 8px gap; hovering underlines the text and shifts the arrow left. The CMS-generated external icon is hidden. Replace the asset and content placeholders with the appropriate Matrix asset URLs, metadata, and WYSIWYG content. Repeat the location element for each affected location.
+Use native `<details>` and `<summary>` markup so the warning summary stays unchanged and the body is revealed when expanded. Leave off the `open` attribute for the collapsed default. The accordion has 24px of vertical margin so the surrounding content has consistent spacing. Hovering the accordion adds a shadow tinted with its warning-level accent without changing the container's dimensions. The chevron stays pinned to the summary's top-right corner as the locations wrap. Add the warning-level class to `<details>` so its accent matches the status: `warning-level-advice` (yellow, the default), `warning-level-watch_act` (orange), or `warning-level-emergency_warning` (red). Use `EMERGENCY WARNING`, `WATCH AND ACT`, or `ADVICE` in the summary title. Each location gets a solid bullet; long names may wrap without separating the bullet from the label. The full-width More information link uses a 14px label, 16px right-arrow icon, and 8px gap; hovering underlines the text and shifts the arrow left. The CMS-generated external icon is hidden. Replace the asset and content placeholders with the appropriate Matrix asset URLs, metadata, and WYSIWYG content. Repeat the location element for each affected location.
 
 ```html
 <link rel="stylesheet" href="PUBLISHED-URL-OF-warning-accordion.css">
@@ -47,13 +47,9 @@ Use native `<details>` and `<summary>` markup so the warning summary stays uncha
   <summary>
     <img class="warning-accordion__icon" src="PUBLISHED-URL-OF-WARNING-ICON" alt="">
     <span class="warning-accordion__content">
-      <strong class="warning-accordion__title">[Incident type] warning: [warning level] for [location]</strong>
+      <strong class="warning-accordion__title">[Incident type] warning: [EMERGENCY WARNING / WATCH AND ACT / ADVICE] for [location]</strong>
       <span class="warning-accordion__locations">
         <span class="warning-accordion__location">
-          <svg aria-hidden="true" viewBox="0 0 24 24">
-            <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"></path>
-            <circle cx="12" cy="10" r="2.25"></circle>
-          </svg>
           <span>[Location name]</span>
         </span>
       </span>
