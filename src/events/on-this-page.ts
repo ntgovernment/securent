@@ -11,11 +11,25 @@ export function initializeEventNavigation(window: Window & typeof globalThis) {
   const update = () => {
     frame = undefined;
     const headings = [...main.querySelectorAll<HTMLElement>("h2:not(.accordion-header)")];
+    const matchedHeadings = new Set<HTMLElement>();
     const sections = [...nav.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')].flatMap((link) => {
-      const heading = headings.find((heading) => `#${encodeURIComponent(heading.id)}` === link.hash);
+      const heading = headings.find((heading) =>
+        !matchedHeadings.has(heading) && `#${encodeURIComponent(heading.id)}` === link.hash);
+      if (heading) {
+        matchedHeadings.add(heading);
+        // The legacy component gives repeated heading labels the same ID.
+        if (window.document.getElementById(heading.id) !== heading) {
+          const base = heading.id;
+          let suffix = 2;
+          while (window.document.getElementById(`${base}-${suffix}`)) suffix++;
+          heading.id = `${base}-${suffix}`;
+          link.setAttribute("href", `#${encodeURIComponent(heading.id)}`);
+        }
+      }
       return heading && heading.getClientRects().length > 0 ? [{ link, heading }] : [];
     });
-    const activationLine = Math.max(32, window.innerHeight * 0.25);
+    // Allow subpixel rounding at anchor destinations, not other visible headings.
+    const activationLine = 2;
     let active: HTMLAnchorElement | undefined;
     for (const { link, heading } of sections) {
       const top = heading.getBoundingClientRect().top;
@@ -28,7 +42,11 @@ export function initializeEventNavigation(window: Window & typeof globalThis) {
 
     const document = window.document.documentElement;
     if (window.scrollY + window.innerHeight >= document.scrollHeight - 2) {
-      active = sections.at(-1)?.link;
+      const destination = sections.find(({ link, heading }) => {
+        const top = heading.getBoundingClientRect().top;
+        return link.hash === window.location.hash && top >= -activationLine && top < window.innerHeight;
+      });
+      active = destination?.link ?? sections.at(-1)?.link;
     }
     for (const link of nav.querySelectorAll<HTMLAnchorElement>("a")) {
       const selected = link === active;

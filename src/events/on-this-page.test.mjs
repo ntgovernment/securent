@@ -32,7 +32,7 @@ async function withPage(check, eventPage = true) {
       window.dispatchEvent(new window.Event("scroll"));
       await flush();
     };
-    await check({ window, nav, populate, flush, scroll });
+    await check({ window, nav, headings, populate, flush, scroll });
   } finally {
     await window.happyDOM.close();
   }
@@ -59,7 +59,7 @@ test("tracks headings in both scroll directions and selects the last section at 
     await flush();
     const links = [...nav.querySelectorAll("a")];
     links[0].focus();
-    await scroll([-800, 150, 850]);
+    await scroll([-800, -0.625, 850]);
     assert.deepEqual(links.map((link) => link.classList.contains("active")), [false, true, false]);
     assert.equal(links[1].getAttribute("aria-current"), "location");
     assert.equal(links[0].hasAttribute("aria-current"), false);
@@ -70,6 +70,55 @@ test("tracks headings in both scroll directions and selects the last section at 
     assert.equal(links[0].getAttribute("aria-current"), "location");
     await scroll([1000, 1800, 2500], 0);
     assert.equal(nav.querySelectorAll(".active, [aria-current]").length, 0);
+  });
+});
+
+test("keeps a short section active until the next heading reaches the viewport top", async () => {
+  await withPage(async ({ window, nav, populate, flush, scroll }) => {
+    populate();
+    initializeEventNavigation(window);
+    await flush();
+    const links = [...nav.querySelectorAll("a")];
+    await scroll([-0.625, 110.5625, 325.75]);
+    assert.equal(links[0].getAttribute("aria-current"), "location");
+    await scroll([-111, -0.625, 214.5625]);
+    assert.equal(links[1].getAttribute("aria-current"), "location");
+    await scroll([-100, 10.375, 225.5625]);
+    assert.equal(links[0].getAttribute("aria-current"), "location");
+  });
+});
+
+test("gives repeated headings distinct anchor targets and highlights the matching occurrence", async () => {
+  await withPage(async ({ window, nav, headings, populate, flush, scroll }) => {
+    headings[1].id = "first";
+    headings[2].id = "first-2";
+    populate();
+    initializeEventNavigation(window);
+    await flush();
+    const links = [...nav.querySelectorAll("a")];
+    assert.deepEqual(headings.map((heading) => heading.id), ["first", "first-3", "first-2"]);
+    assert.deepEqual(links.map((link) => link.hash), ["#first", "#first-3", "#first-2"]);
+    await scroll([-800, 100, 850]);
+    assert.equal(links[0].getAttribute("aria-current"), "location");
+    await scroll([-900, 0, 750]);
+    assert.equal(links[1].getAttribute("aria-current"), "location");
+    assert.equal(nav.querySelectorAll(".active").length, 1);
+    assert.equal(window.document.getElementById(links[1].hash.slice(1)), headings[1]);
+  });
+});
+
+test("keeps a visible anchor destination selected when scrolling is clamped at the page bottom", async () => {
+  await withPage(async ({ window, nav, populate, flush, scroll }) => {
+    populate();
+    initializeEventNavigation(window);
+    await flush();
+    const links = [...nav.querySelectorAll("a")];
+    window.location.hash = "#second";
+    await scroll([-500, 300, 600], 2200);
+    assert.equal(links[1].getAttribute("aria-current"), "location");
+    window.location.hash = "#first";
+    await scroll([-500, 300, 600], 2200);
+    assert.equal(links[2].getAttribute("aria-current"), "location");
   });
 });
 

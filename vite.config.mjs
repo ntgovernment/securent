@@ -290,6 +290,9 @@ export default defineConfig({
         "local-conditions": "./src/local-conditions/local-conditions.js",
       },
       output: {
+        // The CMS also loads this bundle as a classic script alongside jQuery.
+        intro: (chunk) => chunk.name === "theme" ? "(() => {" : "",
+        outro: (chunk) => chunk.name === "theme" ? "})();" : "",
         // Standalone feature entries go to dist/; shared chunks go to SecureNT_files/.
         entryFileNames: (chunk) =>
           chunk.name === "theme" ||
