@@ -1,6 +1,6 @@
 import { curateFeeds } from "./curation.mjs";
 import {
-  emergencyWarningsEndpoint, latestMediaReleaseEndpoint, loadEmergencyWarnings,
+  emergencyWarningsEndpoint, fetchMediaReleaseFeeds, loadEmergencyWarnings,
   loadMappedWarnings, mappedWarningsEndpoint,
 } from "./feeds.mjs";
 import { createCardSkeleton, renderCard, startRelativeTimeUpdates } from "./media-release-card.js";
@@ -17,23 +17,28 @@ if (listing) {
   status.classList.add("media-releases__status--loading");
   status.textContent = "Loading current warnings...";
   results.replaceChildren(...Array.from({ length: 3 }, () => createCardSkeleton({ featured: true })));
-  const releases = fetch(isLocalPreview ? "/api/media-releases/latest" : latestMediaReleaseEndpoint,
-    { headers: { Accept: "application/json" }, credentials: "same-origin" })
-    .then((response) => {
-      if (!response.ok) throw new Error(`Request failed (${response.status})`);
-      return response.json();
-    });
+  const releases = isLocalPreview
+    ? fetch("/api/media-releases/latest", { headers: { Accept: "application/json" }, credentials: "same-origin" })
+      .then((response) => {
+        if (!response.ok) throw new Error(`Request failed (${response.status})`);
+        return response.json();
+      })
+      .then((records) => {
+        if (!Array.isArray(records)) throw new TypeError("Warnings endpoint returned an unsupported response shape");
+        return { feeds: [{ source: "Merged", items: records }], failedSources: [] };
+      })
+    : fetchMediaReleaseFeeds(fetch);
   Promise.all([
     releases,
     loadMappedWarnings(fetch, isLocalPreview ? "/api/media-releases/mapped-warnings" : mappedWarningsEndpoint),
     loadEmergencyWarnings(fetch, emergencyWarningsEndpoint),
   ])
-    .then(([records, { mappedWarnings, mappingFailed }, { emergencyWarnings, emergencyWarningsFailed }]) => {
-      if (!Array.isArray(records)) throw new TypeError("Warnings endpoint returned an unsupported response shape");
-      const items = curateFeeds([{ source: "Merged", items: records }], mappedWarnings, emergencyWarnings).slice(0, 3);
+    .then(([{ feeds, failedSources }, { mappedWarnings, mappingFailed }, { emergencyWarnings, emergencyWarningsFailed }]) => {
+      const items = curateFeeds(feeds, mappedWarnings, emergencyWarnings).slice(0, 3);
       results.replaceChildren(...items.map((item) => renderCard(item, { featured: true })));
       status.textContent = items.length ? "" : "There are no current warnings.";
       const notes = [];
+      if (failedSources.length) notes.push(`Some feeds are unavailable: ${failedSources.join(", ")}.`);
       if (mappingFailed) notes.push("Mapped warning details are unavailable; existing warning details are shown.");
       if (emergencyWarningsFailed) notes.push("Decreasing threat warning levels are unavailable; existing warning levels are shown.");
       feedNote.hidden = notes.length === 0;

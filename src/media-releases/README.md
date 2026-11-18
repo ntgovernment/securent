@@ -13,13 +13,13 @@ rebuilt CSS and JavaScript together with their shared dependencies.
 
 ## Latest Three Warnings
 
-The homepage's latest-three featured cards request the merged `campaign-monitor`
-endpoint and apply the existing operational-warning filtering,
-deduplication, and newest-first ordering to its JSON array. It displays up to
+The homepage's latest-three featured cards combine the Bushfires NT, NTES, and
+NTG agencies feeds, then apply the existing operational-warning filtering,
+deduplication, source precedence, and newest-first ordering. It displays up to
 three cards and does not require the full listing's search, filters, or
-pagination. The endpoint does not identify individual source failures or
-preserve source precedence for duplicate campaigns. Homepage cards show the
-severity icon and badge, relative publication time, title, and optional
+pagination. If a source is unavailable while others load, available warnings
+are shown and the feed note identifies the failed sources. Homepage cards show
+the severity icon and badge, relative publication time, title, and optional
 region, without a separate **More information** action. Their publication
 timestamps are stored as ISO values in the time element's `data-time`
 attribute, and the relative labels refresh every minute using minutes, hours,
@@ -91,11 +91,10 @@ three unique records per request, including one randomly selected Decreasing
 threat, Planned burn, or General information example and two warning
 type/level examples. The 18 preview examples cover Bushfire, Cyclone, Flooding,
 Storm, and Heatwave across Emergency warning, Watch and act, and Advice. This
-keeps the homepage preview independent of the live merged feed; the production
-page still requests the merged Campaign Monitor endpoint.
-The individual source endpoints still proxy to the NT Government site; other
-hosts request the merged endpoint directly and require CORS permission if they
-are on a different origin. The existing site icon font supplies the clock,
+keeps the homepage preview independent of the live source feeds.
+The Vite preview proxies source-feed requests to the NT Government site.
+Production pages request the three source feeds directly, so their origin must
+allow those requests. The existing site icon font supplies the clock,
 location, and arrow icons. The cards use three columns on wide screens, two below 900px,
 and one below 600px. The component shows an empty message when no eligible
 notices are available and reports when the endpoint is unavailable or invalid.
