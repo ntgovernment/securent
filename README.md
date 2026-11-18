@@ -478,7 +478,7 @@ Wrap multiple banners in `.warning-grid`, which uses a single-column grid with a
 
 ### Local conditions
 
-The location label and dropdown use bold Lato at 16px, while the location button uses 14px. The label is `#174C4E`; the controls use `#267E82` on white. Controls and keyboard-focus outlines have square corners.
+The location label and dropdown use bold Lato at 16px, while the location button uses 14px. The label is `#174C4E`; the controls use `#267E82` on white. Controls and keyboard-focus outlines have square corners. The Use location button retains its teal 3px outline during pointer focus and while pressed, as well as keyboard focus.
 
 The local-conditions widget renders Bushfire danger rating, Air quality, and Temperature cards. Its styles live in `src/local-conditions/local-conditions.css`, imported by `src/css/main.css` into the shared `dist/theme.css` bundle. All three cards are 175px high with a `#F5F5F7` background, inset `#D3D3D7` border, and consistently placed decorative icon. Below 992px, cards stack in one column; below 576px, location controls stack at full width and cards have 32px separation. Cards remain visible when readings are unavailable and show a muted “Data not available” message; pending requests use skeleton placeholders. Source attribution and, when available, the relative timestamp share the bottom footer, with the source on the left and timestamp on the right. Both rating charts use a marker without expanding the selected segment. Loading is communicated with the busy state rather than a loading message.
 

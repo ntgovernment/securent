@@ -28,6 +28,26 @@ const fixture = `<product><observations>
   <station bom-id="invalid" description="Invalid coordinates" lat="91" lon="131.0252"><period index="0" /></station>
 </observations></product>`;
 
+test("the location button retains its outline on pointer focus", async () => {
+  const window = new Window();
+  const style = window.document.createElement("style");
+  style.textContent = `button:focus { outline: 0; }\n${stylesheet}`;
+  window.document.head.append(style);
+  const button = window.document.createElement("button");
+  button.className = "lc-use-location";
+  window.document.body.append(button);
+  try {
+    button.focus();
+    const focused = window.getComputedStyle(button);
+    assert.equal(focused.outlineWidth, "3px");
+    assert.equal(focused.outlineStyle, "solid");
+    assert.equal(focused.outlineColor.toLowerCase(), "#267e82");
+    assert.equal(focused.outlineOffset, "3px");
+  } finally {
+    await window.happyDOM.close();
+  }
+});
+
 test("the three condition cards use consistent 175px heights", () => {
   const window = new Window();
   const style = window.document.createElement("style");

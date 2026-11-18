@@ -82,6 +82,8 @@ main.ntg-body--homepage #current-conditions > #local-conditions > .container-xl 
 }
 
 .lc-select:focus-visible,
+.lc-use-location:focus,
+.lc-use-location:active,
 .lc-use-location:focus-visible {
   border-radius: 0;
   outline: 3px solid #267e82;
