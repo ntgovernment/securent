@@ -25,6 +25,11 @@ timestamps are stored as ISO values in the time element's `data-time`
 attribute, and the relative labels refresh every minute using minutes, hours,
 or days ago.
 
+AWS hazard campaigns from the official **NT Emergency Service** sender are
+operational warnings even when their subject omits words such as **warning** or
+**advice**. If the source provides no warning level, they retain **Not
+identified** rather than inferring a severity.
+
 Both warning displays also request the `mapped-warnings` integration and match
 its `campaignId` to the release `CampaignID`. Mapped warning titles use
 **[Type] [level] for [Location]** (for example, **Storm advice for Darwin**)
