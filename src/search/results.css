@@ -210,6 +210,9 @@ main.securent-search .sync-pagination .pagination .page-item.disabled .page-link
 
 main.securent-search .sync-pagination .pagination .page-item:not(.active):not(.disabled) .page-link:hover {
   background: #ecf0f0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transform: none !important;
 }
 
 main.securent-search .sync-pagination .pagination .page-link:focus-visible {

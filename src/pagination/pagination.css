@@ -86,6 +86,12 @@
   color: #fff;
 }
 
+.pagination__page-button:not(:disabled):hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transform: none !important;
+}
+
 .pagination__page-button:disabled {
   color: #777b82;
   cursor: default;

@@ -187,6 +187,10 @@ coordinates have no matching NT locality, the search uses Darwin. Typing in
 the search while a lookup is pending takes precedence.
 The search remains a text filter, not a geographic warning-area match.
 
+On mobile viewports, the Current warnings listing uses 16px of space above
+the search bar. The **Sort and filter** control has a teal border and a subtle
+hover background matching the **Use location** button and filter checkboxes.
+
 The bundled locality boundaries are the NT subset of the Digital Atlas of
 Australia's [Geoscape Administrative Boundaries localities](https://www.arcgis.com/home/item.html?id=370ff462e2c94b46995722887267f832),
 retrieved in November 2026 in EPSG:4326 with coordinates rounded to five

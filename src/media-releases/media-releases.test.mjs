@@ -308,6 +308,9 @@ test("renders declaration-only cards with their accent colors and checkbox style
     assert.match(mediaSelectBase, /background-color:#fff/);
     assert.match(alertsSelectBase, /background-color:#fff/);
     assert.match(css, /\.media-releases__search input:hover:not\(:focus\):not\(:active\):placeholder-shown,\.media-releases__sort select:hover:not\(:focus\):not\(:active\)\{background-color:#ecf0f0\}/);
+    assert.match(css, /@media\(max-width:767\.98px\)\{\.media-releases__listing\{padding:16px 0 32px\}/);
+    assert.match(css, /\.media-releases__filter-panel summary\{[^}]*border:1px solid #267e82;[^}]*background:#fff/);
+    assert.match(css, /\.media-releases__filter-panel summary:hover\{background:#ecf0f0\}/);
 
     assert.match(css, /\.media-releases__item--formatted\.media-releases__item--planned-burn\{--media-releases-accent:\s*#865aa5\}/);
     assert.match(css, /\.media-releases__item--formatted\.media-releases__item--general-information\{--media-releases-accent:\s*#343741\}/);

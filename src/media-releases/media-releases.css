@@ -846,7 +846,7 @@ section.media-releases__hero {
 
 @media (max-width: 767.98px) {
   .media-releases__listing {
-    padding: 32px 0;
+    padding: 16px 0 32px;
   }
 
   .media-releases__search {
@@ -870,12 +870,15 @@ section.media-releases__hero {
   }
 
   .media-releases__filter-panel summary {
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 100%;
     min-height: 60px;
     padding: 8px 16px 8px 0;
+    border: 1px solid #267e82;
+    border-radius: 0;
     background: #fff;
     color: #267e82;
     font-family: Lato, sans-serif;
@@ -883,6 +886,10 @@ section.media-releases__hero {
     font-weight: 700;
     line-height: 16px;
     list-style: none;
+  }
+
+  .media-releases__filter-panel summary:hover {
+    background: #ecf0f0;
   }
 
   .media-releases__filter-panel summary::-webkit-details-marker {
