@@ -90,6 +90,32 @@ test("enhances event navigation after the legacy script populates links, without
   });
 });
 
+test("adds Latest update callout headings to event navigation in document order", async () => {
+  await withPage(async ({ window, nav, headings, populate, flush }) => {
+    const latestUpdate = window.document.createElement("section");
+    latestUpdate.className = "ntg-callout__content latest-update";
+    latestUpdate.innerHTML = '<div class="ntg-callout__text"><h3 id="latest-update-1659855">Latest update</h3></div>';
+    const unrelatedHeading = window.document.createElement("h3");
+    unrelatedHeading.id = "unrelated";
+    unrelatedHeading.textContent = "Not in the side navigation";
+    headings[0].before(latestUpdate, unrelatedHeading);
+    const latestHeading = latestUpdate.querySelector("h3");
+    latestHeading.getClientRects = () => [{ top: 200 }];
+    latestHeading.getBoundingClientRect = () => ({ top: 200 });
+
+    populate();
+    initializeEventNavigation(window);
+    await flush();
+
+    const links = [...nav.querySelectorAll("a")];
+    assert.deepEqual(links.map((link) => link.hash),
+      ["#latest-update-1659855", "#first", "#second", "#last"]);
+    assert.deepEqual(links.map((link) => link.textContent),
+      ["Latest update", "First section", "Second section", "Last section"]);
+    assert.equal(links[0].getAttribute("aria-current"), "location");
+  });
+});
+
 test("tracks headings in both scroll directions and selects the last section at the page bottom", async () => {
   await withPage(async ({ window, nav, populate, flush, scroll }) => {
     populate();

@@ -20,7 +20,7 @@ export function initializeEventNavigation(window: Window & typeof globalThis) {
   const update = () => {
     frame = undefined;
     const headings = [...main.querySelectorAll<HTMLElement>(
-      "h2:not(.accordion-header), .ntg-accordion .accordion-header",
+      "h2:not(.accordion-header), .ntg-accordion .accordion-header, .ntg-callout__content.latest-update h3",
     )];
     accordions = headings.flatMap((heading) => {
       if (!heading.matches(".ntg-accordion .accordion-header")) return [];
@@ -59,14 +59,17 @@ export function initializeEventNavigation(window: Window & typeof globalThis) {
     for (const heading of [...headings].reverse()) {
       let section = sections.find((section) => section.heading === heading);
       const accordion = accordions.find((accordion) => accordion.heading === heading);
-      if (list && accordion) {
+      const latestUpdate = heading.matches(".ntg-callout__content.latest-update h3");
+      if (list && (accordion || latestUpdate)) {
         if (!section) {
+          const label = accordion?.label ?? heading.textContent?.trim();
+          if (!label) continue;
           const item = window.document.createElement("li");
           item.className = "nav-item";
           const link = window.document.createElement("a");
           link.className = "nav-link";
           link.setAttribute("href", `#${encodeURIComponent(heading.id)}`);
-          link.textContent = accordion.label;
+          link.textContent = label;
           item.append(link);
           section = { link, heading };
           sections.push(section);
