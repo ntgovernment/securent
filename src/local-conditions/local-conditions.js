@@ -15,25 +15,66 @@
     ? "/IDD60920.xml"
     : "./?a=1657184";
   var airQualityUrl = isLocal ? "/api/air-quality" : "./?a=1657186";
-  var workerKeys = {
-    "Darwin Airport": "darwin",
-    "Darwin Harbour": "darwin",
-    "Alice Springs Airport": "alice-springs",
-    "Tennant Creek": "tennant-creek",
-    Yulara: "yulara",
+  var fireAreaLocations = {
+    "NT_FW001": [
+      "Darwin Airport", "Batchelor", "Charles Point", "Kangaroo Flats", "Channel Point",
+      "Middle Point", "Noonamah", "Darwin Harbour", "Knuckey Lagoon", "East Point",
+    ],
+    "NT_FW002": ["Point Stuart", "Mount Bundey North", "Mount Bundey South", "Douglas River"],
+    "NT_FW003": [
+      "Wadeye (Port Keats)", "Bradshaw", "Bradshaw-Angallari Valley (Defence)",
+      "Bradshaw-Koolendong Valley",
+    ],
+    "NT_FW004": ["Pirlangimpi"],
+    "NT_FW005": [
+      "Point Fawcett", "Jabiru", "Maningrida Airport", "Warruwi", "Croker Island Airport",
+      "Murganella Airstrip", "Oenpelli Airstrip",
+    ],
+    "NT_FW006": [
+      "McCluer Island", "Cape Wessel", "Gove Airport", "Groote Eylandt Airport", "Milingimbi",
+      "Ngayawili (Elcho Island)",
+    ],
+    "NT_FW007": ["Tindal", "Daly Waters"],
+    "NT_FW008": ["Bulman", "Central Arnhem Plateau", "Ngukurr AWS"],
+    "NT_FW009": ["Borroloola", "Centre Island", "McArthur River Mine"],
+    "NT_FW010": ["Victoria River Downs", "Delamere"],
+    "NT_FW011": ["Territory Grape Farm"],
+    "NT_FW012": ["Tennant Creek"],
+    "NT_FW013": ["Jervois"],
+    "NT_FW014": ["Alice Springs Airport", "Arltunga"],
+    "NT_FW015": ["Dum In Mirrie"],
+    "NT_FW017": ["Curtin Springs", "Yulara"],
+    "NT_FW019": ["Lajamanu", "Rabbit Flat"],
+    "NT_FW020": ["Walungurru (Kintore)", "The Granites Airport"],
+  };
+  var fireAreaCodes = {};
+  Object.keys(fireAreaLocations).forEach(function (areaCode) {
+    fireAreaLocations[areaCode].forEach(function (name) {
+      fireAreaCodes[name] = areaCode;
+    });
+  });
+  var locationAliases = {
+    Tindal: "Katherine (Tindall)",
+    "Knuckey Lagoon": "Palmerston (Knuckey Lagoon)",
   };
   var epaStations = {
     "Darwin Airport": 2,
     "Darwin Harbour": 3,
+    Tindal: 4,
+    "Knuckey Lagoon": 1,
   };
-  var fireAreaCodes = {
-    darwin: "NT_FW001",
-    palmerston: "NT_FW001",
-    "alice-springs": "NT_FW014",
-    katherine: "NT_FW007",
-    "tennant-creek": "NT_FW012",
-    nhulunbuy: "NT_FW006",
-    yulara: "NT_FW018",
+  var epaLocationNames = {
+    1: "Palmerston (Knuckey Lagoon)",
+    4: "Katherine (Tindall)",
+  };
+  var legacyLocationNames = {
+    darwin: "Darwin Airport",
+    palmerston: "Palmerston (Knuckey Lagoon)",
+    "alice-springs": "Alice Springs Airport",
+    katherine: "Katherine (Tindall)",
+    "tennant-creek": "Tennant Creek",
+    nhulunbuy: "Nhulunbuy",
+    yulara: "Yulara",
   };
   var fireLevels = ["No Rating", "Moderate", "High", "Extreme", "Catastrophic"];
   var fireDangerUrl = "https://cmsexternal.nt.gov.au/securent/_design/integrations/fire-danger-ratings";
@@ -310,7 +351,7 @@
   function load(location) {
     var id = ++requestId;
     var data = { temperature: location.temperature };
-    var fireAreaCode = fireAreaCodes[location.workerKey];
+    var fireAreaCode = location.fireAreaCode;
     var pendingFields = [];
     if (fireAreaCode) pendingFields.push("fireDanger");
     if (location.epaStation) pendingFields.push("airQuality");
@@ -332,7 +373,7 @@
       var fireRequest = isLocal
         ? (function () {
           var url = new URL(endpoint, window.location.href);
-          url.searchParams.set("location", location.workerKey);
+          url.searchParams.set("location", fireAreaCode);
           return fetch(url.href);
         }())
         : fetch(fireDangerUrl);
@@ -493,10 +534,10 @@
       var name = station.getAttribute("description");
       return {
         key: station.getAttribute("bom-id"),
-        name: name,
+        name: locationAliases[name] || name,
         lat: numberAttribute(station, "lat"),
         lon: numberAttribute(station, "lon"),
-        workerKey: Object.prototype.hasOwnProperty.call(workerKeys, name) ? workerKeys[name] : null,
+        fireAreaCode: fireAreaCodes[name] || null,
         epaStation: Object.prototype.hasOwnProperty.call(epaStations, name) ? epaStations[name] : null,
         temperature: {
           min: temperature(station, "minimum_air_temperature"),
@@ -540,19 +581,25 @@
           typeof station.name !== "string" || !station.name.trim()) return;
       var name = station.name.trim();
       var existing = locations.find(function (location) {
+        return location.epaStation === station.id;
+      }) || locations.find(function (location) {
         return location.name.toLowerCase() === name.toLowerCase();
       });
       if (existing) {
         existing.epaStation = station.id;
+        existing.name = epaLocationNames[station.id] || existing.name;
+        existing.fireAreaCode = existing.fireAreaCode ||
+          fireAreaCodes[existing.name] || fireAreaCodes[name] ||
+          (station.id === 4 ? "NT_FW007" : "NT_FW001");
         return;
       }
       if (locations.some(function (location) { return location.key === "epa-" + station.id; })) return;
       locations.push({
         key: "epa-" + station.id,
-        name: name,
+        name: epaLocationNames[station.id] || name,
         lat: null,
         lon: null,
-        workerKey: station.id === 1 ? "palmerston" : station.id === 4 ? "katherine" : "darwin",
+        fireAreaCode: station.id === 4 ? "NT_FW007" : "NT_FW001",
         epaStation: station.id,
         temperature: null,
       });
@@ -602,11 +649,19 @@
       }
       var previous = activeLocation && (locations.find(function (location) {
         return location.key === activeLocation.key;
+      }) || (activeLocation.epaStation && locations.find(function (location) {
+        return location.epaStation === activeLocation.epaStation;
       }) || locations.find(function (location) {
         return location.name.toLowerCase() === activeLocation.name.toLowerCase();
-      }));
-      var restored = !userSelected && (locations.find(function (location) { return location.key === saved; }) ||
-        (saved && locations.find(function (location) { return location.workerKey === saved; })));
+      })));
+      var savedEpaStation = typeof saved === "string" && /^epa-([1-4])$/.exec(saved);
+      var restored = !userSelected && (
+        locations.find(function (location) { return location.key === saved; }) ||
+        (saved && locations.find(function (location) {
+          return location.name.toLowerCase() === (legacyLocationNames[saved] || "").toLowerCase();
+        })) || (savedEpaStation && locations.find(function (location) {
+          return location.epaStation === Number(savedEpaStation[1]);
+        })));
       var initial = restored || previous ||
         locations.find(function (location) { return location.name === "Darwin Airport"; }) ||
         locations.find(function (location) { return !location.key.startsWith("epa-"); }) ||
@@ -624,7 +679,7 @@
       select.disabled = false;
       updateLocationButton();
 
-      if (previous === initial && activeLocation.workerKey === initial.workerKey &&
+      if (previous === initial && activeLocation.fireAreaCode === initial.fireAreaCode &&
           activeLocation.epaStation === initial.epaStation) {
         activeLocation = initial;
         activeData.temperature = initial.temperature;

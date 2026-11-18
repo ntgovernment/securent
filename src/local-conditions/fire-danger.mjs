@@ -7,8 +7,12 @@ export const FIRE_AREA_CODES = {
   katherine: "NT_FW007",
   "tennant-creek": "NT_FW012",
   nhulunbuy: "NT_FW006",
-  yulara: "NT_FW018",
+  yulara: "NT_FW017",
 };
+
+export const FIRE_AREA_CODE_VALUES = Array.from({ length: 20 }, (_, index) =>
+  `NT_FW${String(index + 1).padStart(3, "0")}`,
+);
 
 const FIRE_LEVELS = ["No Rating", "Moderate", "High", "Extreme", "Catastrophic"];
 

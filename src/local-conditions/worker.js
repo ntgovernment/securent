@@ -1,7 +1,12 @@
 // Fetch-handler proxy (Cloudflare Workers style): GET ?location=<key> -> JSON for the Local conditions cards.
 // BOM and NT EPA send no CORS headers, so the browser cannot call them directly.
 
-import { FIRE_AREA_CODES, FIRE_DANGER_URL, readFireDanger } from "./fire-danger.mjs";
+import {
+  FIRE_AREA_CODES,
+  FIRE_AREA_CODE_VALUES,
+  FIRE_DANGER_URL,
+  readFireDanger,
+} from "./fire-danger.mjs";
 
 const BOM_API = "https://api.weather.bom.gov.au/v1";
 const NTEPA_URL = "http://ntepa.webhop.net/NTEPA/Default.ltr.aspx";
@@ -83,7 +88,8 @@ export default {
 
     const key = new URL(request.url).searchParams.get("location");
     const loc = LOCATIONS[key];
-    if (!loc) {
+    const areaCode = loc ? FIRE_AREA_CODES[key] : FIRE_AREA_CODE_VALUES.includes(key) ? key : null;
+    if (!areaCode) {
       return Response.json({ error: "Unknown location" }, { status: 400, headers: CORS });
     }
 
@@ -92,13 +98,13 @@ export default {
     if (cached) return cached;
 
     const [bom, air, fire] = await Promise.allSettled([
-      getBomForecast(loc.search),
-      getAirQuality(loc.epaStation),
-      getFireDanger(FIRE_AREA_CODES[key]),
+      loc ? getBomForecast(loc.search) : Promise.resolve(null),
+      loc && loc.epaStation ? getAirQuality(loc.epaStation) : Promise.resolve(null),
+      getFireDanger(areaCode),
     ]);
 
     const body = {
-      location: loc.name,
+      location: loc ? loc.name : key,
       updated: new Date().toISOString(),
       temperature: bom.status === "fulfilled" ? bom.value?.temperature ?? null : null,
       fireDanger: fire.status === "fulfilled" ? fire.value : null,

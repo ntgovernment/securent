@@ -14,14 +14,16 @@
 }
 
 .warning-accordion:hover {
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--warning-accordion-accent) 24%, transparent);
+  box-shadow: 0 4px 14px var(--clr-bg-shade-alt, #e7e7ea);
 }
 
-.warning-accordion.warning-level-watch_act {
+.warning-accordion.warning-level-watch_act,
+.warning-accordion:has(.warning-accordion__level--watch_act) {
   --warning-accordion-accent: var(--clr-status-watch-act, #ff7900);
 }
 
-.warning-accordion.warning-level-emergency_warning {
+.warning-accordion.warning-level-emergency_warning,
+.warning-accordion:has(.warning-accordion__level--emergency_warning) {
   --warning-accordion-accent: var(--clr-status-emergency-warning, #d6001c);
 }
 

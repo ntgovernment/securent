@@ -4,7 +4,12 @@ import test from "node:test";
 import { Window } from "happy-dom";
 import { fetchAirQuality, fetchAirQualityStations, parseAirQualityStations } from "./air-quality.mjs";
 import worker from "./worker.js";
-import { FIRE_AREA_CODES, FIRE_DANGER_URL, readFireDanger } from "./fire-danger.mjs";
+import {
+  FIRE_AREA_CODES,
+  FIRE_AREA_CODE_VALUES,
+  FIRE_DANGER_URL,
+  readFireDanger,
+} from "./fire-danger.mjs";
 
 const script = await readFile(new URL("./local-conditions.js", import.meta.url), "utf8");
 const stylesheet = await readFile(new URL("./local-conditions.css", import.meta.url), "utf8");
@@ -167,7 +172,7 @@ test("fire-danger feed selects the mapped area and normalizes its severity", () 
     katherine: "NT_FW007",
     "tennant-creek": "NT_FW012",
     nhulunbuy: "NT_FW006",
-    yulara: "NT_FW018",
+    yulara: "NT_FW017",
   });
   const darwinWarning = fireDangerFixture.warnings.find((item) => item.area_code === FIRE_AREA_CODES.darwin);
   const aliceWarning = fireDangerFixture.warnings.find((item) => item.area_code === FIRE_AREA_CODES["alice-springs"]);
@@ -183,6 +188,7 @@ test("fire-danger feed selects the mapped area and normalizes its severity", () 
     assert.deepEqual(readFireDanger({ warnings: [{ area_code: "NT_FW001", severity_code: severity }] }, "NT_FW001"),
       { label: severity, level, issuedAt: null });
   }
+  assert.equal(FIRE_AREA_CODE_VALUES.length, 20);
 });
 
 test("production worker gets fire danger from the CMS feed independently of BOM temperatures", async () => {
@@ -210,6 +216,32 @@ test("production worker gets fire danger from the CMS feed independently of BOM 
     assert.deepEqual(body.temperature, { min: 25, max: 34 });
     assert.ok(requestedUrls.includes(FIRE_DANGER_URL));
     assert.ok(requestedUrls.some((url) => url.includes("/forecasts/daily")));
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalCaches === undefined) delete globalThis.caches;
+    else globalThis.caches = originalCaches;
+  }
+});
+
+test("worker accepts mapped fire areas without requiring a town alias", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalCaches = globalThis.caches;
+  const requestedUrls = [];
+  globalThis.caches = { default: { match: async () => null, put: async () => {} } };
+  globalThis.fetch = async (input) => {
+    const url = String(input);
+    requestedUrls.push(url);
+    return Response.json(fireDangerFixture);
+  };
+
+  try {
+    const response = await worker.fetch(new Request("https://worker.example/?location=NT_FW017"));
+    const body = await response.json();
+    assert.equal(response.status, 200);
+    assert.deepEqual(body.fireDanger, readFireDanger(fireDangerFixture, "NT_FW017"));
+    assert.deepEqual(body.temperature, null);
+    assert.deepEqual(body.airQuality, null);
+    assert.deepEqual(requestedUrls, [FIRE_DANGER_URL]);
   } finally {
     globalThis.fetch = originalFetch;
     if (originalCaches === undefined) delete globalThis.caches;
@@ -354,7 +386,7 @@ test("the feed populates every station and shows its observed temperatures", asy
     air: () => Promise.resolve(response({ index: 0 })),
   });
   assert.equal(context.requests[0], "/IDD60920.xml");
-  assert.equal(context.select.options.length, 10);
+  assert.equal(context.select.options.length, 9);
   assert.equal(context.select.querySelector('[value="014272"]').dataset.coordinates, "-13.0544,131.0252");
   assert.equal(context.select.querySelector('[value="missing"]').dataset.coordinates, "");
   assert.equal(context.select.querySelector('[value="invalid"]').dataset.coordinates, "");
@@ -385,10 +417,12 @@ test("the feed populates every station and shows its observed temperatures", asy
   assert.ok(bomTimestamp.querySelector(".fa-light.fa-clock"));
   assert.equal(bomTimestamp.hasAttribute("datetime"), false);
   selectLocation(context, "014253");
+  await settle();
   assert.equal(context.window.document.querySelectorAll(".lc-card-group").length, 3);
   assert.equal(context.window.document.querySelectorAll(".lc-attribution").length, 3);
-  assert.equal(context.window.document.querySelectorAll(".lc-card .fa-circle-exclamation").length, 3);
-  assert.equal(context.requests.length, 4);
+  assert.equal(context.window.document.querySelectorAll(".lc-card .fa-circle-exclamation").length, 2);
+  assert.match(cardFor(context, "Bushfire danger rating").textContent, /Moderate/);
+  assert.equal(context.requests.length, 5);
 });
 
 test("cards show an unavailable message when all local condition feeds have no data", async () => {
@@ -442,7 +476,7 @@ test("localhost fetches the matching EPA station and displays an index, not PM2.
   const count = context.requests.length;
   selectLocation(context, "014253");
   await settle();
-  assert.equal(context.requests.length, count);
+  assert.equal(context.requests.length, count + 1);
   assert.match(airCard().textContent, /Data not available/);
   assert.ok(airCard().querySelector(".fa-circle-exclamation"));
 });
@@ -645,32 +679,92 @@ test("the checked-in BOM snapshot populates every station", async () => {
   const document = new context.window.DOMParser().parseFromString(xml, "application/xml");
   const stations = Array.from(document.querySelectorAll("observations > station"));
   assert.ok(stations.length > 0);
-  assert.equal(context.select.options.length, stations.length + 4);
+  assert.equal(context.select.options.length, stations.length);
   assert.deepEqual(
     Array.from(context.select.options, (option) => option.value).filter((key) => !key.startsWith("epa-")).sort(),
     stations.map((station) => station.getAttribute("bom-id")).sort(),
   );
+  assert.equal(context.select.querySelector('[value="014932"]').textContent, "Katherine (Tindall)");
+  assert.equal(context.select.querySelector('[value="014988"]').textContent, "Palmerston (Knuckey Lagoon)");
+  assert.equal(context.select.querySelector('[value="epa-1"]'), null);
+  assert.equal(context.select.querySelector('[value="epa-4"]'), null);
   const sourceTime = groupFor(context, "Temperature").querySelector(".lc-card__timestamp time");
   assert.match(sourceTime.textContent, /^\d+ (?:min|hr|days?) ago$/);
   assert.equal(sourceTime.dateTime, new Date(document.querySelector("amoc > issue-time-local").textContent).toISOString());
 });
 
-test("localhost adds all missing EPA locations and restores their selections", async () => {
+test("all mapped stations get fire ratings, including renamed EPA locations", async () => {
+  const requestedAreas = [];
+  const context = await widget({
+    feed: xml,
+    worker: (request) => {
+      requestedAreas.push(new URL(request).searchParams.get("location"));
+      return Promise.resolve(response({ fireDanger: { label: "Moderate", level: 1 } }));
+    },
+    air: () => Promise.resolve(response({ index: 51, station: "Mapped EPA station" })),
+  });
+  const expectedAreas = {
+    "014253": "NT_FW001",
+    "014627": "NT_FW008",
+    "014723": "NT_FW009",
+    "014932": "NT_FW007",
+    "014988": "NT_FW001",
+    "015594": "NT_FW014",
+    "015635": "NT_FW017",
+  };
+  for (const [key, areaCode] of Object.entries(expectedAreas)) {
+    selectLocation(context, key);
+    await settle();
+    assert.equal(requestedAreas.at(-1), areaCode);
+    assert.match(cardFor(context, "Bushfire danger rating").textContent, /Moderate/);
+  }
+  for (const option of context.select.options) {
+    selectLocation(context, option.value);
+    await settle();
+    assert.match(cardFor(context, "Bushfire danger rating").textContent, /Moderate/);
+  }
+});
+
+test("saved EPA selections restore to their renamed BOM locations", async () => {
+  for (const [saved, key, name] of [
+    ["epa-1", "014988", "Palmerston (Knuckey Lagoon)"],
+    ["epa-4", "014932", "Katherine (Tindall)"],
+  ]) {
+    const context = await widget({ feed: xml, saved });
+    assert.equal(context.select.value, key);
+    assert.equal(context.select.selectedOptions[0].textContent, name);
+  }
+});
+
+test("localhost adds EPA-only locations and restores their selections", async () => {
   const context = await widget({
     saved: "epa-4",
     air: (url) => Promise.resolve(response({ index: epaFixture.d[Number(url.split("id=")[1]) - 1].IndexValue })),
+    worker: () => Promise.resolve(response({ fireDanger: { label: "Moderate", level: 1 } })),
   });
   assert.equal(context.select.value, "epa-4");
   for (const station of epaFixture.d) {
-    const option = context.select.querySelector(`[value="epa-${station.serialCode}"]`);
-    assert.equal(option.textContent, station.name);
-    assert.equal(option.dataset.coordinates, "");
-    selectLocation(context, option.value);
+    const isDarwinAirport = station.serialCode === 2;
+    const key = isDarwinAirport ? "014015" : `epa-${station.serialCode}`;
+    const option = context.select.querySelector(`[value="${key}"]`);
+    const expectedName = {
+      1: "Palmerston (Knuckey Lagoon)",
+      2: "Darwin Airport",
+      3: "Stokes Hill",
+      4: "Katherine (Tindall)",
+    }[station.serialCode];
+    assert.equal(option.textContent, expectedName);
+    if (!isDarwinAirport) assert.equal(option.dataset.coordinates, "");
+    selectLocation(context, key);
     await settle();
     assert.ok(context.requests.includes(`/api/air-quality?id=${station.serialCode}`));
     assert.match(cardFor(context, "Air quality").textContent,
       new RegExp(station.IndexValue + " AQI"));
-    assert.match(groupFor(context, "Temperature").textContent, /Data not available/);
+    if (isDarwinAirport) {
+      assert.match(groupFor(context, "Temperature").textContent, /36 °C/);
+    } else {
+      assert.match(groupFor(context, "Temperature").textContent, /Data not available/);
+    }
   }
 });
 
@@ -682,7 +776,8 @@ test("EPA locations merge by name without duplicating or losing existing BOM dat
     ] })),
     air: () => Promise.resolve(response({ index: 0 })),
   });
-  assert.equal(Array.from(context.select.options).filter((option) => option.textContent.toLowerCase() === "palmerston").length, 1);
+  assert.equal(Array.from(context.select.options).filter((option) =>
+    option.textContent.toLowerCase() === "palmerston (knuckey lagoon)").length, 1);
   assert.equal(context.select.querySelector('[value="epa-1"]'), null);
   selectLocation(context, "014272");
   await settle();
@@ -700,7 +795,7 @@ test("catalog failures keep the original BOM locations usable", async () => {
     assert.match(context.window.document.querySelector(".lc-cards").textContent, /36 °C/);
   }
   const production = await widget({ url: "https://example.com/conditions" });
-  assert.equal(production.select.options.length, 10);
+  assert.equal(production.select.options.length, 9);
   assert.ok(production.requests.includes("./?a=1657186"));
   assert.equal(production.requests.includes("/api/air-quality"), false);
 });
@@ -809,10 +904,12 @@ test("worker failures cannot hide BOM temperatures or replace them with worker d
 });
 
 test("late worker responses do not overwrite a newer selection", async () => {
-  let resolveWorker;
-  const context = await widget({ worker: () => new Promise((resolve) => { resolveWorker = resolve; }) });
+  const resolveWorkers = [];
+  const context = await widget({
+    worker: () => new Promise((resolve) => { resolveWorkers.push(resolve); }),
+  });
   selectLocation(context, "014272");
-  resolveWorker(response({ fireDanger: { label: "Incorrect", level: 1 } }));
+  resolveWorkers[0](response({ fireDanger: { label: "Incorrect", level: 1 } }));
   await settle();
   const text = context.window.document.querySelector(".lc-cards").textContent;
   assert.match(text, /36 °C/);
@@ -1069,7 +1166,7 @@ test("either catalog populates immediately and late arrivals preserve user selec
       resolveCatalog(response(delayed === "observations" ? fixture
         : local ? { stations: parseAirQualityStations(epaFixture) } : epaFixture));
       await settle();
-      assert.equal(context.select.options.length, 10);
+      assert.equal(context.select.options.length, 9);
       assert.equal(context.select.value, selected);
       assert.equal(context.requests.length, requests);
       assert.equal(context.window.localStorage.getItem("securent.localConditions.location"), selected);
@@ -1095,7 +1192,10 @@ test("saved locations arriving later restore only until the user chooses a locat
       if (userChoice) selectLocation(context, chosen);
       resolveCatalog(response(delayed === "observations" ? fixture : { stations: parseAirQualityStations(epaFixture) }));
       await settle();
-      assert.equal(context.select.value, userChoice ? chosen : saved);
+      const expected = userChoice && delayed === "observations" && chosen === "epa-2"
+        ? "014015"
+        : userChoice ? chosen : saved;
+      assert.equal(context.select.value, expected);
     }
   }
 });

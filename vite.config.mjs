@@ -6,7 +6,11 @@ import { fileURLToPath } from "node:url";
 
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { fetchAirQuality, fetchAirQualityStations } from "./src/local-conditions/air-quality.mjs";
-import { FIRE_AREA_CODES, readFireDanger } from "./src/local-conditions/fire-danger.mjs";
+import {
+  FIRE_AREA_CODES,
+  FIRE_AREA_CODE_VALUES,
+  readFireDanger,
+} from "./src/local-conditions/fire-danger.mjs";
 import {
   latestMediaReleaseEndpoint, mappedWarningsEndpoint, mediaReleaseSources,
 } from "./src/media-releases/feeds.mjs";
@@ -188,7 +192,8 @@ const localConditionsMock = {
     });
     server.middlewares.use("/api/local-conditions", async (req, res) => {
       const key = new URL(req.url, "http://localhost").searchParams.get("location");
-      const areaCode = FIRE_AREA_CODES[key];
+      const areaCode = FIRE_AREA_CODES[key] ||
+        (FIRE_AREA_CODE_VALUES.includes(key) ? key : null);
       if (!areaCode) {
         res.statusCode = 400;
         res.setHeader("Content-Type", "application/json");
