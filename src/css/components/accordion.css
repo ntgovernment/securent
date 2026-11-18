@@ -41,12 +41,13 @@
   --bs-accordion-btn-color: #174c4e;
   --bs-accordion-btn-bg: #fff;
   --bs-accordion-active-color: #174c4e;
-  --bs-accordion-active-bg: #fff;
+  --bs-accordion-active-bg: #F1F2F2;
+  border-top: 0;
 }
 
 .ntg-accordion .accordion-item {
   border: 0;
-  border-bottom: 1px solid var(--bs-accordion-border-color);
+  border-bottom: 0.5px solid var(--bs-accordion-border-color) !important;
 }
 
 .ntg-accordion .accordion-button {
@@ -67,6 +68,10 @@
   color: var(--bs-accordion-active-color);
   background-color: var(--bs-accordion-active-bg);
   box-shadow: none;
+}
+
+.ntg-accordion .accordion-button:hover {
+  background-color: #F1F2F2;
 }
 
 .ntg-accordion .accordion-button::after {

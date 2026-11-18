@@ -34,7 +34,9 @@ The button shares the page title and URL using the Web Share API. When unavailab
 
 Warning accordions use the standalone stylesheet `dist/warning-accordion.css`, built from `src/css/components/warning-accordion.css`. Publish and reference that asset on event pages wherever the warning accordion markup is used.
 
-The Latest update callout uses the shared theme: a 1px strong border, an 8px left accent, and the shade background. Rebuild and publish `dist/theme.css` and refresh its CMS cache reference when changing these styles. The local event capture currently uses its captured theme stylesheet.
+The Latest update callout uses the shared theme: a 1px strong border, an 8px left accent, and the shade background. Rebuild and publish `dist/theme.css` and refresh its CMS cache reference when changing these styles. The local event capture loads `dist/theme.css?v=accordion-hover-1` after its captured legacy theme; Vite rewrites the built-theme link to source CSS during development.
+
+Standard CMS accordions use the shared theme, not `dist/warning-accordion.css`. Their headers are white when collapsed and `#F1F2F2` when hovered or expanded. Each item has a 0.5px bottom divider that overrides Bootstrap's important border utilities, and the accordion wrapper has no top border to prevent stacked dividers between separate sections. Fractional borders may round to a physical pixel at some display scales or zoom levels. See [CMS accordions](../../README.md#cms-accordions) for styling and publication guidance. In the event preview, verify consecutive collapsed sections have a single thin separator and confirm hover, expansion and open/close-all controls still work.
 
 ## Warning accordion paint layout
 
