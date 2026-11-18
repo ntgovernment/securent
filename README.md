@@ -438,7 +438,9 @@ Latest Events uses a pale-grey container capped at 1280px, 32px desktop containe
 
 ### Homepage featured content
 
-Homepage featured-content cards use `src/css/components/homepage-featured-content.css`, imported by `src/css/main.css`. The stylesheet targets the CMS `.ntg-featured-content-small` markup and styles its visible `.card-link` as the orange CTA; card copy, destinations, and photos remain CMS-managed. The pale-teal card is inset 52px at tablet widths and 56px on desktop to align with the homepage content column. Cards use a text/image split at those sizes, while narrow layouts stack the image below the text. The `ntg-featured-content-small--image-left` modifier retains image-first ordering on desktop.
+Homepage featured-content cards use `src/css/components/homepage-featured-content.css`, imported by `src/css/main.css`. The stylesheet targets the CMS `.ntg-featured-content-small` markup and styles its visible `.card-link` as the orange CTA; card copy, destinations, and photos remain CMS-managed. The pale-teal card is inset 52px at tablet widths and 56px on desktop to align with the homepage content column. Below 768px, both image-left and image-right variants stack the image first, any visible mobile caption directly beneath it, then the text with 24px of separation. Caption visibility remains CMS-managed. From 768px, cards retain their configured left/right text/image split.
+
+On mobile, hidden CTA buttons do not reserve layout space, and the card body has no extra bottom padding; the card retains its 24px outer padding beneath the visible buttons.
 
 The local `SecureNT.html` capture is gitignored. For local preview, its feature-card image URLs can point to matching files in the also-gitignored `SecureNT_files/` directory; production CMS image URLs are unchanged. After changing featured-content styles, run `npm run build` and deploy the updated `dist/theme.css` with the source CSS.
 

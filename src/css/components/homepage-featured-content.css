@@ -128,22 +128,39 @@ section[class*="ntg-featured-content-small--"] {
 
 @media (max-width: 767.98px) {
   .ntg-featured-content-small__text,
-  .ntg-featured-content-small__image {
+  .ntg-featured-content-small__image,
+  .ntg-featured-content-small__caption-mobile {
     flex-basis: 100%;
     width: 100%;
   }
 
+  /* Override CMS Bootstrap ordering utilities on mobile. */
+  .ntg-featured-content-small__card .ntg-featured-content-small__image {
+    order: 1 !important;
+    margin-top: 0;
+  }
+
+  .ntg-featured-content-small__caption-mobile {
+    order: 2 !important;
+  }
+
+  .ntg-featured-content-small__text {
+    order: 3 !important;
+    margin-top: 24px;
+  }
+
   .ntg-featured-content-small__text .card-body {
     padding: 0;
+    padding-bottom: 0 !important;
+  }
+
+  .ntg-featured-content-small__buttons > .hidden {
+    display: none !important;
   }
 
   .ntg-featured-content-small__text .wysiwyg_asset_id h2 {
     font-size: 28px;
     line-height: 32px;
-  }
-
-  .ntg-featured-content-small__image {
-    margin-top: 24px;
   }
 
   .ntg-featured-content-small__card {
