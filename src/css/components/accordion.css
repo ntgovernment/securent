@@ -18,13 +18,13 @@
 }
 
 .ntg-accordion-toggler a {
-  color: #10494d;
+  color: #174c4e;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
 .ntg-accordion-toggler a:focus-visible {
-  outline: 2px solid #10494d;
+  outline: 2px solid #174c4e;
   outline-offset: 3px;
 }
 
@@ -37,12 +37,11 @@
 }
 
 .ntg-accordion {
-  --bs-accordion-border-color: #d7d9db;
-  --bs-accordion-btn-color: #10494d;
-  --bs-accordion-btn-bg: #f1f1f1;
-  --bs-accordion-active-color: #10494d;
-  --bs-accordion-active-bg: #e7e7e9;
-  border-top: 1px solid var(--bs-accordion-border-color);
+  --bs-accordion-border-color: #dddee0;
+  --bs-accordion-btn-color: #174c4e;
+  --bs-accordion-btn-bg: #fff;
+  --bs-accordion-active-color: #174c4e;
+  --bs-accordion-active-bg: #fff;
 }
 
 .ntg-accordion .accordion-item {
@@ -51,12 +50,13 @@
 }
 
 .ntg-accordion .accordion-button {
-  min-height: 74px;
+  min-height: 72px;
   padding: 24px;
-  gap: 16px;
+  gap: 24px;
   color: var(--bs-accordion-btn-color);
   background-color: var(--bs-accordion-btn-bg);
   box-shadow: none;
+  font-family: "Lato", sans-serif;
   font-size: 16px;
   font-weight: 700;
   line-height: 24px;
@@ -70,26 +70,26 @@
 }
 
 .ntg-accordion .accordion-button::after {
-  width: 12px;
-  height: 12px;
-  flex: 0 0 12px;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
   margin-left: auto;
-  border-right: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
-  background: none;
-  transform: translateY(-3px) rotate(45deg);
+  background-color: currentColor;
+  background-image: none;
+  clip-path: polygon(8.33% 33.83%, 16.67% 33.83%, 50% 67%, 83.33% 33.83%, 91.67% 33.83%, 50% 79%);
+  transform: none;
   transition: transform 0.2s ease;
 }
 
 .ntg-accordion .accordion-button:not(.collapsed)::after {
-  background: none;
-  transform: translateY(3px) rotate(225deg);
+  background-color: currentColor;
+  transform: rotate(180deg);
 }
 
 .ntg-accordion .accordion-button:focus-visible {
   position: relative;
   z-index: 1;
-  outline: 2px solid #10494d;
+  outline: 2px solid #174c4e;
   outline-offset: -4px;
   box-shadow: none;
 }
@@ -124,7 +124,10 @@
 }
 
 @media (max-width: 575.98px) {
-  .ntg-accordion .accordion-button,
+  .ntg-accordion .accordion-button {
+    padding: 24px;
+  }
+
   .ntg-accordion .accordion-body {
     padding: 20px 16px;
   }
