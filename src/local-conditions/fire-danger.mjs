@@ -1,4 +1,6 @@
-export const FIRE_DANGER_URL = "https://cmsexternal.nt.gov.au/securent/_design/integrations/fire-danger-ratings";
+import { secureNTUrl } from "../config/site-url.mjs";
+
+export const FIRE_DANGER_URL = secureNTUrl("/_design/integrations/fire-danger-ratings");
 
 export const FIRE_AREA_CODES = {
   darwin: "NT_FW001",

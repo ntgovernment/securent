@@ -5,6 +5,7 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
 import { cloudflare } from "@cloudflare/vite-plugin";
+import { SECURENT_BASE_URL } from "./src/config/site-url.mjs";
 import { fetchAirQuality, fetchAirQualityStations } from "./src/local-conditions/air-quality.mjs";
 import {
   FIRE_AREA_CODES,
@@ -265,6 +266,9 @@ const mediaReleaseFeedProxy = {
 
 export default defineConfig({
   root: ".",
+  define: {
+    __SECURENT_BASE_URL__: JSON.stringify(SECURENT_BASE_URL),
+  },
   plugins: [
     sourceThemePreview,
     sourceThemeOnly,
@@ -300,6 +304,16 @@ export default defineConfig({
         // The CMS also loads this bundle as a classic script alongside jQuery.
         intro: (chunk) => chunk.name === "theme" ? "(() => {" : "",
         outro: (chunk) => chunk.name === "theme" ? "})();" : "",
+        manualChunks(id) {
+          const moduleId = id.replaceAll("\\", "/");
+          if ([
+            "/src/config/site-url.mjs",
+            "/src/search/autocomplete.mjs",
+            "/src/alerts-listing/sorting.mjs",
+          ].some((path) => moduleId.endsWith(path))) {
+            return "autocomplete";
+          }
+        },
         // Standalone feature entries go to dist/; shared chunks go to SecureNT_files/.
         entryFileNames: (chunk) =>
           chunk.name === "theme" ||

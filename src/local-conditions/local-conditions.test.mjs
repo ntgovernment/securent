@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { Window } from "happy-dom";
+import { SECURENT_BASE_URL } from "../config/site-url.mjs";
 import { fetchAirQuality, fetchAirQualityStations, parseAirQualityStations } from "./air-quality.mjs";
 import worker from "./worker.js";
 import {
@@ -11,7 +12,8 @@ import {
   readFireDanger,
 } from "./fire-danger.mjs";
 
-const script = await readFile(new URL("./local-conditions.js", import.meta.url), "utf8");
+const script = (await readFile(new URL("./local-conditions.js", import.meta.url), "utf8"))
+  .replaceAll("__SECURENT_BASE_URL__", JSON.stringify(SECURENT_BASE_URL));
 const stylesheet = await readFile(new URL("./local-conditions.css", import.meta.url), "utf8");
 const xml = await readFile(new URL("../../public/IDD60920.xml", import.meta.url), "utf8");
 const fireDangerFixture = JSON.parse(await readFile(new URL("../../public/fire-danger-ratings.json", import.meta.url), "utf8"));
@@ -867,7 +869,7 @@ test("production uses the Matrix asset and restores saved or legacy selections",
 });
 
 test("production reads mapped fire ratings from the CMS integration directly", async () => {
-  const context = await widget({ url: "https://cmsexternal.nt.gov.au/securent/home", saved: "015590" });
+  const context = await widget({ url: "https://example.com/home", saved: "015590" });
   assert.ok(context.requests.includes(FIRE_DANGER_URL));
   assert.equal(context.requests.some((url) => url.includes("/api/local-conditions")), false);
   const card = cardFor(context, "Bushfire danger rating");

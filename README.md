@@ -1,12 +1,15 @@
 # securent
 
-Source and build tooling for the **SecureNT** NT Government site. The temporary site is `https://cmsexternal.nt.gov.au/securent`; its final public URL is `https://securent.nt.gov.au`.
+Source and build tooling for the **SecureNT** NT Government site. The site base URL is controlled by `SECURENT_BASE_URL` in `src/config/site-url.mjs`; it currently points to the temporary CMS URL, and the final public URL is `https://securent.nt.gov.au`. When the domain changes, update that one setting and run `npm run build`.
 
 ## Project structure
 
 ```
 securent/
 ├── src/
+│   ├── config/
+│   │   ├── site-url.mjs               # Shared SecureNT base URL and URL builder
+│   │   └── site-url.test.mjs          # URL composition regression tests
 │   ├── alerts-listing/
 │   │   ├── alerts-listing.js          # Alert rendering, responsive filters, sorting, and pagination
 │   │   ├── alerts-listing.css         # Alerts page listing styles
@@ -75,7 +78,8 @@ securent/
 │   │       ├── statistics.css        # Statistics section styles
 │   │       └── main.css              # Breadcrumbs, side-nav colours, editorial links/bullets, display cards and homepage-news overrides
 │   ├── data/
-│   │   └── navigation.js             # Legacy menu data; no longer imported by the shared theme
+│   │   ├── navigation.js             # Legacy menu data; no longer imported by the shared theme
+│   │   └── navigation.test.mjs       # Shared-base URL regression test
 │   ├── navigation/
 │   │   └── README.md                 # Matrix Main, Level 2 and Level 3 listing templates and publication steps
 │   └── js/
@@ -227,7 +231,7 @@ On localhost, the warnings loader reads the checked-in JSON snapshots [bushfires
 | NTG agencies | `/_design/integrations/campaign-monitor-ntg-agencies` |
 | Mapped warnings | `/_design/integrations/mapped-warnings` |
 
-The data-source URLs are `https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor-bushfires-nt`, `https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor-ntes`, and `https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor-ntg-agencies`. Publish the three integration assets at those paths.
+The data-source URLs are composed from `SECURENT_BASE_URL` and the integration paths above. Publish the three integration assets at those paths.
 
 Matrix keyword attributes are no longer required or read. Remove the old `data-feed-*` attributes from the paint layout when convenient; the updated script ignores stale values. The opening listing tag is:
 
@@ -498,7 +502,7 @@ Air quality displays the NT EPA station-level `IndexValue`, not a pollutant conc
 
 Relative timestamps appear at the bottom right of the card with a light clock icon, opposite the source attribution: date-only values from the current Darwin date and timestamps less than a minute old show “Today”; other values show elapsed minutes, hours, or days. Times retain a machine-readable `time` element. For AQI, use the latest valid pollutant `Date` whose `IndexValue` matches the station AQI; do not include the EPA station name or substitute the fetch time when no timestamp exists. Fire timestamps come from the warning's issue time. Source attributions remain on the card's muted bottom line; unavailable readings use the “Data not available” message instead.
 
-Production requests `./?a=1657186`, which returns the same JSON feed with a Matrix cache expiry of 900 seconds. No station query parameter or cache-busting parameter is added; the widget selects the station from the response by `serialCode`. Catalog failures leave the original BOM dropdown usable. Air quality loads independently of fire danger; either request failing does not erase successful readings from the other source or BOM temperatures. In production, the widget fetches fire-danger JSON directly from the same-origin integration at `https://cmsexternal.nt.gov.au/securent/_design/integrations/fire-danger-ratings`, so it does not depend on a worker URL in CMS markup. The `fireAreaLocations` mapping in `src/local-conditions/local-conditions.js` assigns forecast areas to BOM stations beyond the original town aliases. Examples include Darwin and Palmerston (`NT_FW001`), Alice Springs (`NT_FW014`), Katherine (`NT_FW007`), Tennant Creek (`NT_FW012`), Gove (`NT_FW006`), Bulman (`NT_FW008`), Borroloola (`NT_FW009`), and Yulara/Curtin Springs (`NT_FW017`). Unmapped stations show unavailable fire ratings rather than borrowing another area's rating. The selected severity is displayed from No Rating (level 0) through Catastrophic (level 4).
+Production requests `./?a=1657186`, which returns the same JSON feed with a Matrix cache expiry of 900 seconds. No station query parameter or cache-busting parameter is added; the widget selects the station from the response by `serialCode`. Catalog failures leave the original BOM dropdown usable. Air quality loads independently of fire danger; either request failing does not erase successful readings from the other source or BOM temperatures. In production, the widget fetches fire-danger JSON directly from the same-origin integration, whose base URL is composed from `SECURENT_BASE_URL`, so it does not depend on a worker URL in CMS markup. The `fireAreaLocations` mapping in `src/local-conditions/local-conditions.js` assigns forecast areas to BOM stations beyond the original town aliases. Examples include Darwin and Palmerston (`NT_FW001`), Alice Springs (`NT_FW014`), Katherine (`NT_FW007`), Tennant Creek (`NT_FW012`), Gove (`NT_FW006`), Bulman (`NT_FW008`), Borroloola (`NT_FW009`), and Yulara/Curtin Springs (`NT_FW017`). Unmapped stations show unavailable fire ratings rather than borrowing another area's rating. The selected severity is displayed from No Rating (level 0) through Catastrophic (level 4).
 
 The Vite localhost `/api/local-conditions?location=<area-code>` endpoint reads `public/fire-danger-ratings.json`. Both this endpoint and the standalone worker accept `NT_FW001` through `NT_FW020`, as well as the existing town aliases in `src/local-conditions/fire-danger.mjs`. Area-code worker requests return fire danger only, with null temperature and air quality; legacy town requests retain their existing behavior. The browser continues to obtain temperatures and AQI independently from the BOM and EPA feeds.
 

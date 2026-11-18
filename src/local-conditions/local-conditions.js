@@ -77,7 +77,7 @@
     yulara: "Yulara",
   };
   var fireLevels = ["No Rating", "Moderate", "High", "Extreme", "Catastrophic"];
-  var fireDangerUrl = "https://cmsexternal.nt.gov.au/securent/_design/integrations/fire-danger-ratings";
+  var fireDangerUrl = `${__SECURENT_BASE_URL__}/_design/integrations/fire-danger-ratings`;
   var locations = [];
 
   var FIRE_COLOURS = ["#5fb830", "#f4d63a", "#f28100", "#a80a0a"];

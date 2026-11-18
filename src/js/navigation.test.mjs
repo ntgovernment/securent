@@ -11,7 +11,7 @@ function fixture(window) {
     <header class="ntg-header"><div class="navbar">
       <div class="header-tools"></div><div class="header-navigation">
         <nav class="nav-masthead"><ul class="ntg-main-nav__links cms-main-nav">
-          <li><a href="https://cmsexternal.nt.gov.au/securent/current-warnings">Warnings</a></li>
+          <li><a href="https://example.test/current-warnings">Warnings</a></li>
           <li><a href="./prepare?source=nav&amp;mode=all#start">Prepare</a>
             <button type="button" class="desktop-main-nav__toggle" hidden><span>Prepare</span><span class="fa-regular fa-chevron-right" aria-hidden="true"></span></button>
             <button type="button" class="mobile-submenu-toggle" hidden>Expand Prepare submenu</button>
