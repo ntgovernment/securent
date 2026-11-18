@@ -452,7 +452,7 @@ The card content and destinations remain CMS-managed; the gitignored `SecureNT.h
 
 ### Footer
 
-The shared mobile footer styles live in `src/css/components/header-footer.css`. Below 768px, footer columns have 40px of vertical separation, and social links remain on one horizontal row with wrapping disabled. Keep the footer labels, links, and social destinations in the CMS markup.
+The shared mobile footer styles live in `src/css/components/header-footer.css`. Below 768px, footer columns have a `1.5rem` row gap, and social links remain on one horizontal row with wrapping disabled. The empty `<h3>` before “Follow SecureNT” is retained but hidden with `style="display:none"`; remove `pt-5` from its `.mt-auto` wrapper to reduce the extra space. Keep footer labels, links, and social destinations CMS-managed. After changing the footer styles, run `npm run build`, publish `dist/theme.css`, and refresh the Matrix stylesheet cache reference. Apply the heading and wrapper markup updates separately in the production CMS.
 
 ### Hero banners
 
