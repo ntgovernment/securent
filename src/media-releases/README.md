@@ -74,6 +74,26 @@ standalone module. Deploy `dist/SecureNT_files/media-release-card.js`,
 relative paths. The full listings additionally require
 `dist/SecureNT_files/page-window.js`.
 
+### Troubleshooting missing live warnings
+
+If a Campaign Monitor record is missing from either page:
+
+1. Check that the configured source integration returns the record's
+   `CampaignID`, `Subject`, `FromName`, and `SentDate`. Compare the publication
+   date with the newest displayed card.
+2. Check the operational-notice rules in `curation.mjs`. A successful feed
+   response does not mean every returned campaign is eligible for display.
+3. Confirm that the Matrix Git File Bridge is serving the branch and commit
+   containing the intended fix. A push to `dev` does not update a bridge
+   configured for `main`.
+4. Publish the rebuilt entry modules and shared
+   `SecureNT_files/media-release-card.js` dependency together. Both warning
+   displays use that dependency for curation. Refresh the bridge and page
+   caches; changing only the entry script's query string does not version its
+   relative module imports.
+5. Reload both pages normally and verify the expected record is displayed.
+   A successful local build or Git push alone does not verify CMS deployment.
+
 ```html
 <link rel="stylesheet" href="./dist/theme.css">
 <link rel="stylesheet" href="./dist/media-releases.css">
