@@ -169,7 +169,8 @@ No additional nested listing is needed.
   on hover and keyboard focus without moving. Desktop panel links retain a white
   background; disclosure arrows remain visible.
 - Mobile: parent links navigate; separate buttons with 44px minimum targets
-  expand their children.
+  expand their children. Parent links and disclosure buttons stretch to the same
+  row height so expanded backgrounds cover the full row, including wrapped labels.
   Opening a sibling resets the previous branch. Escape closes and returns focus.
 - Without JavaScript, the links and nested lists remain visible in normal flow.
 - While JavaScript is loading, panels stay collapsed. The expanded fallback is
@@ -222,3 +223,15 @@ Verified locally on 10 November 2026:
 These are local results, not confirmation of production publication. Apply the
 Bodycopy in Matrix and verify the ordinary published page after publishing the
 matching theme assets and refreshing their cache references.
+
+Mobile expanded-row backgrounds rechecked locally on 19 November 2026:
+
+- `node --test src/js/navigation.test.mjs`: all 14 tests pass, including the
+  regression for matching parent-link and disclosure-button heights.
+- `npm run build`: passes and rebuilds the shared theme CSS.
+- In the alerts preview, expanded top-level and nested controls both measured
+  44px high with short labels. With long labels in a 256px-wide drawer, both
+  controls grew to 76px and retained matching `#444855` backgrounds across the
+  full row height. Temporary verification labels were restored afterward.
+- Publish the rebuilt `dist/theme.css` and refresh its Matrix cache reference.
+  This CSS-only fix needs no Bodycopy or JavaScript changes.

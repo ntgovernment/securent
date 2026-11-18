@@ -715,7 +715,7 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-emergency-
   .mobile-main-nav li.has-children {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 44px;
-    align-items: start;
+    align-items: stretch;
   }
 
   .mobile-main-nav li.has-children > ul {
@@ -732,6 +732,7 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-emergency-
 
   .mobile-main-nav li.has-children > a {
     min-width: 0;
+    min-height: 44px;
   }
 
   header.ntg-header .header-navigation nav.nav-masthead .mobile-main-nav,
@@ -739,13 +740,14 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-emergency-
     border: 0 !important;
   }
 
-  .mobile-submenu-toggle {
+  .mobile-main-nav .mobile-submenu-toggle {
     display: flex;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
     width: 44px;
-    height: 44px;
+    min-height: 44px;
+    height: auto;
     margin: 0;
     padding: 0;
     border: 0;

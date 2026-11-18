@@ -275,6 +275,29 @@ test("navigation and header links suppress external icons and underline without 
   }
 });
 
+test("mobile parent links and disclosures fill the same row for short and wrapped labels", async () => {
+  const css = await readFile(new URL("../css/components/mainmenu-dropdown.css", import.meta.url), "utf8");
+  const window = new Window();
+  try {
+    const sheet = new window.CSSStyleSheet();
+    sheet.replaceSync(css);
+    const mobile = [...sheet.cssRules].find((rule) =>
+      rule.conditionText === "(max-width: 767.98px)"
+      && [...rule.cssRules].some((nested) => nested.selectorText === ".mobile-main-nav li.has-children"),
+    );
+    const rules = [...mobile.cssRules];
+    const parent = rules.find((rule) => rule.selectorText === ".mobile-main-nav li.has-children");
+    const link = rules.find((rule) => rule.selectorText === ".mobile-main-nav li.has-children > a");
+    const toggle = rules.find((rule) => rule.selectorText === ".mobile-main-nav .mobile-submenu-toggle");
+    assert.equal(parent.style.alignItems, "stretch");
+    assert.equal(link.style.minHeight, "44px");
+    assert.equal(toggle.style.minHeight, "44px");
+    assert.equal(toggle.style.height, "auto");
+  } finally {
+    await window.happyDOM.close();
+  }
+});
+
 test("missing navigation is a no-op", async () => {
   const window = new Window();
   try {
