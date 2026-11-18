@@ -702,7 +702,9 @@
 
   status.textContent = "";
   cards.setAttribute("aria-busy", "true");
-  cards.replaceChildren(skeletonGroup(), skeletonGroup(), skeletonGroup());
+  if (!cards.querySelector(".lc-skeleton-group")) {
+    cards.replaceChildren(skeletonGroup(), skeletonGroup(), skeletonGroup());
+  }
   fetchCatalog(observationsUrl, "text", readLocations)
     .then(function (result) { bomLocations = result; })
     .catch(function () {})

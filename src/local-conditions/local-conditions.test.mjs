@@ -326,7 +326,7 @@ test("AQI timestamp uses the latest valid matching pollutant, not unrelated read
   }
 });
 
-async function widget({ url = "http://localhost:5173/", saved, feed = fixture, observations, worker, air, catalog, geolocation, timers } = {}) {
+async function widget({ url = "http://localhost:5173/", saved, feed = fixture, observations, worker, air, catalog, geolocation, timers, cmsMarkup = false } = {}) {
   const window = new Window({ url });
   window.document.body.innerHTML = `
     <section id="local-conditions" data-endpoint="/api/local-conditions">
@@ -335,6 +335,23 @@ async function widget({ url = "http://localhost:5173/", saved, feed = fixture, o
       <div class="lc-cards"></div><p class="lc-status"></p>
       <p class="lc-attribution">Source: Bureau of Meteorology and NT Environment Protection Authority.</p>
     </section>`;
+  const cards = window.document.querySelector(".lc-cards");
+  if (cmsMarkup) {
+    cards.setAttribute("aria-busy", "true");
+    cards.innerHTML = `<div class="lc-card-group lc-skeleton-group" aria-hidden="true">
+      <div class="lc-card lc-skeleton">
+        <span class="lc-skeleton-block lc-skeleton-block--title"></span>
+        <span class="lc-skeleton-block lc-skeleton-block--value"></span>
+        <span class="lc-skeleton-block lc-skeleton-block--meta"></span>
+        <p class="lc-attribution lc-skeleton-source">
+          <span class="lc-skeleton-block lc-skeleton-block--source"></span>
+        </p>
+      </div>
+    </div>`.repeat(3);
+    window.document.querySelector(".lc-select").disabled = true;
+    window.document.querySelector(".lc-use-location").disabled = true;
+  }
+  const initialSkeletons = [...cards.children];
   if (saved) window.localStorage.setItem("securent.localConditions.location", saved);
   if (geolocation) Object.defineProperty(window.navigator, "geolocation", { value: geolocation });
   if (timers) {
@@ -364,7 +381,7 @@ async function widget({ url = "http://localhost:5173/", saved, feed = fixture, o
   };
   window.eval(script);
   await settle();
-  return { window, requests, select: window.document.querySelector(".lc-select") };
+  return { window, requests, select: window.document.querySelector(".lc-select"), initialSkeletons };
 }
 
 function selectLocation(context, key) {
@@ -372,23 +389,32 @@ function selectLocation(context, key) {
   context.select.dispatchEvent(new context.window.Event("change"));
 }
 
-test("catalog loading uses skeleton cards without a loading message", async () => {
-  let resolveObservations;
-  let resolveCatalog;
-  const context = await widget({
-    observations: () => new Promise((resolve) => { resolveObservations = resolve; }),
-    catalog: () => new Promise((resolve) => { resolveCatalog = resolve; }),
+for (const cmsMarkup of [false, true]) {
+  test(`${cmsMarkup ? "CMS" : "legacy"} catalog loading uses skeleton cards without a loading message`, async () => {
+    let resolveObservations;
+    let resolveCatalog;
+    const context = await widget({
+      cmsMarkup,
+      observations: () => new Promise((resolve) => { resolveObservations = resolve; }),
+      catalog: () => new Promise((resolve) => { resolveCatalog = resolve; }),
+    });
+    const cards = context.window.document.querySelector(".lc-cards");
+    assert.equal(cards.getAttribute("aria-busy"), "true");
+    assert.equal(cards.querySelectorAll(".lc-skeleton-group").length, 3);
+    assert.equal(cards.querySelectorAll('.lc-skeleton-group[aria-hidden="true"]').length, 3);
+    if (cmsMarkup) assert.deepEqual([...cards.children], context.initialSkeletons);
+    assert.equal(context.select.disabled, true);
+    assert.equal(context.window.document.querySelector(".lc-use-location").disabled, true);
+    assert.equal(context.window.document.querySelector(".lc-status").textContent, "");
+    resolveObservations(response(fixture));
+    resolveCatalog(response({ stations: parseAirQualityStations(epaFixture) }));
+    await settle();
+    assert.equal(cards.querySelectorAll(".lc-skeleton-group").length, 0);
+    assert.equal(cards.hasAttribute("aria-busy"), false);
+    assert.equal(context.select.disabled, false);
+    assert.equal(context.window.document.querySelector(".lc-use-location").disabled, false);
   });
-  const cards = context.window.document.querySelector(".lc-cards");
-  assert.equal(cards.getAttribute("aria-busy"), "true");
-  assert.equal(cards.querySelectorAll(".lc-skeleton-group").length, 3);
-  assert.equal(cards.querySelectorAll('.lc-skeleton-group[aria-hidden="true"]').length, 3);
-  assert.equal(context.window.document.querySelector(".lc-status").textContent, "");
-  resolveObservations(response(fixture));
-  resolveCatalog(response({ stations: parseAirQualityStations(epaFixture) }));
-  await settle();
-  assert.equal(cards.querySelectorAll(".lc-skeleton-group").length, 0);
-});
+}
 
 function cardFor(context, title) {
   return Array.from(context.window.document.querySelectorAll(".lc-card")).find((card) =>
@@ -1158,12 +1184,14 @@ test("no usable catalogs leave controls disabled and end loading", async () => {
       () => Promise.resolve(response(local ? { stations: [{ id: 5, name: "Invalid" }] }
         : { d: [{ serialCode: 5, name: "Invalid" }] })),
     ]) {
-      const context = await widget({ url: local ? "http://localhost/" : "https://example.com/conditions",
+      const context = await widget({ cmsMarkup: true, url: local ? "http://localhost/" : "https://example.com/conditions",
         observations: () => Promise.reject(new Error("offline")), catalog });
       assert.equal(context.select.options.length, 0);
       assert.equal(context.select.disabled, true);
       assert.equal(context.window.document.querySelector(".lc-use-location").disabled, true);
       assert.equal(context.window.document.querySelector(".lc-cards").hasAttribute("aria-busy"), false);
+      assert.equal(context.window.document.querySelectorAll(".lc-skeleton-group").length, 0);
+      assert.equal(context.window.document.querySelectorAll(".lc-card").length, 3);
       assert.match(context.window.document.querySelector(".lc-status").textContent, /locations are currently unavailable/);
     }
   }
