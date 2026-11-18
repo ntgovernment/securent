@@ -33,13 +33,17 @@ if (listing) {
   let currentPage = 1;
   let searchRevision = 0;
 
-  const loadingContents = [...listing.children];
-  const loadingMessage = document.createElement("span");
-  loadingMessage.className = "visually-hidden";
+  status.hidden = false;
+  status.classList.remove("hidden");
+  const loadingMessage = listing.querySelector("[data-loading-status]") || document.createElement("span");
+  loadingMessage.className = "media-releases__status media-releases__status--loading";
+  loadingMessage.hidden = false;
+  loadingMessage.inert = false;
   loadingMessage.dataset.loadingStatus = "";
   loadingMessage.setAttribute("role", "status");
   loadingMessage.setAttribute("aria-live", "polite");
   listing.append(loadingMessage);
+  const loadingContents = [...listing.children].filter((content) => content !== loadingMessage);
 
   function renderFilterSkeletons() {
     const groups = [
@@ -50,6 +54,7 @@ if (listing) {
     ];
     for (const [selector, count] of groups) {
       const container = filters.querySelector(selector);
+      if (container.querySelector(".media-releases__filter-skeleton-row")) continue;
       container.replaceChildren(...Array.from({ length: count }, () => {
         const row = document.createElement("div");
         row.className = "media-releases__filter-skeleton-row";
@@ -71,7 +76,11 @@ if (listing) {
     loadingMessage.textContent = loading ? "Loading current warnings..." : "";
     results.setAttribute("aria-busy", String(loading));
     if (loading) {
-      results.replaceChildren(...Array.from({ length: pageSize }, () => createCardSkeleton()));
+      status.textContent = "";
+      pagination.replaceChildren();
+      if (!results.querySelector(".media-releases__skeleton")) {
+        results.replaceChildren(...Array.from({ length: pageSize }, () => createCardSkeleton()));
+      }
       renderFilterSkeletons();
     }
     for (const content of loadingContents) {

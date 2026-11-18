@@ -8,8 +8,42 @@ filter group. It announces loading through a separate polite status. Results
 are marked busy and listing controls remain inert until the feeds finish.
 Skeletons are replaced by warning cards, an empty state, or the existing
 error message when loading completes. Reduced-motion preferences disable the
-shimmer. Loading skeletons require no additional Matrix markup; publish the
-rebuilt CSS and JavaScript together with their shared dependencies.
+shimmer. For first-paint skeletons, Matrix must output ten
+`.media-releases__skeleton` elements inside `[data-results][aria-busy="true"]`
+and placeholder rows inside the filter groups. Load `media-releases.css` in
+the document head, after the theme stylesheet. JavaScript preserves these
+placeholders, creating them only when absent for older templates. Existing
+`[data-loading-status]` markup is reused and moved outside the inert content;
+otherwise the script creates it. Empty result statuses take up no space, and
+empty/error messages are unhidden even if the CMS initially hides the status.
+Publish the rebuilt CSS and JavaScript together with their shared dependencies.
+
+### Deploying and verifying first-paint skeletons
+
+1. Keep the CMS skeletons in the initial response: ten full-list cards on
+   Current warnings and three featured cards on the homepage. Preserve any
+   CMS-provided filter skeleton rows; their counts do not need to match the
+   JavaScript fallback counts.
+2. Publish `dist/media-releases.css`, `dist/media-releases.js`, and
+   `dist/latest-media-releases.js` together through the Matrix Git File Bridge.
+   Keep their existing shared dependencies available. Refresh the bridge/page
+   caches and the CSS/module cache references on both pages, including the
+   stylesheet links in the document head.
+3. Delay the entry module download, not just feed responses. Skeletons must
+   already be visible before JavaScript executes, then remain the same DOM
+   elements while the feeds load.
+4. Verify populated, empty, and failed responses remove the card/filter
+   placeholders, clear busy states, and release the full listing's inert
+   controls. Empty/error messages must be visible. Check mobile overflow and
+   reduced-motion behavior.
+
+Run `npm run build`, then
+`node --test src/media-releases/media-releases.test.mjs`. The targeted tests
+cover CMS-provided and legacy loading markup, placeholder/status reuse,
+successful and failed feed cleanup, and existing warning-card behavior.
+Browser validation is also required for first-paint timing and CSS visibility;
+happy-dom does not reliably invalidate `:empty` matching after text changes.
+A Git push alone does not confirm that the CMS has refreshed its bridge assets.
 
 ## Latest Three Warnings
 
@@ -98,6 +132,17 @@ If a Campaign Monitor record is missing from either page:
    relative module imports.
 5. Reload both pages normally and verify the expected record is displayed.
    A successful local build or Git push alone does not verify CMS deployment.
+
+The minimal embed below remains supported, but creates skeletons only after
+the module loads. For immediate rendering, put the stylesheet links in the
+document head and output three `.media-releases__skeleton--featured` cards
+inside `[data-results][aria-busy="true"]`, matching `createCardSkeleton` in
+`media-release-card.js`. Initially give the status the
+`media-releases__status--loading` class and the text
+`Loading current warnings...`; do not permanently hide it with `hidden`.
+The script preserves the CMS cards until the feeds settle and falls back to
+creating cards for older markup. A CMS-provided no-JavaScript message is
+needed for visitors with scripting disabled.
 
 ```html
 <link rel="stylesheet" href="./dist/theme.css">

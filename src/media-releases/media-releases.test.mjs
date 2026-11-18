@@ -17,6 +17,56 @@ const notice = {
   WebVersionURL: "http://createsend.com/campaign-1",
 };
 
+function addCmsLoadingMarkup(listing, featured = false) {
+  const results = listing.querySelector("[data-results]");
+  const content = `<span class="media-releases__skeleton-block media-releases__skeleton-meta"></span>
+    <span class="media-releases__skeleton-block media-releases__skeleton-title"></span>
+    <span class="media-releases__skeleton-block media-releases__skeleton-title-short"></span>
+    <span class="media-releases__skeleton-block media-releases__skeleton-region"></span>`;
+  const icon = '<span class="media-releases__skeleton-block media-releases__skeleton-icon"></span>';
+  const skeleton = featured
+    ? `<div class="media-releases__skeleton media-releases__skeleton--featured" aria-hidden="true">
+        <div class="media-releases__skeleton-heading">${icon}
+          <span class="media-releases__skeleton-block media-releases__skeleton-badge"></span>
+        </div>${content}</div>`
+    : `<div class="media-releases__skeleton" aria-hidden="true">${icon}
+        <div class="media-releases__skeleton-content">${content}</div></div>`;
+  results.innerHTML = skeleton.repeat(featured ? 3 : 10);
+  results.setAttribute("aria-busy", "true");
+  const status = listing.querySelector("[data-results-status]");
+  status.classList.add("media-releases__status", "hidden");
+  status.hidden = true;
+  const filterRows = [];
+  let loadingStatus;
+  if (featured) {
+    status.classList.add("media-releases__status--loading");
+    status.textContent = "Loading current warnings...";
+  } else {
+    const layout = listing.querySelector(".media-releases__layout");
+    layout.inert = true;
+    listing.querySelector(".media-releases__search").inert = true;
+    layout.insertAdjacentHTML("beforeend",
+      '<span class="hidden" data-loading-status hidden>Loading current warnings...</span>');
+    loadingStatus = listing.querySelector("[data-loading-status]");
+    for (const [selector, count] of [
+      ["[data-level-filters]", 5], ["[data-type-filters]", 6], ["[data-region-filters]", 6],
+    ]) {
+      const container = listing.querySelector(selector);
+      container.innerHTML = `<div class="media-releases__filter-skeleton-row" aria-hidden="true">
+        <span class="media-releases__filter-skeleton-control">
+          <span class="media-releases__skeleton-block media-releases__filter-skeleton-checkbox"></span>
+        </span>
+        <span class="media-releases__skeleton-block media-releases__filter-skeleton-label"></span>
+      </div>`.repeat(count);
+      filterRows.push(...container.children);
+    }
+  }
+  const style = listing.ownerDocument.createElement("style");
+  style.textContent = css;
+  listing.ownerDocument.head.append(style);
+  return { skeletons: [...results.children], filterRows, loadingStatus };
+}
+
 test("location button and search have the same outer height", async () => {
   const window = new Window();
   window.document.write(html);
@@ -300,10 +350,13 @@ test("renders declaration-only cards with their accent colors and checkbox style
   }
 });
 
-for (const scenario of ["populated", "empty", "partial failure", "total failure", "render failure"]) {
-  test(`loading skeletons clear after ${scenario}`, async () => {
+for (const { scenario, cmsMarkup } of [false, true].flatMap((cmsMarkup) =>
+  ["populated", "empty", "partial failure", "total failure", "render failure"]
+    .map((scenario) => ({ scenario, cmsMarkup })))) {
+  test(`${cmsMarkup ? "CMS" : "legacy"} loading skeletons clear after ${scenario}`, async () => {
     const window = new Window({ url: "http://localhost/media-releases.html" });
     window.document.write(html);
+    const cms = cmsMarkup ? addCmsLoadingMarkup(window.document.querySelector("[data-media-releases]")) : null;
     const originals = { window: globalThis.window, document: globalThis.document, fetch: globalThis.fetch };
     const originalConsoleError = console.error;
     const errors = [];
@@ -317,16 +370,16 @@ for (const scenario of ["populated", "empty", "partial failure", "total failure"
     };
 
     try {
-      await import(`../../dist/media-releases.js?loading-test=${encodeURIComponent(scenario)}`);
+      await import(`../../dist/media-releases.js?loading-test=${encodeURIComponent(scenario)}&cms=${cmsMarkup}`);
       const listing = window.document.querySelector("[data-media-releases]");
       const loadingStatus = listing.querySelector("[data-loading-status]");
       const search = listing.querySelector(".media-releases__search");
       const layout = listing.querySelector(".media-releases__layout");
       const results = listing.querySelector("[data-results]");
       const filterSkeletonCounts = [
-        ["[data-level-filters]", 3],
+        ["[data-level-filters]", cmsMarkup ? 5 : 3],
         ["[data-type-filters]", 6],
-        ["[data-region-filters]", 4],
+        ["[data-region-filters]", cmsMarkup ? 6 : 4],
         ["[data-source-filters]", 3],
       ];
       assert.equal(requests.length, 5);
@@ -336,6 +389,16 @@ for (const scenario of ["populated", "empty", "partial failure", "total failure"
       assert.equal(search.inert, true);
       assert.equal(layout.inert, true);
       assert.equal(loadingStatus.inert, false);
+      if (cms) {
+        assert.deepEqual([...results.children], cms.skeletons);
+        assert.ok(cms.filterRows.every((row) => listing.contains(row)));
+        assert.equal(loadingStatus, cms.loadingStatus);
+        assert.equal(listing.querySelectorAll("[data-loading-status]").length, 1);
+        assert.equal(loadingStatus.parentElement, listing);
+        assert.equal(loadingStatus.hidden, false);
+        assert.equal(window.getComputedStyle(loadingStatus).position, "absolute");
+        assert.equal(window.getComputedStyle(listing.querySelector("[data-results-status]")).display, "none");
+      }
       assert.equal(window.document.querySelector("header").inert, false);
       assert.equal(window.document.querySelector("footer").inert, false);
       assert.equal(results.getAttribute("aria-busy"), "true");
@@ -403,6 +466,11 @@ for (const scenario of ["populated", "empty", "partial failure", "total failure"
         listing.querySelector("[data-search]").dispatchEvent(new window.Event("input"));
         assert.equal(listing.querySelector("[data-results-status]").textContent, "");
         assert.equal(results.querySelectorAll(".media-releases__skeleton").length, 0);
+      }
+      if (cms && (failed || scenario === "empty")) {
+        const status = listing.querySelector("[data-results-status]");
+        assert.equal(status.hidden, false);
+        assert.equal(status.classList.contains("hidden"), false);
       }
     } finally {
       Object.assign(globalThis, originals);
@@ -671,14 +739,17 @@ test("homepage shows available source warnings when one source feed fails", asyn
   }
 });
 
-for (const scenario of ["latest three", "production endpoint", "fewer than three", "missing icon", "unknown region", "empty", "invalid response", "http failure", "total failure"]) {
-  test(`homepage warning cards handle ${scenario}`, async () => {
+for (const { scenario, cmsMarkup } of [false, true].flatMap((cmsMarkup) =>
+  ["latest three", "production endpoint", "fewer than three", "missing icon", "unknown region", "empty", "invalid response", "http failure", "total failure"]
+    .map((scenario) => ({ scenario, cmsMarkup })))) {
+  test(`${cmsMarkup ? "CMS" : "legacy"} homepage warning cards handle ${scenario}`, async () => {
     const window = new Window({ url: scenario === "production endpoint" ? "https://cmsexternal.nt.gov.au/" : "http://localhost/" });
     window.document.write(`<section data-latest-media-releases>
       <p data-results-status role="status"></p>
       <p data-feed-note hidden></p>
       <div class="media-releases__results" data-results></div>
     </section>`);
+    const cms = cmsMarkup ? addCmsLoadingMarkup(window.document.querySelector("[data-latest-media-releases]"), true) : null;
     const originals = { window: globalThis.window, document: globalThis.document, fetch: globalThis.fetch };
     const originalConsoleError = console.error;
     const originalDateNow = Date.now;
@@ -695,7 +766,7 @@ for (const scenario of ["latest three", "production endpoint", "fewer than three
     console.error = () => {};
 
     try {
-      await import(`../../dist/latest-media-releases.js?test=${encodeURIComponent(scenario)}`);
+      await import(`../../dist/latest-media-releases.js?test=${encodeURIComponent(scenario)}&cms=${cmsMarkup}`);
       const listing = window.document.querySelector("[data-latest-media-releases]");
       const results = listing.querySelector("[data-results]");
       assert.equal(intervalCallbacks.length, 1);
@@ -704,6 +775,12 @@ for (const scenario of ["latest three", "production endpoint", "fewer than three
       assert.equal(results.querySelectorAll('.media-releases__skeleton[aria-hidden="true"]').length, 3);
       assert.equal(results.querySelectorAll(".media-releases__skeleton-block").length, 18);
       assert.ok(results.querySelector(".media-releases__skeleton--featured"));
+      if (cms) {
+        assert.deepEqual([...results.children], cms.skeletons);
+        const status = listing.querySelector("[data-results-status]");
+        assert.equal(status.hidden, false);
+        assert.equal(window.getComputedStyle(status).position, "absolute");
+      }
       assert.equal(listing.querySelector("[data-results-status]").textContent, "Loading current warnings...");
       assert.ok(listing.querySelector("[data-results-status]").classList.contains("media-releases__status--loading"));
       const isLocalPreview = scenario !== "production endpoint";
@@ -797,6 +874,12 @@ for (const scenario of ["latest three", "production endpoint", "fewer than three
       }
       if (scenario === "empty") assert.match(listing.querySelector("[data-results-status]").textContent, /no current warnings/i);
       if (["invalid response", "http failure", "total failure"].includes(scenario)) assert.match(listing.querySelector("[data-results-status]").textContent, /temporarily unavailable/i);
+      if (cms && expected === 0) {
+        const status = listing.querySelector("[data-results-status]");
+        assert.equal(status.hidden, false);
+        assert.equal(status.classList.contains("hidden"), false);
+        assert.notEqual(window.getComputedStyle(status).position, "absolute");
+      }
     } finally {
       window.setInterval = originalSetInterval;
       Object.assign(globalThis, originals);

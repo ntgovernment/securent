@@ -180,7 +180,11 @@ section.media-releases__hero {
   gap: 24px;
 }
 
-[data-latest-media-releases] .media-releases__status--loading {
+.media-releases__status:empty {
+  display: none;
+}
+
+.media-releases__status--loading {
   position: absolute;
   width: 1px;
   height: 1px;

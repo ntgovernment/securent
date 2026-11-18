@@ -14,9 +14,13 @@ if (listing) {
   const feedNote = listing.querySelector("[data-feed-note]");
   const isLocalPreview = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
   results.setAttribute("aria-busy", "true");
+  status.hidden = false;
+  status.classList.remove("hidden");
   status.classList.add("media-releases__status--loading");
   status.textContent = "Loading current warnings...";
-  results.replaceChildren(...Array.from({ length: 3 }, () => createCardSkeleton({ featured: true })));
+  if (!results.querySelector(".media-releases__skeleton")) {
+    results.replaceChildren(...Array.from({ length: 3 }, () => createCardSkeleton({ featured: true })));
+  }
   const releases = isLocalPreview
     ? fetch("/api/media-releases/latest", { headers: { Accept: "application/json" }, credentials: "same-origin" })
       .then((response) => {
