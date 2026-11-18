@@ -64,6 +64,7 @@ securent/
 │   │   └── components/
 │   │       ├── accordion.css         # CMS accordion styling, states and content-width alignment
 │   │       ├── alert.css             # Global alert banner styles: information (#FFC72C yellow, dark text AAA), warning (#D6410A orange, white AA), critical (#FC4141 red, white AA large text only); 24×24 close button anchored top-right
+│   │       ├── back-to-top.css       # Fixed charcoal circular back-to-top control
 │   │       ├── buttons.css           # Button overrides: primary bg Charcoal (#343741), secondary outline Charcoal + white bg, hover Territory orange (#D6410A)
 │   │       ├── content-page.css      # Content page body alignment when no in-page navigation is present
 │   │       ├── mainmenu-dropdown.css # Content-width desktop mega-menu and mobile drawer styles
@@ -78,7 +79,9 @@ securent/
 │   ├── navigation/
 │   │   └── README.md                 # Matrix Main, Level 2 and Level 3 listing templates and publication steps
 │   └── js/
-│       ├── main.js                   # JS entry point — desktop mega-menu and mobile drawer
+│       ├── back-to-top.mjs           # Scroll-triggered, accessible site-wide back-to-top control
+│       ├── back-to-top.test.mjs      # Scroll visibility, accessibility and scroll behavior tests
+│       ├── main.js                   # JS entry point — navigation, back-to-top and shared enhancements
 │       ├── navigation.test.mjs       # CMS link preservation, listing-template and interaction regressions
 │       ├── homepage-news.js          # Runtime JS for homepage news cards (tag transformation)
 │       └── display-cards.js          # Runtime JS — swaps FA 5 `fal` icons to FA 6 `fa-solid` in display cards
@@ -183,13 +186,13 @@ Run `node --test src/search/results.test.mjs` with a Node.js release supporting 
 
 When mapped regions are unavailable, region inference uses [nt-suburbs-by-government-region.json](src/media-releases/nt-suburbs-by-government-region.json), a 270-locality working map compiled from the NT Government regions map, the Australia Post NT locality list, and Geoscape locality boundaries. Exact locality matches in notice titles, names, and structured place fields take precedence over conflicting legacy aliases; broader area names such as Tanami and Lasseter remain as fallbacks. The source label “Greater Darwin, Palmerston and Litchfield” is presented as the existing **Greater Darwin** filter value. The source describes the six-region classification as a map rather than an authoritative locality table, so boundary localities may need spatial validation; do not treat these inferred regions as authoritative emergency boundaries.
 
-The standalone **Current warnings** page ([media-releases.html](media-releases.html)) combines the NTES, Bushfires NT and NTG agencies Campaign Monitor feeds defined in [feeds.mjs](src/media-releases/feeds.mjs). It curates operational emergency notices rather than showing all government news. Matching `CampaignID` values are deduplicated with Bushfires NT > NTES > NTG agencies precedence; source labels remain available for filtering and curation. Warning/action language and the approved NTES duty-officer email in `FromName` identify operational items. General awards, recruitment, ceremonies, outlooks and corporate announcements are excluded unless operational warning language takes precedence. [curation.mjs](src/media-releases/curation.mjs) owns these rules.
+The standalone **Current warnings** page ([media-releases.html](media-releases.html)) combines the NTES, Bushfires NT and NTG agencies Campaign Monitor feeds defined in [feeds.mjs](src/media-releases/feeds.mjs). It curates operational emergency notices rather than showing all government news. Matching `CampaignID` values are deduplicated with Bushfires NT > NTES > NTG agencies precedence; source labels remain available for filtering and curation. Warning/action language and the approved NTES duty-officer email in `FromName` identify operational items. AWS hazard campaigns from the official **NT Emergency Service** sender are also included when their subject omits words such as **warning** or **advice**; if a warning level is missing, it remains **Not identified**. General awards, recruitment, ceremonies, outlooks and corporate announcements are excluded unless operational warning language takes precedence. [curation.mjs](src/media-releases/curation.mjs) owns these rules.
 
-The separate latest-three listing requests the merged `campaign-monitor` endpoint and displays up to three eligible warnings, newest first, in responsive featured cards without search or filters. It applies the existing curation rules to the returned records, but the merged response cannot identify individual source failures or preserve source precedence for duplicates. See [the media-releases guide](src/media-releases/README.md) for embed markup, assets, localhost proxy, and cross-origin requirements. It does not replace the full listing or automatically add itself to a page.
+The separate latest-three listing displays up to three eligible warnings, newest first, in responsive featured cards without search or filters. In production it requests the Bushfires NT, NTES, and NTG agencies feeds independently, applies the same curation and source-precedence rules as the full listing, and reports unavailable sources while showing warnings from feeds that succeeded. The localhost preview uses the merged `/api/media-releases/latest` proxy backed by the checked-in snapshots. See [the media-releases guide](src/media-releases/README.md) for embed markup, assets, preview behavior, and cross-origin requirements. It does not replace the full listing or automatically add itself to a page.
 
 Both displays match `CampaignID` to `campaignId` in the mapped-warnings integration. Valid mapped hazard, warning level, location and regions enrich the existing curated notice; ordinary titles use **[Type] [level] for [Location]**, such as **Storm advice for Darwin**, when those values are available. A leading **Part of** or **Parts of** in a location is lowercased in the title without changing place-name capitalization. Mapped regions may contain multiple values and support the existing region filters and search. Missing or invalid fields use the existing classification, and an unavailable location leaves the original title unchanged. Declarations retain their type and styling while using mapped locations and regions. Mapping failures or timeouts preserve the existing warnings and show an accessible notice; source-feed errors are reported separately.
 
-Featured warning titles use an `h3` with 20px bold text and a 24px line height. Severity tags use 12px bold Lato with 16px line height, 1px letter spacing, and the Emergency, Watch and act, Advice, Planned burn, and General information colors documented in [the media-releases guide](src/media-releases/README.md). On localhost, the latest-three proxy returns one randomly selected Decreasing threat, Planned burn, or General information example plus two randomized warning type/level examples from [latest-warnings.preview.json](src/media-releases/latest-warnings.preview.json). Production continues to request the merged Campaign Monitor endpoint.
+Featured warning titles use an `h3` with 20px bold text and a 24px line height. Severity tags use 12px bold Lato with 16px line height, 1px letter spacing, and the Emergency, Watch and act, Advice, Planned burn, and General information colors documented in [the media-releases guide](src/media-releases/README.md). On localhost, the latest-three proxy returns one randomly selected Decreasing threat, Planned burn, or General information example plus two randomized warning type/level examples from [latest-warnings.preview.json](src/media-releases/latest-warnings.preview.json). Production loads the three source feeds independently; their origin must allow those requests.
 
 Run `npm run build` and start `npm run dev` to preview the homepage at `/` and the captured Current warnings page at `/Current%20warnings%20_%20SecureNT.html`. The standalone shell at `/media-releases.html` remains available and may normalize to `/media-releases`. Its search placeholder is **Search for a location, incident type or keyword**. Suggestions include terms from notice titles, mapped locations, available town, street, suburb, locality, and address fields, and regions; each option shows a decorative magnifying-glass icon. Selecting a suggestion filters the listing. Vite serves the warning modules from source during local development; built assets are used for deployment. Captured vendor dependencies and static assets load from shared, gitignored `SecureNT_files/`. Refresh versioned asset references after rebuilding: the Current warnings capture currently uses media-release CSS `36` and JavaScript `54`; the standalone shell uses CSS `35` and JavaScript `54`. Mapped warning enrichment does not alter the existing Alerts and warnings listing.
 
@@ -244,7 +247,7 @@ Validation checklist:
 - Check that **Clear all filters** unchecks Warning level, Incident or notice type, Region and Source, resets pagination to page 1, and preserves search text and sort order. Confirm that the text-only button and Filters heading fit on desktop/mobile and no fieldset divider lines remain.
 - Manually inspect excluded candidates after curation changes, especially borderline operational announcements. Keep this review in validation; do not add a public exclusions section or generated review report.
 - Check desktop/mobile search, combined filters, sidebar sorting, page resets, collapsed filter accessibility, and partial/all-source failures. Live feeds may stall; controlled browser fixtures can isolate UI checks without changing production feed configuration.
-- For the latest-three listing, delay the merged endpoint response and verify that three responsive skeleton cards appear, the loading status remains accessible, reduced-motion disables the shimmer, and placeholders clear for successful, empty, invalid, and failed responses.
+- For the latest-three listing, delay the local merged proxy response and verify that three responsive skeleton cards appear, the loading status remains accessible, reduced-motion disables the shimmer, and placeholders clear for successful, empty, invalid, and failed responses. In production, verify that available source feeds still show warnings and identify failed sources in the feed note.
 - Delay feed responses and check the ten in-results skeleton cards, polite loading announcement, blocked listing controls, usable header/footer and reduced-motion behavior at desktop/mobile widths. Confirm placeholders are replaced or cleared after populated or empty results, partial/total feed failure and rendering errors. The automated DOM checks cover these cleanup paths.
 
 ## Build
@@ -530,9 +533,21 @@ Runs at page load to fix Font Awesome icon classes inside `.ntg-display-cards`:
 
 Imported by `src/js/main.js` and bundled into `dist/theme.js` on build.
 
+### Back-to-top control (`src/js/back-to-top.mjs`)
+
+The shared theme adds a fixed, circular Charcoal (`--clr-text-default`)
+button with an accessible **Back to top** label and a chevron-up icon. It
+appears after the page is scrolled more than 500px and returns to the top with
+smooth scrolling unless the visitor prefers reduced motion. Its styles are
+imported by `src/css/main.css`; publish the rebuilt `dist/theme.js` and
+`dist/theme.css` together and refresh their CMS cache references.
+
 ## Deployment
 
-The `deploy-to-dev.prompt.md` prompt targets the `dev` branch. The `securent` remote currently uses `main`; use the repository's configured branch when committing and pushing unless a `dev` deployment is intended.
+The `deploy-to-dev.prompt.md` prompt targets `origin/dev`. Ensure the local
+`dev` branch is based on the intended release branch before committing and
+pushing; do not force-push. A Git push does not update CMS markup, published
+file-bridge assets, or cache references automatically.
 
 ## Favicons
 

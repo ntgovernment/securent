@@ -8,7 +8,7 @@ const sourceRank = new Map(sourceOrder.map((source, index) => [source, index]));
 const alertLanguage = /\b(?:advice|warning|watch\s*(?:&|and)\s*act|emergency\s+(?:warning|alert|declaration)|decreasing[\s_-]+threats?|threat is reduced|evacu\w*|take shelter|shelter now|prepare now|stay informed|fire bans?|fire danger period|planned burns?|boil(?:ing)? water|public health alert|code yellow|rescue operation|incidents?\b|hazmat|dangerous surf|avoid (?:the )?flooded area)\b/i;
 const hazardLanguage = /\b(?:storm|flood|cyclone|bushfires?|fires?|planned burns?|emergency|incident|hazmat|health|boil(?:ing)? water|evacu\w*|surf)\b/i;
 const generalNews = /\b(?:awards?|recruit(?:ment|ing)?|ceremon(?:y|ies)|outlook|symposium|funding|grant recipients|honours? list|anniversary|celebrates?\b|celebration)\b/i;
-const operationalSender = /\b(?:ntes|northern territory emergency service|territory emergency operations centre|nt fire and emergency services|bushfires? nt|securent)\b|territorydutyofficer\.ntes@pfes\.nt\.gov\.au/i;
+const operationalSender = /\b(?:ntes|nt emergency services?|northern territory emergency services?|territory emergency operations centre|nt fire and emergency services|bushfires? nt|securent)\b|territorydutyofficer\.ntes@pfes\.nt\.gov\.au/i;
 const approvedDutyOfficer = /\bterritorydutyofficer\.ntes@pfes\.nt\.gov\.au\b/i;
 
 export const warningLevelOrder = ["Emergency warning", "Watch and act", "Advice", "Decreasing threat", "Not identified"];
@@ -185,7 +185,10 @@ export function isOperationalNotice(record) {
   const content = [record.title || record.Subject, record.name || record.Name].filter(Boolean).join(" ");
   const sender = record.fromName || record.FromName;
   if (approvedDutyOfficer.test(sender)) return true;
-  if (!alertLanguage.test(content)) return false;
+  const awsHazardNotice = /\baws\b/i.test(content)
+    && operationalSender.test(sender)
+    && hazardLanguage.test(content);
+  if (!awsHazardNotice && !alertLanguage.test(content)) return false;
   if (generalNews.test(content) && !/\b(?:warning|watch\s*(?:&|and)\s*act|emergency alert|evacu\w*|fire bans?|fire danger period|planned burns?|boil(?:ing)? water)\b/i.test(content)) {
     return false;
   }

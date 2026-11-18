@@ -640,6 +640,37 @@ test("homepage displays existing warnings when mapped warnings fail", async () =
   }
 });
 
+test("homepage shows available source warnings when one source feed fails", async () => {
+  const window = new Window({ url: "https://cmsexternal.nt.gov.au/" });
+  window.document.write(`<section data-latest-media-releases>
+    <p data-results-status></p><p data-feed-note hidden></p><div data-results></div></section>`);
+  const originals = { window: globalThis.window, document: globalThis.document, fetch: globalThis.fetch };
+  globalThis.window = window;
+  globalThis.document = window.document;
+  globalThis.fetch = async (url) => {
+    if (url.endsWith("campaign-monitor-ntes")) throw new Error("offline");
+    if (url === emergencyWarningsEndpoint) return { ok: true, json: async () => [] };
+    if (url.endsWith("mapped-warnings")) return { ok: true, json: async () => [] };
+    const source = url.endsWith("campaign-monitor-bushfires-nt") ? "Bushfire" : "Flood";
+    return { ok: true, json: async () => [{
+      ...notice,
+      CampaignID: source,
+      Name: `${source} advice - Darwin`,
+      Subject: `${source} advice - Darwin`,
+    }] };
+  };
+  try {
+    await import("../../dist/latest-media-releases.js?source-failure");
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.equal(window.document.querySelectorAll(".media-releases__item").length, 2);
+    assert.equal(window.document.querySelector("[data-feed-note]").hidden, false);
+    assert.match(window.document.querySelector("[data-feed-note]").textContent, /Some feeds are unavailable: NTES/);
+  } finally {
+    Object.assign(globalThis, originals);
+    await window.happyDOM.close();
+  }
+});
+
 for (const scenario of ["latest three", "production endpoint", "fewer than three", "missing icon", "unknown region", "empty", "invalid response", "http failure", "total failure"]) {
   test(`homepage warning cards handle ${scenario}`, async () => {
     const window = new Window({ url: scenario === "production endpoint" ? "https://cmsexternal.nt.gov.au/" : "http://localhost/" });
@@ -675,10 +706,16 @@ for (const scenario of ["latest three", "production endpoint", "fewer than three
       assert.ok(results.querySelector(".media-releases__skeleton--featured"));
       assert.equal(listing.querySelector("[data-results-status]").textContent, "Loading current warnings...");
       assert.ok(listing.querySelector("[data-results-status]").classList.contains("media-releases__status--loading"));
-      assert.equal(requests.length, 3);
-      assert.equal(requests[0].url, scenario === "production endpoint"
-        ? "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor"
-        : "/api/media-releases/latest");
+      const isLocalPreview = scenario !== "production endpoint";
+      const feedRequestCount = isLocalPreview ? 1 : 3;
+      assert.equal(requests.length, feedRequestCount + 2);
+      assert.deepEqual(requests.slice(0, feedRequestCount).map(({ url }) => url), isLocalPreview
+        ? ["/api/media-releases/latest"]
+        : [
+          "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor-bushfires-nt",
+          "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor-ntes",
+          "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor-ntg-agencies",
+        ]);
       const records = [1, 4, 2, 3].map((day) => ({
         ...notice,
         CampaignID: `campaign-${day}`,
@@ -686,7 +723,7 @@ for (const scenario of ["latest three", "production endpoint", "fewer than three
         SentDate: `2026-11-0${day} 09:00:00`,
       }));
       requests.forEach((request, index) => {
-        if (index === 1 || index === 2) {
+        if (index >= feedRequestCount) {
           request.resolve({ ok: true, json: async () => [] });
         } else if (scenario === "total failure") {
           request.reject(new Error("Feed offline"));

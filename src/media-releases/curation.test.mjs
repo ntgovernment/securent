@@ -179,6 +179,27 @@ test("includes operational warning and public health alert language", () => {
   })), true);
 });
 
+test("includes AWS hazard campaigns from NT Emergency Service", () => {
+  const notice = record({
+    Name: "2026 11 17 AWS Storm Lasseter",
+    Subject: "2026 11 17 AWS Storm Lasseter, Tanami, Simpson",
+    FromName: "NT Emergency Service",
+    CampaignID: "93cad8c4009b9e126fb0fe84b09b4bdb",
+    SentDate: "2026-11-18 19:30:00",
+    WebVersionURL: "http://createsend.com/t/t-C7BFE5611B58A6862540EF23F30FEDED",
+  });
+
+  assert.equal(isOperationalNotice(notice), true);
+  const [curated] = curateFeeds([{ source: "NTES", items: [notice] }]);
+  assert.equal(curated.campaignId, notice.CampaignID);
+  assert.deepEqual(curated.emergencyTypes, ["Storm"]);
+  assert.equal(curated.warningLevel, "Not identified");
+  assert.equal(curateFeeds([{ source: "NTES", items: [{
+    ...notice,
+    FromName: "Tourism NT",
+  }] }]).length, 0);
+});
+
 test("rejects general news and weak hazard-only matches", () => {
   assert.equal(isOperationalNotice(record({
     Name: "Bushfires NT launches new Strategic Bushfire Management Plan",
