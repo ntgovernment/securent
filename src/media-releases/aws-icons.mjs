@@ -20,8 +20,8 @@ export function warningLevelSlug(warningLevel) {
 export function awsHazardIconFilename(emergencyTypes, warningLevel) {
   const level = warningLevelSlugs.get(warningLevel);
   const emergencyType = emergencyTypes.find((type) => type !== "Not identified");
-  if (!level || warningLevel === "Decreasing threat" || !emergencyType) return "";
+  if (!level || !emergencyType) return "";
 
   const hazard = hazardTypeSlugs.get(emergencyType) || "other";
-  return `${hazard}-${level}.webp`;
+  return `${hazard}-${level === "decreasing_threat" ? "advice" : level}.webp`;
 }

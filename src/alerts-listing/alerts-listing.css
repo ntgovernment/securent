@@ -165,7 +165,7 @@ section.alerts-page {
 }
 
 .alerts-listing__card[data-warning-level="decreasing-threat"] {
-  border-left-color: #848491;
+  border-left-color: #fbe032;
 }
 
 .alerts-listing__card-link {

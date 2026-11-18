@@ -42,8 +42,8 @@ test("homepage warning-card styles match the reference layout", () => {
   assert.match(css, /\.media-releases__severity\{[^}]*padding:4px 8px;[^}]*font-size:12px;[^}]*line-height:16px;[^}]*letter-spacing:1px;[^}]*text-transform:uppercase/);
   assert.match(css, /\.media-releases__item\[data-warning-level=emergency_warning\] \.media-releases__severity\{background:var\(--clr-status-danger-bg,\s*#f7e7eb\);color:var\(--clr-status-danger,\s*#a60f37\)\}/);
   assert.match(css, /\.media-releases__item\[data-warning-level=watch_act\] \.media-releases__severity\{background:#ffe4cc;color:#9e4b00\}/);
-  assert.match(css, /\.media-releases__item\[data-warning-level=advice\] \.media-releases__severity\{background:#fdf4b9;color:#716309\}/);
-  assert.match(css, /\.media-releases__item\[data-general-information=true\] \.media-releases__severity,.media-releases__item\[data-warning-level=decreasing_threat\] \.media-releases__severity\{background:var\(--clr-bg-shade-alt,\s*#e7e7ea\);color:var\(--clr-text-default,\s*#1f1e27\)\}/);
+  assert.match(css, /\.media-releases__item\[data-warning-level=advice\] \.media-releases__severity,\.media-releases__item\[data-warning-level=decreasing_threat\] \.media-releases__severity\{background:#fdf4b9;color:#716309\}/);
+  assert.match(css, /\.media-releases__item\[data-general-information=true\] \.media-releases__severity\{background:var\(--clr-bg-shade-alt,\s*#e7e7ea\);color:var\(--clr-text-default,\s*#1f1e27\)\}/);
   assert.match(css, /\.media-releases__item--planned-burn \.media-releases__severity\{background:#dbcde4;color:#634578\}/);
   assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__card-heading\{gap:4px;min-height:24px\}/);
   assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__hazard-icon,\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__notice-icon\{width:24px;height:24px;font-size:24px\}/);
@@ -268,10 +268,11 @@ test("renders declaration-only cards with their accent colors and checkbox style
     assert.match(css, /\.media-releases__item--formatted \.media-releases__hazard-icon\{width:48px;height:48px\}/);
     assert.match(css, /\.media-releases__item\[data-declaration~=fire-ban-declaration\][^{]*\{--media-releases-accent:\s*#1f1f5f\}/);
     assert.match(css, /\.media-releases__item\[data-general-information=true\][^{]*\{--media-releases-accent:\s*#1f1f5f\}/);
-    assert.match(css, /\.media-releases__item\[data-general-information=true\] \.media-releases__severity,.media-releases__item\[data-warning-level=decreasing_threat\] \.media-releases__severity\{background:var\(--clr-bg-shade-alt,\s*#e7e7ea\);color:var\(--clr-text-default,\s*#1f1e27\)\}/);
-    assert.match(css, /\.media-releases__item\[data-warning-level=decreasing_threat\]\{--media-releases-accent:\s*#343741\}/);
+    assert.match(css, /\.media-releases__item\[data-general-information=true\] \.media-releases__severity\{background:var\(--clr-bg-shade-alt,\s*#e7e7ea\);color:var\(--clr-text-default,\s*#1f1e27\)\}/);
+    assert.match(css, /\.media-releases__item\[data-warning-level=decreasing_threat\]\{--media-releases-accent:\s*#fadf31\}/);
     assert.match(css, /\.media-releases__item\[data-warning-level=advice\]\{--media-releases-accent:\s*#fadf31\}/);
-    assert.match(css, /\.media-releases__item\[data-warning-level=advice\] \.media-releases__severity\{background:#fdf4b9;color:#716309\}/);
+    assert.match(css, /\.media-releases__item\[data-warning-level=advice\] \.media-releases__severity,\.media-releases__item\[data-warning-level=decreasing_threat\] \.media-releases__severity\{background:#fdf4b9;color:#716309\}/);
+    assert.match(alertsCss, /\.alerts-listing__card\[data-warning-level=decreasing-threat\]\{border-left-color:#fbe032\}/);
     assert.match(css, /\.media-releases__item:hover\{box-shadow:0 4px 16px #0f0f2f26\}/);
     assert.match(css, /\.media-releases__item\[data-warning-level=watch_act\] \.media-releases__severity/);
     assert.doesNotMatch(css, /\.media-releases__item\[data-declaration\] \.media-releases__severity/);
@@ -593,9 +594,8 @@ for (const page of ["listing", "homepage"]) {
       const card = listing.querySelector(".media-releases__item");
       assert.equal(card.querySelector(".media-releases__title").textContent, "Flooding decreasing threat for Katherine");
       assert.equal(card.dataset.warningLevel, "decreasing_threat");
-      assert.equal(card.querySelector(".media-releases__notice-icon").className,
-        "fa-light fa-triangle-exclamation media-releases__notice-icon");
-      assert.equal(card.querySelector(".media-releases__hazard-icon"), null);
+      assert.equal(card.querySelector(".media-releases__notice-icon"), null);
+      assert.match(card.querySelector(".media-releases__hazard-icon").src, /flood-advice\.webp$/);
       assert.equal(listing.querySelector("[data-feed-note]").hidden, true);
       if (page === "homepage") {
         assert.equal(card.querySelector(".media-releases__severity").textContent, "Decreasing threat");

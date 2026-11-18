@@ -44,9 +44,9 @@ match its `campaignId` to `CampaignID`, falling back to the normalized
 `WebVersionURL` when the IDs differ. A matching `warningLevel` of
 `decreasing_threat` overrides the mapped or inferred level with **Decreasing
 threat**. The level is available in the Current Warnings filter and appears as
-the severity badge on homepage cards. Its icon uses the generic
-`fa-triangle-exclamation` treatment used for Other, not a hazard-specific Advice
-image. Its badge and card accent use the same neutral colors as Other. Advice
+the severity badge on homepage cards. It uses the hazard-specific Advice WEBP for
+its mapped emergency type and the same yellow card accent and badge colors as
+Advice, while retaining the distinct **Decreasing threat** label. Advice
 classifications without a matching Squiz record are unchanged.
 
 If either mapping feed fails, returns an invalid response, or times out after
@@ -63,8 +63,9 @@ Featured warning titles use an `h3` styled at 20px bold with a 24px line
 height. Severity badges use 12px bold Lato, 16px line height, 1px letter
 spacing, and 4px by 8px padding. Emergency uses the danger background/text
 tokens; Watch and act uses `#FFE4CC` / `#9E4B00`; Advice uses `#FDF4B9` /
-`#716309`; Planned burn uses `#DBCDE4` / `#634578`; and General information and
-Decreasing threat use the neutral background/text tokens.
+`#716309`; Planned burn uses `#DBCDE4` / `#634578`; and General information uses
+the neutral background/text tokens. Decreasing threat uses the same badge
+background/text and card accent as Advice.
 
 Include the existing site theme and icon fonts, `media-releases.css`, and the
 standalone module. Deploy `dist/SecureNT_files/media-release-card.js`,

@@ -27,6 +27,11 @@
   --warning-accordion-accent: var(--clr-status-emergency-warning, #d6001c);
 }
 
+.warning-accordion.warning-level-decreasing_threat,
+.warning-accordion:has(.warning-accordion__level--decreasing_threat) {
+  --warning-accordion-accent: var(--clr-status-advice, #fbe032);
+}
+
 .warning-accordion > summary {
   position: relative;
   display: grid;
@@ -67,7 +72,8 @@
 
 .warning-accordion__level--emergency_warning,
 .warning-accordion__level--watch_act,
-.warning-accordion__level--advice {
+.warning-accordion__level--advice,
+.warning-accordion__level--decreasing_threat {
   text-transform: uppercase;
 }
 

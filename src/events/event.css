@@ -5,7 +5,8 @@
   background-color: var(--clr-status-neutral);
 }
 
-.event-page__header-accent.warning-level-advice {
+.event-page__header-accent.warning-level-advice,
+.event-page__header-accent.warning-level-decreasing_threat {
   background-color: var(--clr-status-advice);
 }
 

@@ -14,9 +14,11 @@ test("uses the first identified type and the Other icon for unmapped types", () 
   assert.equal(awsHazardIconFilename(["Health emergency"], "Advice"), "other-advice.webp");
 });
 
-test("uses a distinct data level for decreasing threat without an Advice hazard icon", () => {
+test("uses the Advice hazard icon while retaining a distinct data level for decreasing threat", () => {
   assert.equal(warningLevelSlug("Decreasing threat"), "decreasing_threat");
-  assert.equal(awsHazardIconFilename(["Flooding"], "Decreasing threat"), "");
+  assert.equal(awsHazardIconFilename(["Flooding"], "Decreasing threat"), "flood-advice.webp");
+  assert.equal(awsHazardIconFilename(["Storm"], "Decreasing threat"), "storm-advice.webp");
+  assert.equal(awsHazardIconFilename(["Health emergency"], "Decreasing threat"), "other-advice.webp");
 });
 
 test("omits AWS icons when type or warning level is not identified", () => {

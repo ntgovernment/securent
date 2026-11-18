@@ -110,7 +110,7 @@ export function renderCard(item, { compact = false, featured = false } = {}) {
   if (isGeneralInformation) article.dataset.generalInformation = "true";
   const isGeneralInformationCard = !compact
     && (isGeneralInformation || item.emergencyTypes.includes("Not identified"));
-  const iconUrl = hasDecreasingThreatLevel ? "" : hazardIconFor(item);
+  const iconUrl = hazardIconFor(item);
   const isEmergencyTypeCard = !compact && Boolean(iconUrl);
   const isFormattedCard = featured || isPlannedBurn || isGeneralInformationCard || isEmergencyTypeCard || hasDecreasingThreatLevel;
   if (isFormattedCard) article.classList.add("media-releases__item--formatted");
