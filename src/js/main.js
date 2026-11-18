@@ -1,9 +1,11 @@
 import "./homepage-news.js";
 import "./display-cards.js";
 import "../hero-banners/hero-banners.js";
+import { initializeBackToTop } from "./back-to-top.mjs";
 import { guardQuickExit } from "./quick-exit.mjs";
 import { initializeEventNavigation } from "../events/on-this-page.ts";
 
+initializeBackToTop(window);
 guardQuickExit(window);
 initializeEventNavigation(window);
 
