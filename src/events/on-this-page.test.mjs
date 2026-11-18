@@ -21,9 +21,11 @@ async function withPage(check, eventPage = true) {
     });
     Object.defineProperty(window.document.documentElement, "scrollHeight", { value: 3000 });
     const nav = window.document.querySelector('[data-component="ntg-inpage-nav"]');
-    const populate = () => {
-      nav.querySelector("ul").innerHTML = headings
+    const populate = (append = false) => {
+      const markup = headings
         .map((heading) => `<li><a href="#${heading.id}">${heading.textContent}</a></li>`).join("");
+      if (append) nav.querySelector("ul").insertAdjacentHTML("beforeend", markup);
+      else nav.querySelector("ul").innerHTML = markup;
     };
     const flush = () => new Promise((resolve) => window.requestAnimationFrame(resolve));
     const scroll = async (tops, scrollY = 500) => {
@@ -36,6 +38,42 @@ async function withPage(check, eventPage = true) {
   } finally {
     await window.happyDOM.close();
   }
+}
+
+function addAccordion(window, id = "1659929", headerTag = "div") {
+  const section = window.document.createElement("section");
+  section.className = "accordion ntg-accordion";
+  section.innerHTML = `
+    <div class="accordion-item">
+      <${headerTag} class="accordion-header" id="heading-${id}">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+          data-bs-target="#collapse-${id}" aria-expanded="false" aria-controls="collapse-${id}">
+          Schools
+        </button>
+      </${headerTag}>
+      <div id="collapse-${id}" class="accordion-collapse collapse" aria-labelledby="heading-${id}">
+        <div class="accordion-body"><p>School opening information.</p></div>
+      </div>
+    </div>`;
+  window.document.getElementById("second").before(section);
+  const heading = section.querySelector(".accordion-header");
+  const button = section.querySelector("button");
+  const panel = section.querySelector(".accordion-collapse");
+  heading.getClientRects = () => [{ top: 600 }];
+  heading.getBoundingClientRect = () => ({ top: 600 });
+  let clicks = 0;
+  button.addEventListener("click", () => {
+    clicks++;
+    panel.classList.add("collapsing");
+  });
+  const finishOpening = () => {
+    panel.classList.remove("collapsing");
+    panel.classList.add("show");
+    button.classList.remove("collapsed");
+    button.setAttribute("aria-expanded", "true");
+    panel.dispatchEvent(new window.Event("shown.bs.collapse", { bubbles: true }));
+  };
+  return { section, heading, button, panel, finishOpening, get clicks() { return clicks; } };
 }
 
 test("enhances event navigation after the legacy script populates links, without duplicating them", async () => {
@@ -124,10 +162,140 @@ test("keeps a visible anchor destination selected when scrolling is clamped at t
 
 test("leaves navigation on other page types unchanged", async () => {
   await withPage(async ({ window, nav, populate, flush }) => {
+    const accordion = addAccordion(window);
+    window.location.hash = "#heading-1659929";
     populate();
     const original = nav.outerHTML;
     initializeEventNavigation(window);
     await flush();
     assert.equal(nav.outerHTML, original);
+    assert.equal(accordion.clicks, 0);
   }, false);
+});
+
+test("adds DIV and H2 accordion titles in page order without duplicates after late legacy population", async () => {
+  await withPage(async ({ window, nav, populate, flush }) => {
+    const first = addAccordion(window);
+    const second = addAccordion(window, "1659930", "h2");
+    initializeEventNavigation(window);
+    await flush();
+    assert.equal(nav.querySelectorAll("a").length, 2);
+    populate(true);
+    await window.happyDOM.whenAsyncComplete();
+    await flush();
+    initializeEventNavigation(window);
+    await flush();
+    const links = [...nav.querySelectorAll("a")];
+    assert.deepEqual(links.map((link) => link.hash),
+      ["#first", "#heading-1659929", "#heading-1659930", "#second", "#last"]);
+    assert.deepEqual(links.map((link) => link.textContent),
+      ["First section", "Schools", "Schools", "Second section", "Last section"]);
+    for (const accordion of [first, second]) {
+      assert.equal(accordion.panel.getAttribute("aria-labelledby"), accordion.heading.id);
+      assert.equal(accordion.button.getAttribute("data-bs-target"), `#${accordion.panel.id}`);
+      assert.equal(accordion.button.getAttribute("aria-controls"), accordion.panel.id);
+      assert.equal(accordion.clicks, 0);
+    }
+    window.dispatchEvent(new window.Event("resize"));
+    await flush();
+    assert.equal(nav.querySelectorAll("a").length, 5);
+  });
+});
+
+test("opens only the selected accordion and realigns its heading after expansion", async () => {
+  await withPage(async ({ window, nav, headings, populate, flush }) => {
+    const accordion = addAccordion(window);
+    const other = addAccordion(window, "1659930");
+    populate();
+    initializeEventNavigation(window);
+    await flush();
+    const link = nav.querySelector('a[href="#heading-1659929"]');
+    let scrolls = 0;
+    accordion.heading.scrollIntoView = () => {
+      scrolls++;
+      headings[0].getBoundingClientRect = () => ({ top: -300 });
+      accordion.heading.getBoundingClientRect = () => ({ top: 0 });
+    };
+    link.focus();
+    const modifiedClick = new window.MouseEvent("click", { bubbles: true, cancelable: true, ctrlKey: true });
+    modifiedClick.preventDefault();
+    link.dispatchEvent(modifiedClick);
+    assert.equal(accordion.clicks, 0, "does not expand the current page for a modified click");
+    link.click();
+    assert.equal(accordion.clicks, 1);
+    assert.equal(other.clicks, 0);
+    link.click();
+    assert.equal(accordion.clicks, 1, "does not toggle a transitioning panel");
+    window.location.hash = link.hash;
+    accordion.finishOpening();
+    await flush();
+    assert.equal(scrolls, 1);
+    assert.equal(link.getAttribute("aria-current"), "location");
+    assert.equal(window.document.activeElement, link);
+    link.click();
+    await flush();
+    assert.equal(accordion.clicks, 1, "does not close an already-open panel");
+  });
+});
+
+test("opens accordion targets on initial hashes and subsequent hash changes", async () => {
+  await withPage(async ({ window, populate, flush }) => {
+    const first = addAccordion(window);
+    const second = addAccordion(window, "1659930");
+    first.heading.scrollIntoView = () => {};
+    second.heading.scrollIntoView = () => {};
+    window.location.hash = "#heading-1659929";
+    populate();
+    initializeEventNavigation(window);
+    await flush();
+    assert.equal(first.clicks, 1);
+    assert.equal(second.clicks, 0);
+    first.finishOpening();
+    window.location.hash = "#heading-1659930";
+    window.dispatchEvent(new window.HashChangeEvent("hashchange"));
+    await flush();
+    assert.equal(second.clicks, 1);
+    second.finishOpening();
+    window.location.hash = "#heading-1659929";
+    window.dispatchEvent(new window.HashChangeEvent("hashchange"));
+    await flush();
+    assert.equal(first.clicks, 1);
+  });
+});
+
+test("tracks accordion anchors against the visible viewport on mobile", async () => {
+  await withPage(async ({ window, nav, headings, populate, flush }) => {
+    const accordion = addAccordion(window);
+    const viewport = Object.assign(new window.EventTarget(), { offsetTop: 89, height: 800 });
+    Object.defineProperty(window, "visualViewport", { value: viewport });
+    headings[0].getBoundingClientRect = () => ({ top: -0.8125 });
+    accordion.heading.getBoundingClientRect = () => ({ top: 89.1875 });
+    populate();
+    initializeEventNavigation(window);
+    await flush();
+    const link = nav.querySelector('a[href="#heading-1659929"]');
+    assert.equal(link.getAttribute("aria-current"), "location");
+    viewport.offsetTop = 0;
+    viewport.dispatchEvent(new window.Event("scroll"));
+    await flush();
+    assert.equal(nav.querySelector('[aria-current="location"]').hash, "#first");
+    viewport.offsetTop = 89;
+    viewport.dispatchEvent(new window.Event("resize"));
+    await flush();
+    assert.equal(link.getAttribute("aria-current"), "location");
+  });
+});
+
+test("does not include warning summaries or unrelated Bootstrap accordion headers", async () => {
+  await withPage(async ({ window, nav, populate, flush }) => {
+    const accordion = addAccordion(window);
+    accordion.section.classList.remove("ntg-accordion");
+    accordion.section.insertAdjacentHTML("beforebegin", `
+      <details class="warning-accordion"><summary>Warning summary</summary><p>Warning body</p></details>`);
+    populate();
+    initializeEventNavigation(window);
+    await flush();
+    assert.deepEqual([...nav.querySelectorAll("a")].map((link) => link.hash), ["#first", "#second", "#last"]);
+    assert.equal(accordion.clicks, 0);
+  });
 });
