@@ -374,8 +374,9 @@
 }
 
 .cms-main-nav .mobile-submenu-toggle:hover,
+.cms-main-nav .mobile-submenu-toggle:active,
 .cms-main-nav .mobile-submenu-toggle[aria-expanded="true"] {
-  background: #d6410a;
+  background: #12405d;
 }
 
 .cms-main-nav .desktop-main-nav__description:empty {
@@ -806,12 +807,16 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-emergency-
   }
 
   .ntg-main-nav__links li > a:hover,
+  .ntg-main-nav__links li > a:active,
   .ntg-main-nav__links li > a:focus-visible,
+  .ntg-main-nav__links > li.active > a,
+  .ntg-main-nav__links > li.current > a,
   .ntg-main-nav__links li.open > a,
   .mobile-submenu-toggle:hover,
+  .mobile-submenu-toggle:active,
   .mobile-submenu-toggle:focus-visible,
   .mobile-submenu-toggle[aria-expanded="true"] {
-    background: #d6410a !important;
+    background: #12405d !important;
     color: #ffffff !important;
   }
 
@@ -1236,4 +1241,13 @@ header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links > li 
 header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links > li > a[href$="/current-warnings"]:focus-visible {
   background-color: #b93608 !important;
   color: #ffffff !important;
+}
+
+@media (max-width: 767.98px) {
+  header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links > li > a[href$="/current-warnings"],
+  header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links > li > a[href$="/current-warnings"]:active,
+  header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links > li > a[href$="/current-warnings"]:hover,
+  header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links > li > a[href$="/current-warnings"]:focus-visible {
+    background-color: #12405d !important;
+  }
 }
