@@ -438,7 +438,7 @@ The homepage warning banner uses the same stylesheet but is a separate CMS asset
 </div>
 ```
 
-Latest Events uses a pale-grey container capped at 1280px, 32px desktop container padding, and square cards with 24px padding, 240px minimum height, and 3px accent borders. The grid changes from three columns to two below 992px and one below 576px. Metadata can wrap, and cards expand for longer descriptions rather than clipping text. Tag text follows its warning accent, with Advice using dark yellow `#716309` for legibility. On mobile, the heading and card copy use the larger homepage type scale, event cards are separated by 32px, and “View all warnings” is hidden. The “Find out more” link keeps fixed padding while its arrow shifts 2px right on hover without vertical layout movement.
+Latest Events uses a pale-grey container capped at 1280px, 32px desktop container padding, and square cards with 24px padding, 240px minimum height, and 3px accent borders. The grid changes from three columns to two below 992px and one below 576px. Metadata can wrap, and cards expand for longer descriptions rather than clipping text. Tag text follows its warning accent, with Advice using dark yellow `#716309` for legibility. On mobile, the heading and card copy use the larger homepage type scale, the “View all warnings” link remains visible beneath the heading, and event cards are separated by 32px. The “Find out more” link keeps fixed padding while its arrow shifts 2px right on hover without vertical layout movement.
 
 ### Homepage featured content
 

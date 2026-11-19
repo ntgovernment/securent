@@ -326,10 +326,6 @@
     text-transform: capitalize;
   }
 
-  #latest-events-intro p {
-    display: none;
-  }
-
   #latest-events-cards .event-grid {
     grid-template-columns: 1fr;
     gap: 2rem;
