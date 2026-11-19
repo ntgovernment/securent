@@ -1,6 +1,6 @@
 # securent
 
-Source and build tooling for the **SecureNT** NT Government site. The site base URL is controlled by `SECURENT_BASE_URL` in `src/config/site-url.mjs`; it currently points to the temporary CMS URL, and the final public URL is `https://securent.nt.gov.au`. When the domain changes, update that one setting and run `npm run build`.
+Source and build tooling for the **SecureNT** NT Government site. The site base URL is controlled by `SECURENT_BASE_URL` in `src/config/site-url.mjs`, which points to `https://securent.nt.gov.au`.
 
 ## Project structure
 
