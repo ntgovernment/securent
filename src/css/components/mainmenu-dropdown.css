@@ -266,7 +266,7 @@
 
   nav.nav-masthead .ntg-main-nav__links > li > a:hover,
   nav.nav-masthead .ntg-main-nav__links > li > a:focus {
-    background-color: #d6410a !important;
+    background-color: #003251 !important;
     color: #ffffff !important;
     border-bottom: 0 !important;
   }
@@ -324,7 +324,7 @@
   nav.nav-masthead .ntg-main-nav__links > li.active > a,
   nav.nav-masthead .ntg-main-nav__links > li.current > a,
   nav.nav-masthead .ntg-main-nav__links > li.open > a {
-    background-color: #d6410a !important;
+    background-color: #003251 !important;
     color: #ffffff !important;
     border-bottom: 0 !important;
   }
@@ -444,7 +444,7 @@
   .desktop-main-nav > li > button:hover,
   .desktop-main-nav > li > button:focus-visible,
   .desktop-main-nav > li > button[aria-expanded="true"] {
-    background: #d6410a;
+    background: #003251;
     color: #ffffff !important;
   }
 
@@ -977,7 +977,7 @@ nav.nav-masthead .cms-main-nav a {
 
   .cms-main-nav > li > .desktop-main-nav__toggle:hover,
   .cms-main-nav > li > .desktop-main-nav__toggle[aria-expanded="true"] {
-    background: #d6410a;
+    background: #003251;
   }
 
   .cms-main-nav > li > .desktop-main-nav__toggle:focus-visible {
@@ -1233,13 +1233,13 @@ nav.nav-masthead:not(.navigation-enhanced) .cms-main-nav .desktop-main-nav__pane
 }
 
 header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links > li > a[href$="/current-warnings"] {
-  background-color: #d6410a !important;
+  background-color: #003251 !important;
   color: #ffffff !important;
 }
 
 header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links > li > a[href$="/current-warnings"]:hover,
 header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links > li > a[href$="/current-warnings"]:focus-visible {
-  background-color: #b93608 !important;
+  background-color: #003251 !important;
   color: #ffffff !important;
 }
 

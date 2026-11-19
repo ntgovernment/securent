@@ -263,7 +263,7 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li > a {
 header.ntg-header .header-navigation .ntg-main-nav__links > li > a:hover,
 header.ntg-header .header-navigation .ntg-main-nav__links > li > a:focus-visible {
   border-bottom-color: #d6410a;
-  background-color: #d6410a;
+  background-color: #003251;
   color: #ffffff;
 }
 
