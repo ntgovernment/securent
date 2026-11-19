@@ -579,7 +579,8 @@
   display: none;
 }
 
-header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-emergency-link {
+header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-emergency-link,
+header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-only-link {
   display: none !important;
 }
 
@@ -860,7 +861,8 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-emergency-
     font-weight: 700 !important;
   }
 
-  header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-emergency-link {
+  header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-emergency-link,
+  header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-only-link {
     display: block !important;
   }
 
@@ -1243,11 +1245,6 @@ header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links > li 
   color: #ffffff !important;
 }
 
-@media (max-width: 767.98px) {
-  header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links > li > a[href$="/current-warnings"],
-  header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links > li > a[href$="/current-warnings"]:active,
-  header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links > li > a[href$="/current-warnings"]:hover,
-  header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links > li > a[href$="/current-warnings"]:focus-visible {
-    background-color: #12405d !important;
-  }
+header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links > li > a[href$="/current-warnings"]:active {
+  background-color: #d6410a !important;
 }
