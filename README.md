@@ -565,6 +565,16 @@ The `deploy-to-dev.prompt.md` prompt targets `origin/dev`. Ensure the local
 pushing; do not force-push. A Git push does not update CMS markup, published
 file-bridge assets, or cache references automatically.
 
+### Bushfires NT email alerts
+
+The `/respond` page is managed in Squiz Matrix and is not tracked in this
+repository. Its Campaign Monitor signup form requires
+`https://js.createsend1.com/javascript/copypastesubscribeformlogic.js`; without
+that script, submitting the form can lead to Campaign Monitor's JavaScript
+requirement error. Add the script to the CMS page alongside the form, then
+publish and verify the ordinary page. See [Campaign Monitor's embedded
+signup-form guidance](https://help.campaignmonitor.com/s/article/html-signup-forms).
+
 ## Favicons
 
 The icon-only source is `assets/secure-nt-favicon.svg`. Its shield artwork keeps the white and orange mark over a Charcoal (`#343741`) fill. The PNG exports in `public/` are the 180×180 Apple touch icon and 32×32 and 16×16 favicons. `npm run build` copies them to `dist/`; publish those files at the site root with the updated page HTML so the root-relative icon links resolve.
