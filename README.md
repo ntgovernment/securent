@@ -41,7 +41,7 @@ securent/
 │   │   ├── page-window.mjs            # Compact page-number window with ellipses
 │   │   └── page-window.test.mjs       # Pagination window regression tests
 │   ├── hero-banners/
-│   │   ├── homepage-hero.css         # Purple-light homepage hero and responsive conditions alignment
+│   │   ├── homepage-hero.css         # Monsoon navy homepage hero and responsive conditions alignment
 │   │   ├── landing-hero.css          # Alt landing variant, breadcrumbs and optional CTA
 │   │   └── hero-banners.js           # Landing-only breadcrumb relocation and optional CTA enhancement
 │   ├── local-conditions/
@@ -71,7 +71,7 @@ securent/
 │   │       ├── buttons.css           # Button overrides: primary bg Charcoal (#343741), secondary outline Charcoal + white bg, hover Territory orange (#D6410A)
 │   │       ├── content-page.css      # Content page body alignment when no in-page navigation is present
 │   │       ├── mainmenu-dropdown.css # Content-width desktop mega-menu and mobile drawer styles
-│   │       ├── header-footer.css     # Header/footer brand colour overrides; background: Charcoal (#343741)
+│   │       ├── header-footer.css     # Header/footer brand overrides using Monsoon navy and Territory orange
 │   │       ├── homepage-featured-content.css # CMS homepage feature cards: responsive image/text layout and CTA styling
 │   │       ├── homepage-latest-events.css # Homepage warning banners (20px headings, 24px icon boxes) and event cards
 │   │       ├── active-recovery.css   # Homepage Active recovery programs card layout and interaction styling
@@ -361,9 +361,9 @@ Overrides of the upstream `ntgbase.min.css` theme are isolated in `src/css/compo
 | `buttons.css`           | `.btn.ntg-btn--secondary:hover`                                                           | Background and border colour changed to Territory orange `#D6410A` (was `#2d2d8a`)                                                                                                                                                                                                                                                   |
 | `buttons.css`           | `.homepage-news .btn.ntg-btn`                                                             | Border radius removed from the "View all" button                                                                                                                                                                                                                                                                                     |
 | `buttons.css`           | `.cta-button.btn.ntg-btn--primary`                                                        | Border radius removed from primary CTA links                                                                                                                                                                                                                                                                                           |
-| `header-footer.css`     | Two-row header, footer, and mobile search banner                                          | `.header-top` uses charcoal `#343741`; `.header-navigation` uses `#424550`; the desktop search is expanded in the top row; the mobile search banner uses charcoal `#343741`                                                                                                                                                             |
-| `header-footer.css`     | Mobile search banner background                                                           | `.mobile-banner` overridden from navy `#1f1f5f` to Charcoal `#343741`                                                                                                                                                                                                                                                                |
-| `mainmenu-dropdown.css` | Main navigation styles                                                                    | Desktop navigation has content-width mega-menu panels with grouped links; mobile navigation uses a charcoal nested drawer. |
+| `header-footer.css`     | Two-row header, footer, and mobile search banner                                          | Header and footer use Monsoon navy `#003251`; navigation and footer text use `#12405D`; active navigation and search controls use Territory orange `#D6410A`. The footer selectors outrank the later captured stylesheet's legacy charcoal rule. |
+| `mainmenu-dropdown.css` | Main navigation styles                                                                    | Desktop navigation and dropdown surfaces use navy `#12405D`; active and hover states use Territory orange `#D6410A`; the mobile drawer uses the same navy surface. |
+| `warning-accordion.css` | `.warning-accordion__body a:hover`                                                        | Preserves the link's bottom padding while adding an underline, preventing hover from shifting the accordion content. |
 | `statistics.css`        | Statistics section                                                                        | Sand `#D9DED4` background; default text token and black icons                                                                                                                                                                                                                                                                       |
 | `main.css`              | Display card icons                                                                        | Icons use `fa-solid` (FA 6); default colour `#f4551a` (orange), hover colour `#c84c01` (darker orange)                                                                                                                                                                                                                               |
 | `main.css`              | Display card titles                                                                       | Title colour `#343741` (Charcoal); orange long-arrow-right (`→`) appended via `::after`, slides 4 px right on hover; title uses flexbox row layout                                                                                                                                                                                   |
@@ -456,13 +456,13 @@ The card content and destinations remain CMS-managed; the gitignored `SecureNT.h
 
 ### Footer
 
-The shared mobile footer styles live in `src/css/components/header-footer.css`. Below 768px, footer columns have a `1.5rem` row gap, and social links remain on one horizontal row with wrapping disabled. The empty `<h3>` before “Follow SecureNT” is retained but hidden with `style="display:none"`; remove `pt-5` from its `.mt-auto` wrapper to reduce the extra space. Keep footer labels, links, and social destinations CMS-managed. After changing the footer styles, run `npm run build`, publish `dist/theme.css`, and refresh the Matrix stylesheet cache reference. Apply the heading and wrapper markup updates separately in the production CMS.
+The shared footer styles live in `src/css/components/header-footer.css`. The footer uses Monsoon navy `#003251`, with `#12405D` behind its text row. Its selectors are deliberately more specific than the later captured `alt.css` charcoal rule. Below 768px, footer columns have a `1.5rem` row gap, and social links remain on one horizontal row with wrapping disabled. The empty `<h3>` before “Follow SecureNT” is retained but hidden with `style="display:none"`; remove `pt-5` from its `.mt-auto` wrapper to reduce the extra space. Keep footer labels, links, and social destinations CMS-managed. After changing the footer styles, run `npm run build`, publish `dist/theme.css`, and refresh the Matrix stylesheet cache reference. Apply the heading and wrapper markup updates separately in the production CMS.
 
 ### Hero banners
 
 Hero CSS and JavaScript are isolated in `src/hero-banners/`. Both stylesheets are imported by `src/css/main.css`; `hero-banners.js` is imported by `src/js/main.js`. They ship in the existing `dist/theme.css` and `dist/theme.js` bundles, with no separate CMS asset includes.
 
-`homepage-hero.css` targets `.hero-banner.intro-section.bg-ntg-background-purple-light`; retain the CMS `bg-ntg-background-home` class. It preserves the charcoal background, white 42px desktop heading, 14px copy and orange Incident map action. The `#current-conditions` panel is scoped to `main.ntg-body--homepage`: 49px desktop overlap and 34px tablet overlap; below 576px it has no overlap and fills the available width. Mobile hero text uses a 32px heading and 18px copy. The gitignored homepage capture now uses the supplied purple-light classes; any corresponding CMS template correction must be made separately.
+`homepage-hero.css` targets `.hero-banner.intro-section.bg-ntg-background-purple-light`; retain the CMS `bg-ntg-background-home` class. The hero uses Monsoon navy `#003251`, white 42px desktop heading, 14px copy and an orange Incident map action. The `#current-conditions` panel is scoped to `main.ntg-body--homepage`: 49px desktop overlap and 34px tablet overlap; below 576px it has no overlap and fills the available width. Mobile hero text uses a 32px heading and 18px copy. The gitignored homepage capture now uses the supplied purple-light classes; any corresponding CMS template correction must be made separately.
 
 `landing-hero.css` targets `.hero-banner.intro-section.bg-ntg-background-alt`. It uses a pale-grey `#E7E7EA` background, dark text, 40px/44px desktop heading, 18px/20px copy and a 604px maximum content column. Below 576px the heading is 32px/36px. Content stays in document flow, wraps and grows without a fixed hero height. Breadcrumbs and an optional orange CTA receive their own scoped styles and keyboard focus outlines.
 
@@ -574,6 +574,8 @@ Source: _Accessible Colours — Brand Guidelines, May 2025_
 | --------- | --------- | -------------- | --------------- |
 | Territory | `#F4551A` | `#D6410A`      | White text      |
 | Charcoal  | `#343741` | `#343741`      | White text      |
+
+For the shared site chrome, use Monsoon `#003251` for the header, footer, and homepage hero; use `#12405D` for the navigation and footer text row. Active navigation and search controls use accessible Territory orange `#D6410A`. Charcoal remains the default text color and is retained for components that explicitly use it.
 
 ### Secondary
 

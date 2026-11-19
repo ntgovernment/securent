@@ -203,9 +203,9 @@
 /* ---- Active / current page highlight ---- */
 .ntg-main-nav__links > li.active > a,
 .ntg-main-nav__links > li.current > a {
-  background-color: #fcccbb;
-  color: var(--clr-text-default);
-  border-bottom: 3px solid #f4551a;
+  background-color: #d6410a;
+  color: #ffffff;
+  border-bottom: 3px solid #d6410a;
 }
 
 @media (min-width: 768px) {
@@ -266,13 +266,13 @@
 
   nav.nav-masthead .ntg-main-nav__links > li > a:hover,
   nav.nav-masthead .ntg-main-nav__links > li > a:focus {
-    background-color: #343741 !important;
+    background-color: #d6410a !important;
     color: #ffffff !important;
     border-bottom: 0 !important;
   }
 
   nav.nav-masthead .ntg-main-nav__links > li > ul {
-    background-color: #343741;
+    background-color: #12405d;
     border-color: rgba(255, 255, 255, 0.2);
     border-left-width: 1px;
   }
@@ -296,7 +296,7 @@
   nav.nav-masthead .ntg-main-nav__links > li > ul > li.current > a,
   nav.nav-masthead .ntg-main-nav__links > li > ul > li > ul > li.active > a,
   nav.nav-masthead .ntg-main-nav__links > li > ul > li > ul > li.current > a {
-    background-color: #444855 !important;
+    background-color: #d6410a !important;
     color: #ffffff !important;
   }
 
@@ -324,7 +324,7 @@
   nav.nav-masthead .ntg-main-nav__links > li.active > a,
   nav.nav-masthead .ntg-main-nav__links > li.current > a,
   nav.nav-masthead .ntg-main-nav__links > li.open > a {
-    background-color: #343741 !important;
+    background-color: #d6410a !important;
     color: #ffffff !important;
     border-bottom: 0 !important;
   }
@@ -375,7 +375,7 @@
 
 .cms-main-nav .mobile-submenu-toggle:hover,
 .cms-main-nav .mobile-submenu-toggle[aria-expanded="true"] {
-  background: #444855;
+  background: #d6410a;
 }
 
 .cms-main-nav .desktop-main-nav__description:empty {
@@ -443,7 +443,7 @@
   .desktop-main-nav > li > button:hover,
   .desktop-main-nav > li > button:focus-visible,
   .desktop-main-nav > li > button[aria-expanded="true"] {
-    background: #343741;
+    background: #d6410a;
     color: #ffffff !important;
   }
 
@@ -505,7 +505,7 @@
   }
 
   .desktop-main-nav__panel a:focus-visible {
-    outline: 2px solid #343741;
+    outline: 2px solid #d6410a;
     outline-offset: 2px;
   }
 
@@ -662,7 +662,7 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-emergency-
     overflow-x: hidden;
     overflow-y: auto;
     padding: 8px 0 24px;
-    background: #343741;
+    background: #12405d;
     box-shadow: -8px 4px 20px rgba(15, 15, 47, 0.2);
     transform: translateX(102%);
     visibility: hidden;
@@ -811,7 +811,7 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-emergency-
   .mobile-submenu-toggle:hover,
   .mobile-submenu-toggle:focus-visible,
   .mobile-submenu-toggle[aria-expanded="true"] {
-    background: #444855 !important;
+    background: #d6410a !important;
     color: #ffffff !important;
   }
 
@@ -829,7 +829,7 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-emergency-
     opacity: 1;
     visibility: visible;
     transform: none;
-    background: #343741;
+    background: #12405d;
     box-shadow: none;
   }
 
@@ -866,7 +866,7 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-emergency-
     display: block;
     width: 100%;
     border: 0;
-    background: rgba(59, 64, 73, 0.8);
+    background: rgba(0, 50, 81, 0.8);
   }
 
   .mobile-menu-backdrop[hidden] {
@@ -972,7 +972,7 @@ nav.nav-masthead .cms-main-nav a {
 
   .cms-main-nav > li > .desktop-main-nav__toggle:hover,
   .cms-main-nav > li > .desktop-main-nav__toggle[aria-expanded="true"] {
-    background: #343741;
+    background: #d6410a;
   }
 
   .cms-main-nav > li > .desktop-main-nav__toggle:focus-visible {
@@ -1062,7 +1062,7 @@ nav.nav-masthead .cms-main-nav a {
   }
 
   nav.nav-masthead .cms-main-nav .desktop-main-nav__panel a:focus-visible {
-    outline-color: #343741;
+    outline-color: #d6410a;
   }
 }
 
@@ -1204,7 +1204,7 @@ nav.nav-masthead:not(.navigation-enhanced) .cms-main-nav .desktop-main-nav__pane
     margin: 0;
     padding: 0 0 0 1rem;
     border: 0;
-    background: #343741;
+    background: #12405d;
     box-shadow: none;
     opacity: 1;
     visibility: visible;

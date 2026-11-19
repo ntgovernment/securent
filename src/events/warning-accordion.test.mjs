@@ -53,6 +53,23 @@ test("existing outer warning-level classes still set the accent", async () => {
   });
 });
 
+test("hovering a warning link preserves its padding against site-wide hover styles", async () => {
+  const window = new Window();
+  try {
+    window.document.head.innerHTML = `<style>${css.replace('@import "../tokens.css";', "")}</style>`;
+    const rules = Array.from(window.document.styleSheets[0].cssRules);
+    const linkRule = rules.find((rule) => rule.selectorText === ".warning-accordion__body a");
+    const hoverRule = rules.find((rule) => rule.selectorText === ".warning-accordion__body a:hover");
+    assert.ok(linkRule);
+    assert.ok(hoverRule);
+    assert.notEqual(linkRule.style.paddingBottom, "");
+    assert.equal(hoverRule.style.paddingBottom, linkRule.style.paddingBottom);
+    assert.equal(hoverRule.style.textDecoration, "underline");
+  } finally {
+    await window.happyDOM.close();
+  }
+});
+
 test("event-page header accent matches Advice for decreasing threat", async () => {
   const window = new Window();
   try {
