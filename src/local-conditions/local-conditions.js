@@ -13,8 +13,8 @@
   var isLocal = LOCAL_HOSTS.includes(window.location.hostname);
   var observationsUrl = isLocal
     ? "/IDD60920.xml"
-    : "./?a=1657184";
-  var airQualityUrl = isLocal ? "/api/air-quality" : "./?a=1657186";
+    : "/_design/integrations/temperatures";
+  var airQualityUrl = isLocal ? "/api/air-quality" : "/_design/integrations/air-quality-json";
   var fireAreaLocations = {
     "NT_FW001": [
       "Darwin Airport", "Batchelor", "Charles Point", "Kangaroo Flats", "Channel Point",

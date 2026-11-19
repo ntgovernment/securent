@@ -364,14 +364,14 @@ async function widget({ url = "http://localhost:5173/", saved, feed = fixture, o
   window.fetch = (input, options) => {
     const request = String(input);
     requests.push(request);
-    if (request.includes("IDD60920.xml") || request.includes("1657184")) {
+    if (request === "/IDD60920.xml" || request === "/_design/integrations/temperatures") {
       return observations ? observations(options) : Promise.resolve(response(feed));
     }
     if (request === FIRE_DANGER_URL) return Promise.resolve(response(fireDangerFixture));
     if (request === "/api/air-quality") {
       return catalog ? catalog(options) : Promise.resolve(response({ stations: parseAirQualityStations(epaFixture) }));
     }
-    if (request === "./?a=1657186") {
+    if (request === "/_design/integrations/air-quality-json") {
       const first = requests.filter((item) => item === request).length === 1;
       if (first) return catalog ? catalog(options) : Promise.resolve(response(epaFixture));
       return air ? air(request) : Promise.resolve(response(epaFixture));
@@ -529,15 +529,15 @@ test("localhost fetches the matching EPA station and displays an index, not PM2.
   assert.ok(airCard().querySelector(".fa-circle-exclamation"));
 });
 
-test("production requests the JSON Matrix asset and selects the station index", async () => {
+test("production requests the JSON integration and selects the station index", async () => {
   for (const value of [0, 64.5]) {
     const context = await widget({ url: "https://example.com/conditions",
       air: () => Promise.resolve(response({ d: [
         { serialCode: 1, IndexValue: 999 }, { serialCode: 2, IndexValue: value },
       ] })),
     });
-    assert.ok(context.requests.includes("./?a=1657186"));
-    assert.equal(context.requests.some((url) => url.includes("1657178") || url.includes("1657186?id")), false);
+    assert.ok(context.requests.includes("/_design/integrations/air-quality-json"));
+    assert.equal(context.requests.some((url) => url.includes("?a=") || url.includes("air-quality-json?")), false);
     assert.match(cardFor(context, "Air quality").textContent,
       new RegExp(Number(value) + " AQI"));
   }
@@ -844,7 +844,7 @@ test("catalog failures keep the original BOM locations usable", async () => {
   }
   const production = await widget({ url: "https://example.com/conditions" });
   assert.equal(production.select.options.length, 9);
-  assert.ok(production.requests.includes("./?a=1657186"));
+  assert.ok(production.requests.includes("/_design/integrations/air-quality-json"));
   assert.equal(production.requests.includes("/api/air-quality"), false);
 });
 
@@ -855,12 +855,25 @@ test("production adds and restores EPA-only locations from the cached JSON asset
   selectLocation(context, "epa-1");
   await settle();
   assert.match(cardFor(context, "Air quality").textContent, /0 AQI/);
-  assert.equal(context.requests.filter((url) => url === "./?a=1657186").length, 3);
+  assert.equal(context.requests.filter((url) => url === "/_design/integrations/air-quality-json").length, 3);
 });
 
-test("production uses the Matrix asset and restores saved or legacy selections", async () => {
+test("production loads raw integration catalogs from homepage and nested pages", async () => {
+  for (const url of ["https://securent.nt.gov.au/", "https://securent.nt.gov.au/respond/conditions"]) {
+    const context = await widget({ url });
+    assert.equal(context.requests[0], "/_design/integrations/temperatures");
+    assert.ok(context.requests.includes("/_design/integrations/air-quality-json"));
+    assert.equal(context.requests.some((request) => request.includes("?a=")), false);
+    assert.equal(context.select.disabled, false);
+    assert.equal(context.select.value, "014015");
+    assert.match(cardFor(context, "Temperature").textContent, /36 °C/);
+    assert.match(cardFor(context, "Air quality").textContent, /51 AQI/);
+  }
+});
+
+test("production uses the XML integration and restores saved or legacy selections", async () => {
   const context = await widget({ url: "https://example.com/conditions", saved: "alice-springs" });
-  assert.equal(context.requests[0], "./?a=1657184");
+  assert.equal(context.requests[0], "/_design/integrations/temperatures");
   assert.equal(context.select.value, "015590");
   assert.equal(context.window.localStorage.getItem("securent.localConditions.location"), "015590");
   assert.ok(context.requests.includes(FIRE_DANGER_URL));
@@ -1093,7 +1106,7 @@ test("BOM failures still populate EPA locations and display their readings", asy
         air: () => Promise.resolve(response(local
           ? { ...parseAirQualityStations(epaFixture)[1], station: "Winnellie" } : epaFixture)),
       });
-      assert.ok(context.requests.includes(local ? "/api/air-quality" : "./?a=1657186"));
+      assert.ok(context.requests.includes(local ? "/api/air-quality" : "/_design/integrations/air-quality-json"));
       assert.equal(context.select.disabled, false);
       assert.equal(context.select.options.length, 4);
       assert.equal(context.select.value, "epa-2");
