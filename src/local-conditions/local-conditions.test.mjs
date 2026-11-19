@@ -745,7 +745,7 @@ test("the checked-in BOM snapshot populates every station", async () => {
     Array.from(context.select.options, (option) => option.value).filter((key) => !key.startsWith("epa-")).sort(),
     stations.map((station) => station.getAttribute("bom-id")).sort(),
   );
-  assert.equal(context.select.querySelector('[value="014932"]').textContent, "Katherine (Tindall)");
+  assert.equal(context.select.querySelector('[value="014932"]').textContent, "Katherine (Tindal)");
   assert.equal(context.select.querySelector('[value="014988"]').textContent, "Palmerston (Knuckey Lagoon)");
   assert.equal(context.select.querySelector('[value="epa-1"]'), null);
   assert.equal(context.select.querySelector('[value="epa-4"]'), null);
@@ -789,7 +789,7 @@ test("all mapped stations get fire ratings, including renamed EPA locations", as
 test("saved EPA selections restore to their renamed BOM locations", async () => {
   for (const [saved, key, name] of [
     ["epa-1", "014988", "Palmerston (Knuckey Lagoon)"],
-    ["epa-4", "014932", "Katherine (Tindall)"],
+    ["epa-4", "014932", "Katherine (Tindal)"],
   ]) {
     const context = await widget({ feed: xml, saved });
     assert.equal(context.select.value, key);
@@ -812,7 +812,7 @@ test("localhost adds EPA-only locations and restores their selections", async ()
       1: "Palmerston (Knuckey Lagoon)",
       2: "Darwin Airport",
       3: "Stokes Hill",
-      4: "Katherine (Tindall)",
+      4: "Katherine (Tindal)",
     }[station.serialCode];
     assert.equal(option.textContent, expectedName);
     if (!isDarwinAirport) assert.equal(option.dataset.coordinates, "");

@@ -34,6 +34,33 @@ initializeEventNavigation(window);
   const headerTools = header && header.querySelector(".header-tools");
   if (!nav || !header || !menuList || !headerTools || !menuList.classList.contains("cms-main-nav")) return;
 
+  const emergencyContacts = headerTools.querySelector('a[href*="/emergency-contacts"]');
+  const emergencyContactsHref = emergencyContacts
+    ? emergencyContacts.getAttribute("href")
+    : "/emergency-contacts";
+  const incidentMapHref = emergencyContacts
+    ? new URL("./homepage/dataset/incident-map", emergencyContacts.href).href
+    : "/homepage/dataset/incident-map";
+  [
+    { label: "Emergency contacts", href: emergencyContactsHref },
+    { label: "Incident map", href: incidentMapHref },
+  ].forEach(function (supplementalLink) {
+    const existing = Array.from(menuList.children).some(function (item) {
+      const link = item.querySelector(":scope > a");
+      return link
+        && link.textContent.trim().toLowerCase() === supplementalLink.label.toLowerCase();
+    });
+    if (existing) return;
+
+    const item = document.createElement("li");
+    const link = document.createElement("a");
+    item.className = "mobile-only-link";
+    link.href = supplementalLink.href;
+    link.textContent = supplementalLink.label;
+    item.append(link);
+    menuList.append(item);
+  });
+
   let searchButton = headerTools.querySelector(".mobile-search-toggle");
   if (!searchButton) {
     searchButton = document.createElement("button");

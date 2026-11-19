@@ -53,15 +53,20 @@ async function withMenu(width, check) {
   }
 }
 
-test("keeps CMS anchor identity and literal destinations instead of rebuilding menu content", async () => {
+test("keeps CMS anchor identity and literal destinations while appending missing mobile links", async () => {
   await withMenu(390, async (window, initialize) => {
     const anchors = [...window.document.querySelectorAll("nav a")];
     const destinations = anchors.map((anchor) => anchor.getAttribute("href"));
     initialize();
     const initialized = [...window.document.querySelectorAll("nav a")];
-    assert.ok(initialized.length === anchors.length && initialized.every((anchor, index) => anchor === anchors[index]));
+    assert.equal(initialized.length, anchors.length + 2);
+    assert.ok(initialized.slice(0, anchors.length).every((anchor, index) => anchor === anchors[index]));
     assert.deepEqual(anchors.map((anchor) => anchor.getAttribute("href")), destinations);
     assert.ok(anchors.every((anchor) => anchor.isConnected));
+    assert.deepEqual(
+      initialized.slice(-2).map((anchor) => anchor.textContent.trim()),
+      ["Emergency contacts", "Incident map"],
+    );
     assert.equal(window.document.querySelectorAll("nav .mobile-menu-toggle").length, 0);
   });
 });
@@ -328,6 +333,30 @@ test("mobile-only links follow the listing and retain their destinations", async
   } finally {
     await window.happyDOM.close();
   }
+});
+
+test("initialization restores missing mobile-only links without duplicating existing ones", async () => {
+  await withMenu(390, async (window, initialize) => {
+    const document = window.document;
+    const headerTools = document.querySelector(".header-tools");
+    const emergencyContacts = document.createElement("a");
+    emergencyContacts.href = "https://preview.example/securent/emergency-contacts";
+    emergencyContacts.textContent = "Emergency contacts";
+    headerTools.append(emergencyContacts);
+    const menu = document.querySelector(".cms-main-nav");
+    const existing = document.createElement("li");
+    existing.className = "mobile-only-link";
+    existing.innerHTML = '<a href="/emergency-contacts">Emergency contacts</a>';
+    menu.append(existing);
+    document.querySelector("nav").dataset.navigationReady = "true";
+
+    initialize();
+    initialize();
+
+    const links = [...menu.querySelectorAll(":scope > li.mobile-only-link > a")];
+    assert.deepEqual(links.map((link) => link.textContent.trim()), ["Emergency contacts", "Incident map"]);
+    assert.equal(links[1].href, "https://preview.example/securent/homepage/dataset/incident-map");
+  });
 });
 
 test("Current warnings keeps the orange background on mobile in all interaction states", async () => {

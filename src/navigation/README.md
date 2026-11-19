@@ -2,7 +2,7 @@
 
 Publish these Bodycopy changes with the updated `dist/theme.js` and `dist/theme.css`.
 The old script replaces CMS links with hard-coded destinations. The new script
-never creates or changes menu links; `%asset_short_name_linked%` stays authoritative.
+does not replace or change CMS links; `%asset_short_name_linked%` stays authoritative.
 Keep the existing listing roots, ordering, asset types, permissions and link settings.
 Use raw HTML divisions, not visual-editor paragraphs, around the Nested Content divisions.
 
@@ -15,7 +15,9 @@ If the earlier three-level templates are already installed:
 2. Update Main's Page Contents as shown below to append the two mobile-only
   links. Keep its closing HTML division and Level 2 Nested Content division
   unchanged. Level 2 and Level 3 markup and both dynamic-root calls are
-  unchanged. Do not edit the CMS-generated listing destinations.
+  unchanged. Do not edit the CMS-generated listing destinations. The theme
+  also restores missing supplemental links at runtime for older migrated
+  captures, without duplicating CMS-rendered links.
 3. Publish the revised Main Bodycopy with the rebuilt `dist/theme.js` and
   `dist/theme.css`, then refresh both CMS asset cache references. Updating JS
   alone cannot provide the unified desktop control without its new markup.
@@ -189,8 +191,9 @@ No additional nested listing is needed.
 - There is one shared tree, not duplicate desktop/mobile listing assets. Descriptions
   are HTML-escaped text in the overview, not JSON embedded in HTML attributes.
 - The two supplemental links are present in the shared markup but hidden at
-  desktop widths. JavaScript does not copy or rewrite them. Current warnings
-  retains its orange background in the mobile drawer.
+  desktop widths. If older CMS markup omits either link, JavaScript appends only
+  the missing item and leaves existing links untouched. Current warnings retains
+  its orange background in the mobile drawer.
 
 ## Publish and Verify
 

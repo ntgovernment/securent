@@ -54,7 +54,7 @@
     });
   });
   var locationAliases = {
-    Tindal: "Katherine (Tindall)",
+    Tindal: "Katherine (Tindal)",
     "Knuckey Lagoon": "Palmerston (Knuckey Lagoon)",
   };
   var epaStations = {
@@ -65,13 +65,13 @@
   };
   var epaLocationNames = {
     1: "Palmerston (Knuckey Lagoon)",
-    4: "Katherine (Tindall)",
+    4: "Katherine (Tindal)",
   };
   var legacyLocationNames = {
     darwin: "Darwin Airport",
     palmerston: "Palmerston (Knuckey Lagoon)",
     "alice-springs": "Alice Springs Airport",
-    katherine: "Katherine (Tindall)",
+    katherine: "Katherine (Tindal)",
     "tennant-creek": "Tennant Creek",
     nhulunbuy: "Nhulunbuy",
     yulara: "Yulara",
