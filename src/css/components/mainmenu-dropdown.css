@@ -1233,13 +1233,13 @@ nav.nav-masthead:not(.navigation-enhanced) .cms-main-nav .desktop-main-nav__pane
 }
 
 header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links > li > a[href$="/current-warnings"] {
-  background-color: #003251 !important;
+  background-color: #d6410a !important;
   color: #ffffff !important;
 }
 
 header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links > li > a[href$="/current-warnings"]:hover,
 header.ntg-header .header-navigation nav.nav-masthead .ntg-main-nav__links > li > a[href$="/current-warnings"]:focus-visible {
-  background-color: #003251 !important;
+  background-color: #d6410a !important;
   color: #ffffff !important;
 }
 
