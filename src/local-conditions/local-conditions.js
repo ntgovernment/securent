@@ -228,10 +228,11 @@
     var c = card("Air quality", "fa-fan", "lc-card--air-quality");
     if (!data || !Number.isFinite(data.index)) return null;
 
-    var level = AQI_LEVELS.find(function (item) {
-      return data.index >= item.min && data.index <= item.max;
+    var levelIndex = AQI_LEVELS.findIndex(function (item) {
+      return data.index >= 0 && data.index <= item.max;
     });
-    if (!level) return null;
+    if (levelIndex < 0) return null;
+    var level = AQI_LEVELS[levelIndex];
     var row = el("div", "lc-card__row lc-air-row");
     var value = el("span", "lc-card__value", String(data.index));
     value.appendChild(el("span", "lc-card__unit", " AQI"));
@@ -245,7 +246,10 @@
     row.appendChild(status);
     var chartLabel = "NT EPA air quality index: current index " + data.index + ", " + level.label + ". "
       + AQI_LEVELS.map(function (item) { return item.label + " " + item.range; }).join("; ");
-    var markerPosition = Math.max(0, Math.min(data.index, 700)) / 700 * 100;
+    var lowerBound = levelIndex === 0 ? 0 : AQI_LEVELS[levelIndex - 1].max;
+    var upperBound = Math.min(level.max, 700);
+    var bandProgress = (Math.min(data.index, upperBound) - lowerBound) / (upperBound - lowerBound);
+    var markerPosition = (levelIndex + bandProgress) / AQI_LEVELS.length * 100;
     c.appendChild(ratingChart("lc-air-chart", chartLabel, AQI_LEVELS, null, markerPosition));
     c.appendChild(row);
     return c;

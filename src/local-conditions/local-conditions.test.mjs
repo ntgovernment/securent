@@ -508,7 +508,7 @@ test("temperature remains available when only one bound is present", async () =>
 test("localhost fetches the matching EPA station and displays an index, not PM2.5", async () => {
   const context = await widget({
     feed: xml,
-    air: (url) => Promise.resolve(response({ index: url.endsWith("id=2") ? 51 : 64 })),
+    air: (url) => Promise.resolve(response({ index: url.endsWith("id=2") ? 51 : 143 })),
     worker: () => Promise.resolve(response({ fireDanger: { label: "Moderate", level: 1 },
       airQuality: { category: "Fair", pm25: 999 } })),
   });
@@ -516,11 +516,14 @@ test("localhost fetches the matching EPA station and displays an index, not PM2.
   const airCard = () => cardFor(context, "Air quality");
   assert.match(airCard().textContent, /51 AQI/);
   assert.equal(airCard().querySelector(".lc-air").textContent, "Fair");
+  assert.ok(Math.abs(parseFloat(airCard().querySelector(".lc-rating-chart__marker").style.left) - 20.4) < 0.000001);
   assert.doesNotMatch(airCard().textContent, /PM2\.5|999/);
   selectLocation(context, "014072");
   await settle();
   assert.ok(context.requests.includes("/api/air-quality?id=3"));
-  assert.match(airCard().textContent, /64 AQI/);
+  assert.match(airCard().textContent, /143 AQI/);
+  assert.equal(airCard().querySelector(".lc-air").textContent, "Poor");
+  assert.ok(Math.abs(parseFloat(airCard().querySelector(".lc-rating-chart__marker").style.left) - 57.2) < 0.000001);
   const count = context.requests.length;
   selectLocation(context, "014253");
   await settle();
@@ -543,7 +546,7 @@ test("production requests the JSON integration and selects the station index", a
   }
 });
 
-test("AQI card uses five category bands and positions the marker on a capped 0â€“700 scale", async () => {
+test("AQI card positions the marker proportionally within five category bands capped at 700", async () => {
   const levels = [
     { range: "0â€“50", label: "Good", colour: "#61b92f" },
     { range: "51â€“100", label: "Fair", colour: "#f5d639" },
@@ -552,22 +555,31 @@ test("AQI card uses five category bands and positions the marker on a capped 0â€
     { range: "301+", label: "Extremely poor", colour: "#590019" },
   ];
   const readings = [
-    { index: 0, label: "Good" },
-    { index: 35, label: "Good" },
-    { index: 50, label: "Good" },
-    { index: 51, label: "Fair" },
-    { index: 87, label: "Fair" },
-    { index: 100, label: "Fair" },
-    { index: 101, label: "Poor" },
-    { index: 143, label: "Poor" },
-    { index: 150, label: "Poor" },
-    { index: 151, label: "Very poor" },
-    { index: 300, label: "Very poor" },
-    { index: 301, label: "Extremely poor" },
-    { index: 472, label: "Extremely poor" },
-    { index: 681, label: "Extremely poor" },
-    { index: 700, label: "Extremely poor" },
-    { index: 701, label: "Extremely poor" },
+    { index: 0, label: "Good", position: 0 },
+    { index: 25, label: "Good", position: 10 },
+    { index: 35, label: "Good", position: 14 },
+    { index: 50, label: "Good", position: 20 },
+    { index: 50.5, label: "Fair", position: 20.2 },
+    { index: 51, label: "Fair", position: 20.4 },
+    { index: 75, label: "Fair", position: 30 },
+    { index: 87, label: "Fair", position: 34.8 },
+    { index: 100, label: "Fair", position: 40 },
+    { index: 100.5, label: "Poor", position: 40.2 },
+    { index: 101, label: "Poor", position: 40.4 },
+    { index: 125, label: "Poor", position: 50 },
+    { index: 143, label: "Poor", position: 57.2 },
+    { index: 150, label: "Poor", position: 60 },
+    { index: 150.5, label: "Very poor", position: 60.0666666667 },
+    { index: 151, label: "Very poor", position: 60.1333333333 },
+    { index: 225, label: "Very poor", position: 70 },
+    { index: 300, label: "Very poor", position: 80 },
+    { index: 300.5, label: "Extremely poor", position: 80.025 },
+    { index: 301, label: "Extremely poor", position: 80.05 },
+    { index: 472, label: "Extremely poor", position: 88.6 },
+    { index: 500, label: "Extremely poor", position: 90 },
+    { index: 681, label: "Extremely poor", position: 99.05 },
+    { index: 700, label: "Extremely poor", position: 100 },
+    { index: 701, label: "Extremely poor", position: 100 },
   ];
   for (const selected of readings) {
     const context = await widget({
@@ -582,8 +594,9 @@ test("AQI card uses five category bands and positions the marker on a capped 0â€
       levels.find((level) => level.label === selected.label).colour);
     assert.equal(segments.length, 5);
     assert.deepEqual(segments.map((segment) => segment.style.backgroundColor), levels.map((level) => level.colour));
-    assert.equal(chart.querySelector(".lc-rating-chart__marker").style.left,
-      Math.max(0, Math.min(selected.index, 700)) / 700 * 100 + "%");
+    const position = parseFloat(chart.querySelector(".lc-rating-chart__marker").style.left);
+    assert.ok(Math.abs(position - selected.position) < 0.000001,
+      `AQI ${selected.index}: expected ${selected.position}%, got ${position}%`);
     assert.equal(chart.getAttribute("role"), "img");
     assert.match(chart.getAttribute("aria-label"), new RegExp(selected.label));
     levels.forEach((level) => assert.match(chart.getAttribute("aria-label"), new RegExp(level.range)));
