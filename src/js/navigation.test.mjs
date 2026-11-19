@@ -11,7 +11,7 @@ function fixture(window) {
     <header class="ntg-header"><div class="navbar">
       <div class="header-tools"></div><div class="header-navigation">
         <nav class="nav-masthead"><ul class="ntg-main-nav__links cms-main-nav">
-          <li><a href="https://cmsexternal.nt.gov.au/securent/current-warnings">Warnings</a></li>
+          <li><a href="https://example.test/current-warnings">Warnings</a></li>
           <li><a href="./prepare?source=nav&amp;mode=all#start">Prepare</a>
             <button type="button" class="desktop-main-nav__toggle" hidden><span>Prepare</span><span class="fa-regular fa-chevron-right" aria-hidden="true"></span></button>
             <button type="button" class="mobile-submenu-toggle" hidden>Expand Prepare submenu</button>
@@ -293,6 +293,61 @@ test("mobile parent links and disclosures fill the same row for short and wrappe
     assert.equal(link.style.minHeight, "44px");
     assert.equal(toggle.style.minHeight, "44px");
     assert.equal(toggle.style.height, "auto");
+  } finally {
+    await window.happyDOM.close();
+  }
+});
+
+test("mobile-only links follow the listing and retain their destinations", async () => {
+  const preview = await readFile(new URL("../../alerts-and-warnings.html", import.meta.url), "utf8");
+  const guide = await readFile(new URL("../navigation/README.md", import.meta.url), "utf8");
+  const markup = guide.match(/```html\r?\n([\s\S]*?)```/)[1];
+  const window = new Window();
+  try {
+    for (const html of [preview, markup.replace("%asset_listing%", '<li><a href="/recover">Recover</a></li>')]) {
+      window.document.body.innerHTML = html;
+      const links = [...window.document.querySelectorAll(".cms-main-nav > li.mobile-only-link > a")];
+      assert.deepEqual(links.map((link) => link.textContent.trim()), ["Emergency contacts", "Incident map"]);
+      assert.deepEqual(links.map((link) => new URL(link.href).pathname.replace(/^\/securent/, "")), [
+        "/emergency-contacts",
+        "/homepage/dataset/incident-map",
+      ]);
+      const items = [...window.document.querySelectorAll(".cms-main-nav > li")];
+      assert.deepEqual(items.slice(-2), links.map((link) => link.parentElement));
+    }
+
+    const sheet = new window.CSSStyleSheet();
+    sheet.replaceSync(await readFile(new URL("../css/components/mainmenu-dropdown.css", import.meta.url), "utf8"));
+    const rules = [...sheet.cssRules];
+    const desktop = rules.find((rule) => rule.selectorText?.includes("li.mobile-only-link"));
+    assert.equal(desktop.style.getPropertyValue("display"), "none");
+    const mobile = rules.find((rule) => rule.conditionText === "(max-width: 767.98px)"
+      && [...rule.cssRules].some((nested) => nested.selectorText?.includes("li.mobile-only-link")));
+    const visible = [...mobile.cssRules].find((rule) => rule.selectorText?.includes("li.mobile-only-link"));
+    assert.equal(visible.style.getPropertyValue("display"), "block");
+  } finally {
+    await window.happyDOM.close();
+  }
+});
+
+test("Current warnings keeps the orange background on mobile in all interaction states", async () => {
+  const css = await readFile(new URL("../css/components/mainmenu-dropdown.css", import.meta.url), "utf8");
+  const window = new Window();
+  try {
+    const sheet = new window.CSSStyleSheet();
+    sheet.replaceSync(css);
+    const rules = [...sheet.cssRules];
+    for (const state of ["", ":hover", ":focus-visible", ":active"]) {
+      const selector = `a[href$="/current-warnings"]${state}`;
+      const matches = rules.filter((rule) => rule.selectorText?.split(",").some((part) => part.trim().endsWith(selector)));
+      assert.ok(matches.length > 0, `Missing ${selector}`);
+      const rule = matches.at(-1);
+      assert.equal(rule.style.getPropertyValue("background-color"), "#d6410a");
+      assert.equal(rule.style.getPropertyPriority("background-color"), "important");
+    }
+    for (const media of rules.filter((rule) => rule.conditionText === "(max-width: 767.98px)")) {
+      assert.equal([...media.cssRules].some((rule) => rule.selectorText?.includes('a[href$="/current-warnings"]')), false);
+    }
   } finally {
     await window.happyDOM.close();
   }

@@ -48,7 +48,7 @@
   background-color: #dcdde1;
 }
 
-.feedback-band #component_1248686 a[href="https://cmsexternal.nt.gov.au/securent/submit-your-feedback"]::after {
+.feedback-band #component_1248686 a[href$="/submit-your-feedback"]::after {
   content: none;
 }
 

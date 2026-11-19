@@ -1,13 +1,12 @@
 /* ==========================================================================
    #header-footer – Brand colour overrides
-   Overrides the default navy (#1f1f5f) from ntgbase.min.css with
-   NTG Charcoal (#343741) per the Accessible Colours brand guidelines (May 2025).
+   Applies the SecureNT navy and orange brand colors to the shared site chrome.
    ========================================================================== */
 
 /* ---- Header ---- */
 header.ntg-header {
   padding-bottom: 0 !important;
-  background-color: #343741;
+  background-color: #003251;
 }
 
 header.ntg-header .navbar {
@@ -16,7 +15,7 @@ header.ntg-header .navbar {
 }
 
 header.ntg-header .header-top {
-  background-color: #343741;
+  background-color: #003251;
 }
 
 header.ntg-header .header-top > .container-xl,
@@ -94,7 +93,7 @@ header.ntg-header .header-tools > a:active,
 header.ntg-header .header-tools > a.active,
 header.ntg-header .header-tools > a.current,
 header.ntg-header .header-tools > a[aria-current="page"] {
-  background-color: #424550 !important;
+  background-color: #12405d !important;
 }
 
 header.ntg-header .header-tools a.external::before,
@@ -172,7 +171,7 @@ header.ntg-header .header-tools .ntg-header-search .input-group-append button,
   padding: 0;
   border: 0;
   border-radius: 0;
-  background: #f4551a;
+  background: #d6410a;
   color: #ffffff;
 }
 
@@ -192,7 +191,7 @@ header.ntg-header .header-tools .ntg-header-search .input-group-append button::b
 
 header.ntg-header .header-navigation {
   min-height: 56px;
-  background-color: #424550;
+  background-color: #12405d;
 }
 
 header.ntg-header .header-navigation > .container-xl {
@@ -263,8 +262,8 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li > a {
 
 header.ntg-header .header-navigation .ntg-main-nav__links > li > a:hover,
 header.ntg-header .header-navigation .ntg-main-nav__links > li > a:focus-visible {
-  border-bottom-color: #f4551a;
-  background-color: #343741;
+  border-bottom-color: #d6410a;
+  background-color: #003251;
   color: #ffffff;
 }
 
@@ -290,12 +289,12 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li > a:focus-visible
 }
 
 /* ---- Footer ---- */
-.ntg-footer {
-  background-color: #343741;
+footer.ntg-footer {
+  background-color: #003251;
 }
 
-.ntg-footer__text {
-  background-color: #3F4352;
+footer .ntg-footer__text {
+  background-color: #12405d;
 }
 
 @media (max-width: 767.98px) {
@@ -311,14 +310,14 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li > a:focus-visible
 }
 
 @media (min-width: 992px) {
-  .ntg-footer {
+  footer.ntg-footer {
     padding-top: 48px !important;
   }
 }
 
 /* ---- Mobile search banner ---- */
 .mobile-banner {
-  background-color: #343741;
+  background-color: #003251;
 }
 
 /* ---- Search submit button ---- */

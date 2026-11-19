@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { secureNTUrl } from "../config/site-url.mjs";
 import {
   emergencyWarningsEndpoint, fetchEmergencyWarnings, fetchMappedWarnings, fetchMediaReleaseFeeds,
   loadMappedWarnings, mappedWarningsEndpoint, mediaReleaseSources, parseFeedPayload,
@@ -65,9 +66,9 @@ test("uses the configured integration URLs and supports localhost proxy override
     return { ok: true, json: async () => [] };
   };
   const expected = [
-    "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor-bushfires-nt",
-    "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor-ntes",
-    "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor-ntg-agencies",
+    secureNTUrl("/_design/integrations/campaign-monitor-bushfires-nt"),
+    secureNTUrl("/_design/integrations/campaign-monitor-ntes"),
+    secureNTUrl("/_design/integrations/campaign-monitor-ntg-agencies"),
   ];
   assert.deepEqual(mediaReleaseSources.map((item) => item.endpoint), expected);
   assert.equal(new Set(expected).size, 3);

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { Window } from "happy-dom";
+import { SECURENT_BASE_URL } from "../config/site-url.mjs";
 import { fetchAirQuality, fetchAirQualityStations, parseAirQualityStations } from "./air-quality.mjs";
 import worker from "./worker.js";
 import {
@@ -11,7 +12,8 @@ import {
   readFireDanger,
 } from "./fire-danger.mjs";
 
-const script = await readFile(new URL("./local-conditions.js", import.meta.url), "utf8");
+const script = (await readFile(new URL("./local-conditions.js", import.meta.url), "utf8"))
+  .replaceAll("__SECURENT_BASE_URL__", JSON.stringify(SECURENT_BASE_URL));
 const stylesheet = await readFile(new URL("./local-conditions.css", import.meta.url), "utf8");
 const xml = await readFile(new URL("../../public/IDD60920.xml", import.meta.url), "utf8");
 const fireDangerFixture = JSON.parse(await readFile(new URL("../../public/fire-danger-ratings.json", import.meta.url), "utf8"));
@@ -362,14 +364,14 @@ async function widget({ url = "http://localhost:5173/", saved, feed = fixture, o
   window.fetch = (input, options) => {
     const request = String(input);
     requests.push(request);
-    if (request.includes("IDD60920.xml") || request.includes("1657184")) {
+    if (request === "/IDD60920.xml" || request === "/_design/integrations/temperatures") {
       return observations ? observations(options) : Promise.resolve(response(feed));
     }
     if (request === FIRE_DANGER_URL) return Promise.resolve(response(fireDangerFixture));
     if (request === "/api/air-quality") {
       return catalog ? catalog(options) : Promise.resolve(response({ stations: parseAirQualityStations(epaFixture) }));
     }
-    if (request === "./?a=1657186") {
+    if (request === "/_design/integrations/air-quality-json") {
       const first = requests.filter((item) => item === request).length === 1;
       if (first) return catalog ? catalog(options) : Promise.resolve(response(epaFixture));
       return air ? air(request) : Promise.resolve(response(epaFixture));
@@ -506,7 +508,7 @@ test("temperature remains available when only one bound is present", async () =>
 test("localhost fetches the matching EPA station and displays an index, not PM2.5", async () => {
   const context = await widget({
     feed: xml,
-    air: (url) => Promise.resolve(response({ index: url.endsWith("id=2") ? 51 : 64 })),
+    air: (url) => Promise.resolve(response({ index: url.endsWith("id=2") ? 51 : 143 })),
     worker: () => Promise.resolve(response({ fireDanger: { label: "Moderate", level: 1 },
       airQuality: { category: "Fair", pm25: 999 } })),
   });
@@ -514,11 +516,14 @@ test("localhost fetches the matching EPA station and displays an index, not PM2.
   const airCard = () => cardFor(context, "Air quality");
   assert.match(airCard().textContent, /51 AQI/);
   assert.equal(airCard().querySelector(".lc-air").textContent, "Fair");
+  assert.ok(Math.abs(parseFloat(airCard().querySelector(".lc-rating-chart__marker").style.left) - 20.4) < 0.000001);
   assert.doesNotMatch(airCard().textContent, /PM2\.5|999/);
   selectLocation(context, "014072");
   await settle();
   assert.ok(context.requests.includes("/api/air-quality?id=3"));
-  assert.match(airCard().textContent, /64 AQI/);
+  assert.match(airCard().textContent, /143 AQI/);
+  assert.equal(airCard().querySelector(".lc-air").textContent, "Poor");
+  assert.ok(Math.abs(parseFloat(airCard().querySelector(".lc-rating-chart__marker").style.left) - 57.2) < 0.000001);
   const count = context.requests.length;
   selectLocation(context, "014253");
   await settle();
@@ -527,21 +532,21 @@ test("localhost fetches the matching EPA station and displays an index, not PM2.
   assert.ok(airCard().querySelector(".fa-circle-exclamation"));
 });
 
-test("production requests the JSON Matrix asset and selects the station index", async () => {
+test("production requests the JSON integration and selects the station index", async () => {
   for (const value of [0, 64.5]) {
     const context = await widget({ url: "https://example.com/conditions",
       air: () => Promise.resolve(response({ d: [
         { serialCode: 1, IndexValue: 999 }, { serialCode: 2, IndexValue: value },
       ] })),
     });
-    assert.ok(context.requests.includes("./?a=1657186"));
-    assert.equal(context.requests.some((url) => url.includes("1657178") || url.includes("1657186?id")), false);
+    assert.ok(context.requests.includes("/_design/integrations/air-quality-json"));
+    assert.equal(context.requests.some((url) => url.includes("?a=") || url.includes("air-quality-json?")), false);
     assert.match(cardFor(context, "Air quality").textContent,
       new RegExp(Number(value) + " AQI"));
   }
 });
 
-test("AQI card uses five category bands and positions the marker on a capped 0–700 scale", async () => {
+test("AQI card positions the marker proportionally within five category bands capped at 700", async () => {
   const levels = [
     { range: "0–50", label: "Good", colour: "#61b92f" },
     { range: "51–100", label: "Fair", colour: "#f5d639" },
@@ -550,22 +555,31 @@ test("AQI card uses five category bands and positions the marker on a capped 0�
     { range: "301+", label: "Extremely poor", colour: "#590019" },
   ];
   const readings = [
-    { index: 0, label: "Good" },
-    { index: 35, label: "Good" },
-    { index: 50, label: "Good" },
-    { index: 51, label: "Fair" },
-    { index: 87, label: "Fair" },
-    { index: 100, label: "Fair" },
-    { index: 101, label: "Poor" },
-    { index: 143, label: "Poor" },
-    { index: 150, label: "Poor" },
-    { index: 151, label: "Very poor" },
-    { index: 300, label: "Very poor" },
-    { index: 301, label: "Extremely poor" },
-    { index: 472, label: "Extremely poor" },
-    { index: 681, label: "Extremely poor" },
-    { index: 700, label: "Extremely poor" },
-    { index: 701, label: "Extremely poor" },
+    { index: 0, label: "Good", position: 0 },
+    { index: 25, label: "Good", position: 10 },
+    { index: 35, label: "Good", position: 14 },
+    { index: 50, label: "Good", position: 20 },
+    { index: 50.5, label: "Fair", position: 20.2 },
+    { index: 51, label: "Fair", position: 20.4 },
+    { index: 75, label: "Fair", position: 30 },
+    { index: 87, label: "Fair", position: 34.8 },
+    { index: 100, label: "Fair", position: 40 },
+    { index: 100.5, label: "Poor", position: 40.2 },
+    { index: 101, label: "Poor", position: 40.4 },
+    { index: 125, label: "Poor", position: 50 },
+    { index: 143, label: "Poor", position: 57.2 },
+    { index: 150, label: "Poor", position: 60 },
+    { index: 150.5, label: "Very poor", position: 60.0666666667 },
+    { index: 151, label: "Very poor", position: 60.1333333333 },
+    { index: 225, label: "Very poor", position: 70 },
+    { index: 300, label: "Very poor", position: 80 },
+    { index: 300.5, label: "Extremely poor", position: 80.025 },
+    { index: 301, label: "Extremely poor", position: 80.05 },
+    { index: 472, label: "Extremely poor", position: 88.6 },
+    { index: 500, label: "Extremely poor", position: 90 },
+    { index: 681, label: "Extremely poor", position: 99.05 },
+    { index: 700, label: "Extremely poor", position: 100 },
+    { index: 701, label: "Extremely poor", position: 100 },
   ];
   for (const selected of readings) {
     const context = await widget({
@@ -580,8 +594,9 @@ test("AQI card uses five category bands and positions the marker on a capped 0�
       levels.find((level) => level.label === selected.label).colour);
     assert.equal(segments.length, 5);
     assert.deepEqual(segments.map((segment) => segment.style.backgroundColor), levels.map((level) => level.colour));
-    assert.equal(chart.querySelector(".lc-rating-chart__marker").style.left,
-      Math.max(0, Math.min(selected.index, 700)) / 700 * 100 + "%");
+    const position = parseFloat(chart.querySelector(".lc-rating-chart__marker").style.left);
+    assert.ok(Math.abs(position - selected.position) < 0.000001,
+      `AQI ${selected.index}: expected ${selected.position}%, got ${position}%`);
     assert.equal(chart.getAttribute("role"), "img");
     assert.match(chart.getAttribute("aria-label"), new RegExp(selected.label));
     levels.forEach((level) => assert.match(chart.getAttribute("aria-label"), new RegExp(level.range)));
@@ -842,7 +857,7 @@ test("catalog failures keep the original BOM locations usable", async () => {
   }
   const production = await widget({ url: "https://example.com/conditions" });
   assert.equal(production.select.options.length, 9);
-  assert.ok(production.requests.includes("./?a=1657186"));
+  assert.ok(production.requests.includes("/_design/integrations/air-quality-json"));
   assert.equal(production.requests.includes("/api/air-quality"), false);
 });
 
@@ -853,12 +868,25 @@ test("production adds and restores EPA-only locations from the cached JSON asset
   selectLocation(context, "epa-1");
   await settle();
   assert.match(cardFor(context, "Air quality").textContent, /0 AQI/);
-  assert.equal(context.requests.filter((url) => url === "./?a=1657186").length, 3);
+  assert.equal(context.requests.filter((url) => url === "/_design/integrations/air-quality-json").length, 3);
 });
 
-test("production uses the Matrix asset and restores saved or legacy selections", async () => {
+test("production loads raw integration catalogs from homepage and nested pages", async () => {
+  for (const url of ["https://securent.nt.gov.au/", "https://securent.nt.gov.au/respond/conditions"]) {
+    const context = await widget({ url });
+    assert.equal(context.requests[0], "/_design/integrations/temperatures");
+    assert.ok(context.requests.includes("/_design/integrations/air-quality-json"));
+    assert.equal(context.requests.some((request) => request.includes("?a=")), false);
+    assert.equal(context.select.disabled, false);
+    assert.equal(context.select.value, "014015");
+    assert.match(cardFor(context, "Temperature").textContent, /36 °C/);
+    assert.match(cardFor(context, "Air quality").textContent, /51 AQI/);
+  }
+});
+
+test("production uses the XML integration and restores saved or legacy selections", async () => {
   const context = await widget({ url: "https://example.com/conditions", saved: "alice-springs" });
-  assert.equal(context.requests[0], "./?a=1657184");
+  assert.equal(context.requests[0], "/_design/integrations/temperatures");
   assert.equal(context.select.value, "015590");
   assert.equal(context.window.localStorage.getItem("securent.localConditions.location"), "015590");
   assert.ok(context.requests.includes(FIRE_DANGER_URL));
@@ -867,7 +895,7 @@ test("production uses the Matrix asset and restores saved or legacy selections",
 });
 
 test("production reads mapped fire ratings from the CMS integration directly", async () => {
-  const context = await widget({ url: "https://cmsexternal.nt.gov.au/securent/home", saved: "015590" });
+  const context = await widget({ url: "https://example.com/home", saved: "015590" });
   assert.ok(context.requests.includes(FIRE_DANGER_URL));
   assert.equal(context.requests.some((url) => url.includes("/api/local-conditions")), false);
   const card = cardFor(context, "Bushfire danger rating");
@@ -1091,7 +1119,7 @@ test("BOM failures still populate EPA locations and display their readings", asy
         air: () => Promise.resolve(response(local
           ? { ...parseAirQualityStations(epaFixture)[1], station: "Winnellie" } : epaFixture)),
       });
-      assert.ok(context.requests.includes(local ? "/api/air-quality" : "./?a=1657186"));
+      assert.ok(context.requests.includes(local ? "/api/air-quality" : "/_design/integrations/air-quality-json"));
       assert.equal(context.select.disabled, false);
       assert.equal(context.select.options.length, 4);
       assert.equal(context.select.value, "epa-2");

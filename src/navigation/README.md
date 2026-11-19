@@ -12,9 +12,10 @@ If the earlier three-level templates are already installed:
 
 1. Replace Main's **Default Format: First HTML Division** with the revised version
   below, which adds the native `.desktop-main-nav__toggle` label-and-arrow button.
-2. Keep Main's Page Contents, closing HTML division and Level 2 Nested Content
-  division unchanged. Level 2 and Level 3 markup and both dynamic-root calls are
-  unchanged. Do not edit the CMS-generated destination URLs.
+2. Update Main's Page Contents as shown below to append the two mobile-only
+  links. Keep its closing HTML division and Level 2 Nested Content division
+  unchanged. Level 2 and Level 3 markup and both dynamic-root calls are
+  unchanged. Do not edit the CMS-generated listing destinations.
 3. Publish the revised Main Bodycopy with the rebuilt `dist/theme.js` and
   `dist/theme.css`, then refresh both CMS asset cache references. Updating JS
   alone cannot provide the unified desktop control without its new markup.
@@ -41,7 +42,11 @@ Replace the Main listing Page Contents with:
       <div class="au-main-nav__menu">
         <div class="au-main-nav__menu-inner" id="au-main-nav__links">
           <div class="au-main-nav__menu-inner-wrap" id="mmenu-wrapper">
-            <ul class="ntg-main-nav__links cms-main-nav">%asset_listing%</ul>
+            <ul class="ntg-main-nav__links cms-main-nav">
+              %asset_listing%
+              <li class="mobile-only-link"><a href="https://securent.nt.gov.au/emergency-contacts">Emergency contacts</a></li>
+              <li class="mobile-only-link"><a href="https://securent.nt.gov.au/homepage/dataset/incident-map">Incident map</a></li>
+            </ul>
           </div>
         </div>
       </div>
@@ -52,6 +57,11 @@ Replace the Main listing Page Contents with:
 
 The surrounding `nav.nav-masthead` remains in the header design. Give it
 `aria-label="Primary navigation"`; do not add another nested `nav` here.
+Append the two mobile-only links after the listing, in the order shown. Use
+the existing CMS destinations for the environment being published; the example
+uses the production URLs. Keep the header Emergency contacts link.
+If an earlier mobile-only Emergency contacts listing item was added, remove it
+from the listing so the drawer does not show the link twice.
 
 ### Default Format: First HTML Division
 
@@ -178,9 +188,9 @@ No additional nested listing is needed.
   Load the shared theme stylesheet in the document head, not asynchronously.
 - There is one shared tree, not duplicate desktop/mobile listing assets. Descriptions
   are HTML-escaped text in the overview, not JSON embedded in HTML attributes.
-- Keep the emergency-contacts link in the header. If it is needed inside the mobile
-  drawer too, include it as a CMS-managed Main listing item with its existing URL
-  and class `mobile-emergency-link`; it is not copied by JavaScript.
+- The two supplemental links are present in the shared markup but hidden at
+  desktop widths. JavaScript does not copy or rewrite them. Current warnings
+  retains its orange background in the mobile drawer.
 
 ## Publish and Verify
 
@@ -190,7 +200,9 @@ No additional nested listing is needed.
 3. Compare literal link `href` attributes before and after script initialization,
    including aliases, external links, query strings, fragments and trailing slashes.
 4. Test leaf items, empty children, keyboard focus, Escape, sibling collapse and
-   767px/768px transitions. Check long labels at 320px and 375px.
+   767px/768px transitions. Check long labels at 320px and 375px. Confirm Current
+   warnings stays orange and both supplemental links appear at the end of the
+   mobile drawer, navigate to the existing destinations, and are hidden on desktop.
 5. Publish the Bodycopy and `dist/theme.js`/`dist/theme.css` together. Refresh the
    CMS asset cache versions; an old theme script will still overwrite these links.
 6. Confirm the ordinary published page, not only Matrix preview or a no-cache URL.

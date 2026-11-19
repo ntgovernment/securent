@@ -1,22 +1,24 @@
-export const latestMediaReleaseEndpoint = "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor";
-export const mappedWarningsEndpoint = "https://cmsexternal.nt.gov.au/securent/_design/integrations/mapped-warnings";
+import { secureNTUrl } from "../config/site-url.mjs";
+
+export const latestMediaReleaseEndpoint = secureNTUrl("/_design/integrations/campaign-monitor");
+export const mappedWarningsEndpoint = secureNTUrl("/_design/integrations/mapped-warnings");
 export const emergencyWarningsEndpoint = "https://au-ad0720ef.datastore.squiz.cloud/emergency-warnings";
 
 export const mediaReleaseSources = [
   {
     id: "bushfires-nt",
     name: "Bushfires NT",
-    endpoint: "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor-bushfires-nt",
+    endpoint: secureNTUrl("/_design/integrations/campaign-monitor-bushfires-nt"),
   },
   {
     id: "ntes",
     name: "NTES",
-    endpoint: "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor-ntes",
+    endpoint: secureNTUrl("/_design/integrations/campaign-monitor-ntes"),
   },
   {
     id: "ntg-agencies",
     name: "NTG agencies",
-    endpoint: "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor-ntg-agencies",
+    endpoint: secureNTUrl("/_design/integrations/campaign-monitor-ntg-agencies"),
   },
 ];
 

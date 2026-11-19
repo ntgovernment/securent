@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { Window } from "happy-dom";
+import { secureNTUrl } from "../config/site-url.mjs";
 import { emergencyWarningsEndpoint } from "./feeds.mjs";
 
 const html = await readFile(new URL("../../media-releases.html", import.meta.url), "utf8");
@@ -792,9 +793,9 @@ for (const { scenario, cmsMarkup } of [false, true].flatMap((cmsMarkup) =>
       assert.deepEqual(requests.slice(0, feedRequestCount).map(({ url }) => url), isLocalPreview
         ? ["/api/media-releases/latest"]
         : [
-          "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor-bushfires-nt",
-          "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor-ntes",
-          "https://cmsexternal.nt.gov.au/securent/_design/integrations/campaign-monitor-ntg-agencies",
+          secureNTUrl("/_design/integrations/campaign-monitor-bushfires-nt"),
+          secureNTUrl("/_design/integrations/campaign-monitor-ntes"),
+          secureNTUrl("/_design/integrations/campaign-monitor-ntg-agencies"),
         ]);
       const records = [1, 4, 2, 3].map((day) => ({
         ...notice,

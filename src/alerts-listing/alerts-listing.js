@@ -2,8 +2,9 @@ import "./alerts-listing.css";
 import { sortAlerts } from "./sorting.mjs";
 import { getPageWindow } from "../pagination/page-window.mjs";
 import { attachAutocomplete, getAutocompleteCandidates, getPlaceSearchValues } from "../search/autocomplete.mjs";
+import { secureNTUrl } from "../config/site-url.mjs";
 
-const endpoint = "https://cmsexternal.nt.gov.au/securent/_design/listing/alerts-listing/_nocache";
+const endpoint = secureNTUrl("/_design/listing/alerts-listing/_nocache");
 const listing = document.querySelector("[data-alerts-listing]");
 
 if (listing) {
@@ -192,7 +193,10 @@ if (listing) {
 
     const link = document.createElement("a");
     link.className = "alerts-listing__card-link";
-    link.href = safeLink(item.url);
+    const itemUrl = typeof item.url === "string" && item.url.startsWith("/")
+      ? secureNTUrl(item.url)
+      : item.url;
+    link.href = safeLink(itemUrl);
 
     const title = document.createElement("h2");
     title.className = "alerts-listing__card-title";
