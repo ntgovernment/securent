@@ -531,7 +531,7 @@ Each location option exposes its latitude and longitude as `data-coordinates="la
 
 Use location is disabled when neither a geolocation match nor the Darwin Airport fallback is available; the dropdown remains usable for EPA-only locations.
 
-Each card has a source link beneath it: Bushfires NT links to the NT incident map, NTEPA links to its homepage, and the temperature card links to BOM's Northern Territory observations. Production fire-danger data comes directly from the same-origin CMS fire-danger ratings integration; the incident-map link is an attribution link, not the data endpoint. Air-quality data comes from NTEPA, and failed or unsupported requests do not prevent BOM temperatures from displaying.
+Each card has a source link beneath it: NT Fire and Emergency Services links to the NT incident map, NTEPA links to its homepage, and the temperature card links to BOM's Northern Territory observations. Attribution links use the same muted color as their “Source:” label. Production fire-danger data comes directly from the same-origin CMS fire-danger ratings integration; the incident-map link is an attribution link, not the data endpoint. Air-quality data comes from NTEPA, and failed or unsupported requests do not prevent BOM temperatures from displaying.
 
 ### Homepage news JS (`src/js/homepage-news.js`)
 
