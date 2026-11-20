@@ -61,6 +61,8 @@ initializeEventNavigation(window);
     menuList.append(item);
   });
 
+  const searchBanner = document.querySelector(".mobile-banner.banner-search");
+  const searchInput = searchBanner?.querySelector(".ntg-header-search input[name='query']");
   let searchButton = headerTools.querySelector(".mobile-search-toggle");
   if (!searchButton) {
     searchButton = document.createElement("button");
@@ -71,49 +73,83 @@ initializeEventNavigation(window);
     searchButton.innerHTML = '<span class="fa-regular fa-magnifying-glass" aria-hidden="true"></span>';
     headerTools.append(searchButton);
   }
-  const searchBanner = document.querySelector(".mobile-banner.banner-search");
   const searchToggleBound = Symbol.for("securent.searchToggleBound");
-  header.classList.add("search-toggle-enhanced");
   function positionSearchBanner() {
-    if (!searchBanner || !document.body.classList.contains("mobile-search-open")
-      || window.innerWidth < 768 || window.innerWidth >= 992) return;
     const bounds = searchButton.getBoundingClientRect();
-    const height = bounds.height || 44;
-    const top = bounds.height ? bounds.top + (height - 48) / 2 : 12;
     const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
-    searchBanner.style.setProperty("--search-overlay-top", `${top}px`);
+    searchBanner.style.setProperty("--search-overlay-top", `${bounds.top + (bounds.height - 48) / 2}px`);
     searchBanner.style.setProperty("--search-overlay-right", `${Math.max(0, viewportWidth - bounds.right)}px`);
   }
-  if (!searchButton[searchToggleBound]) {
-    searchButton[searchToggleBound] = true;
-    const isOpen = document.body.classList.contains("mobile-search-open");
-    searchButton.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    searchButton.setAttribute("aria-label", isOpen ? "Close search" : "Open search");
-    searchButton.addEventListener("click", function () {
-      if (header.classList.contains("menu-open")) {
-        const menuButton = headerTools.querySelector(".mobile-menu-toggle");
-        if (menuButton) menuButton.click();
-      }
-      const isSearchOpen = document.body.classList.toggle("mobile-search-open");
-      searchButton.setAttribute("aria-expanded", isSearchOpen ? "true" : "false");
-      searchButton.setAttribute("aria-label", isSearchOpen ? "Close search" : "Open search");
+
+  function setSearchOpen(open, returnFocus = false) {
+    document.body.classList.toggle("mobile-search-open", open);
+    searchButton.setAttribute("aria-expanded", String(open));
+    searchButton.setAttribute("aria-label", open ? "Close search" : "Open search");
+    if (open) {
       positionSearchBanner();
-      if (isSearchOpen) {
-        const input = searchBanner && searchBanner.querySelector(".ntg-header-search input[name='query']");
-        if (input) input.focus();
+      searchInput?.focus();
+    } else if (returnFocus) {
+      searchButton.focus();
+    }
+  }
+
+  if (searchBanner && !searchButton[searchToggleBound]) {
+    searchButton[searchToggleBound] = true;
+    header.classList.add("search-toggle-enhanced");
+    document.body.classList.add("search-popup-ready");
+    const searchBackdrop = document.createElement("button");
+    searchBackdrop.className = "mobile-search-backdrop";
+    searchBackdrop.type = "button";
+    searchBackdrop.tabIndex = -1;
+    searchBackdrop.setAttribute("aria-label", "Close search");
+    document.body.append(searchBackdrop);
+    searchBackdrop.addEventListener("click", function () {
+      setSearchOpen(false, true);
+    });
+
+    const searchSubmit = searchInput?.closest(".input-group")?.querySelector(".input-group-append");
+    if (searchSubmit) {
+      const clearButton = document.createElement("button");
+      clearButton.className = "mobile-search-clear";
+      clearButton.type = "button";
+      clearButton.setAttribute("aria-label", "Clear search");
+      clearButton.textContent = "\u00d7";
+      searchSubmit.before(clearButton);
+
+      function syncClearButton() {
+        clearButton.hidden = searchInput.value === "";
       }
+
+      searchInput.addEventListener("input", syncClearButton);
+      searchInput.addEventListener("focus", syncClearButton);
+      clearButton.addEventListener("click", function () {
+        searchInput.value = "";
+        searchInput.focus();
+        searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+      });
+      syncClearButton();
+    }
+
+    setSearchOpen(window.innerWidth < 992 && document.body.classList.contains("mobile-search-open"));
+    searchButton.addEventListener("click", function () {
+      if (window.innerWidth >= 992) return;
+      if (header.classList.contains("menu-open")) {
+        headerTools.querySelector(".mobile-menu-toggle")?.click();
+      }
+      setSearchOpen(!document.body.classList.contains("mobile-search-open"), true);
     });
     document.addEventListener("keydown", function (event) {
       if (event.key !== "Escape" || !document.body.classList.contains("mobile-search-open")) return;
-      document.body.classList.remove("mobile-search-open");
-      searchButton.setAttribute("aria-expanded", "false");
-      searchButton.setAttribute("aria-label", "Open search");
-      searchButton.focus();
+      setSearchOpen(false, true);
     });
-    window.addEventListener("resize", positionSearchBanner);
-    window.addEventListener("scroll", positionSearchBanner, { passive: true });
+    function updateSearchPosition() {
+      if (!document.body.classList.contains("mobile-search-open")) return;
+      if (window.innerWidth >= 992) setSearchOpen(false);
+      else positionSearchBanner();
+    }
+    window.addEventListener("resize", updateSearchPosition);
+    window.addEventListener("scroll", updateSearchPosition, { passive: true });
   }
-  positionSearchBanner();
 
   if (nav.dataset.navigationReady) return;
   const navbar = header.querySelector(".navbar");
@@ -265,6 +301,7 @@ initializeEventNavigation(window);
   nav.classList.add("navigation-enhanced");
 
   function setMenuOpen(open, returnFocus) {
+    if (open && document.body.classList.contains("mobile-search-open")) setSearchOpen(false);
     if (open && !header.classList.contains("menu-open")) previousBodyOverflow = document.body.style.overflow;
     else closeAll();
     header.classList.toggle("menu-open", open);

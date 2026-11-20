@@ -39,7 +39,12 @@ function fixture(window) {
       </div>
     </div></header>
     <div class="mobile-banner banner-search">
-      <form class="ntg-header-search"><input name="query" aria-label="Search"></form>
+      <form class="ntg-header-search">
+        <div class="input-group">
+          <input name="query" aria-label="Search">
+          <div class="input-group-append"><button type="submit">Search</button></div>
+        </div>
+      </form>
     </div>`;
 }
 
@@ -112,9 +117,9 @@ test("compact search icon reveals the banner field and Escape closes it", async 
       assert.ok(toggle);
       assert.equal(document.querySelector("header.ntg-header").classList.contains("search-toggle-enhanced"), true);
       assert.equal(toggle.getAttribute("aria-expanded"), "false");
-      if (width === 900) {
-        toggle.getBoundingClientRect = () => ({ top: 14, right: 821, height: 44 });
-      }
+      const top = width === 900 ? 14 : 6;
+      const rightInset = width === 900 ? 79 : 68;
+      toggle.getBoundingClientRect = () => ({ top, right: width - rightInset, height: 44 });
       const navClass = nav.className;
       toggle.click();
       assert.equal(document.body.classList.contains("mobile-search-open"), true);
@@ -122,10 +127,8 @@ test("compact search icon reveals the banner field and Escape closes it", async 
       assert.equal(toggle.getAttribute("aria-label"), "Close search");
       assert.equal(document.activeElement, input);
       assert.equal(nav.className, navClass);
-      if (width === 900) {
-        assert.equal(banner.style.getPropertyValue("--search-overlay-top"), "12px");
-        assert.equal(banner.style.getPropertyValue("--search-overlay-right"), "79px");
-      }
+      assert.equal(banner.style.getPropertyValue("--search-overlay-top"), `${top - 2}px`);
+      assert.equal(banner.style.getPropertyValue("--search-overlay-right"), `${rightInset}px`);
       document.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Escape" }));
       assert.equal(document.body.classList.contains("mobile-search-open"), false);
       assert.equal(toggle.getAttribute("aria-expanded"), "false");
@@ -133,6 +136,71 @@ test("compact search icon reveals the banner field and Escape closes it", async 
       assert.equal(document.activeElement, toggle);
     });
   }
+});
+
+test("compact search stays open inside the form and closes on the backdrop or desktop resize", async () => {
+  await withMenu(320, async (window, initialize) => {
+    initialize();
+    initialize();
+    const document = window.document;
+    const toggle = document.querySelector(".mobile-search-toggle");
+    const backdrops = document.querySelectorAll(".mobile-search-backdrop");
+    assert.equal(backdrops.length, 1);
+
+    toggle.click();
+    const input = document.querySelector(".mobile-banner input[name='query']");
+    input.value = "shelter";
+    input.click();
+    assert.equal(document.body.classList.contains("mobile-search-open"), true);
+    backdrops[0].click();
+    assert.equal(document.body.classList.contains("mobile-search-open"), false);
+    assert.equal(toggle.getAttribute("aria-expanded"), "false");
+    assert.equal(document.activeElement, toggle);
+
+    toggle.click();
+    assert.equal(input.value, "shelter");
+    window.happyDOM.setWindowSize({ width: 992, height: 844 });
+    window.dispatchEvent(new window.Event("resize"));
+    assert.equal(document.body.classList.contains("mobile-search-open"), false);
+    assert.equal(toggle.getAttribute("aria-expanded"), "false");
+    toggle.click();
+    assert.equal(document.body.classList.contains("mobile-search-open"), false);
+  });
+});
+
+test("the compact search clear button empties the query without submitting or dismissing the popup", async () => {
+  await withMenu(320, async (window, initialize) => {
+    initialize();
+    initialize();
+    const document = window.document;
+    document.querySelector(".mobile-search-toggle").click();
+    const form = document.querySelector(".mobile-banner form");
+    const input = form.querySelector("input");
+    const buttons = form.querySelectorAll(".mobile-search-clear");
+    assert.equal(buttons.length, 1);
+    const [clear] = buttons;
+    assert.equal(clear.hidden, true);
+    assert.equal(clear.getAttribute("aria-label"), "Clear search");
+    input.value = "shelter";
+    input.dispatchEvent(new window.Event("input", { bubbles: true }));
+    assert.equal(clear.hidden, false);
+
+    let submitted = false;
+    let clearedQuery;
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      submitted = true;
+    });
+    form.addEventListener("input", (event) => { clearedQuery = event.target.value; });
+    clear.focus();
+    clear.click();
+    assert.equal(input.value, "");
+    assert.equal(clearedQuery, "");
+    assert.equal(submitted, false);
+    assert.equal(clear.hidden, true);
+    assert.equal(document.activeElement, input);
+    assert.equal(document.body.classList.contains("mobile-search-open"), true);
+  });
 });
 
 test("search toggle initializes in captures whose navigation is already enhanced", async () => {
@@ -220,8 +288,11 @@ test("tablet search breakpoint uses the icon and the banner shares desktop field
         .style.display,
       "inline-flex",
     );
-    const banner = tabletRules.find((rule) => rule.selectorText === ".mobile-banner.banner-search");
-    const expandedBanner = tabletRules.find((rule) =>
+    const compactRules = [...menuSheet.cssRules].find((rule) =>
+      rule.conditionText === "screen and (max-width: 991.98px)",
+    ).cssRules;
+    const banner = [...compactRules].find((rule) => rule.selectorText === ".mobile-banner.banner-search");
+    const expandedBanner = [...compactRules].find((rule) =>
       rule.selectorText === "body.mobile-search-open .mobile-banner.banner-search",
     );
     assert.equal(banner.style.position, "fixed");
@@ -232,9 +303,8 @@ test("tablet search breakpoint uses the icon and the banner shares desktop field
     const headerSheet = new window.CSSStyleSheet();
     headerSheet.replaceSync(headerCss);
     const bannerWidth = [...headerSheet.cssRules].find((rule) =>
-      rule.selectorText?.includes("header.ntg-header .header-tools .ntg-header-search")
-      && rule.selectorText.includes(".mobile-banner.banner-search .ntg-header-search")
-      && rule.style.width === "296px",
+      rule.selectorText === ".mobile-banner.banner-search .ntg-header-search"
+      && rule.style.width === "100%",
     );
     const bannerInputGroup = [...headerSheet.cssRules].find((rule) =>
       rule.selectorText?.includes("header.ntg-header .header-tools .ntg-header-search .input-group")
