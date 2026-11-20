@@ -71,9 +71,7 @@ export function createCardSkeleton({ compact = false, featured = false } = {}) {
   return skeleton;
 }
 
-function hazardIconFor(item) {
-  const filename = awsHazardIconFilename(item.emergencyTypes, item.warningLevel);
-  if (!filename) return "";
+function hazardIconUrl(filename) {
   const assetUrl = hazardIcons[`../../assets/hazard-icons/${filename}`];
   if (!assetUrl) return "";
   if (import.meta.env.DEV) return assetUrl;
@@ -81,6 +79,23 @@ function hazardIconFor(item) {
   const base = new URL(import.meta.url);
   return new URL(base.pathname.includes("/SecureNT_files/") ? `../${assetPath}` : assetPath, base).href;
 }
+
+function hazardIconFor(item) {
+  const filename = item.declarations.includes("Planned burn advice")
+    ? "planned-burn.webp"
+    : awsHazardIconFilename(item.emergencyTypes, item.warningLevel);
+  return filename ? hazardIconUrl(filename) : "";
+}
+
+function createHazardIcon(src) {
+  const icon = document.createElement("img");
+  icon.className = "media-releases__hazard-icon";
+  icon.src = src;
+  icon.alt = "";
+  return icon;
+}
+
+const otherHazardIconUrl = hazardIconUrl("other-hazard.webp");
 
 export function renderCard(item, { compact = false, featured = false } = {}) {
   const article = document.createElement("article");
@@ -173,10 +188,7 @@ export function renderCard(item, { compact = false, featured = false } = {}) {
 
   let icon;
   if (iconUrl) {
-    icon = document.createElement("img");
-    icon.className = "media-releases__hazard-icon";
-    icon.src = iconUrl;
-    icon.alt = "";
+    icon = createHazardIcon(iconUrl);
     article.classList.add("media-releases__item--with-icon");
     if (!compact && !featured) cardLink.append(icon);
   }
@@ -193,10 +205,7 @@ export function renderCard(item, { compact = false, featured = false } = {}) {
     if (icon) {
       heading.append(icon);
     } else {
-      const noticeIcon = document.createElement("i");
-      noticeIcon.className = "fa-light fa-triangle-exclamation media-releases__notice-icon";
-      noticeIcon.setAttribute("aria-hidden", "true");
-      heading.append(noticeIcon);
+      heading.append(createHazardIcon(otherHazardIconUrl));
     }
     heading.append(severity);
     content.append(heading);
@@ -204,10 +213,7 @@ export function renderCard(item, { compact = false, featured = false } = {}) {
     content.append(title);
   } else if (isFormattedCard) {
     if (!icon) {
-      const noticeIcon = document.createElement("i");
-      noticeIcon.className = "fa-light fa-triangle-exclamation media-releases__notice-icon";
-      noticeIcon.setAttribute("aria-hidden", "true");
-      cardLink.append(noticeIcon);
+      cardLink.append(createHazardIcon(otherHazardIconUrl));
     }
     if (meta.hasChildNodes()) content.append(meta);
     content.append(title);

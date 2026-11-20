@@ -255,12 +255,14 @@ AWS WEBP icons and warning-level border accents. The region uses
 `fa-light fa-location-dot`
 instead of a visible **Region:** prefix, while keeping an accessible region
 label. The fire-ban option displays as **Fire ban notices**; its card uses the
-neutral warning icon and `#343741` accent. Planned burns display as **Planned
-burn advice** in the filter and use the `#865AA5` warning icon and accent.
-Boil-water notices display as **Boil water notice** in the filter; fire-ban,
-boil-water, other and general-information cards share the neutral icon and
-accent. Homepage warning cards show the severity badge alongside their
-warning icon and omit a separate **More information** action.
+`other-hazard.webp` icon and `#343741` accent. Planned and prescribed burns share
+the **Planned burn advice** filter value and show the **Planned burn** badge on
+the homepage. Both warning views use `assets/hazard-icons/planned-burn.webp`
+with the `#865AA5` accent. Boil-water notices display as **Boil water notice**
+in the filter; fire-ban, boil-water, other and general-information cards share
+the `other-hazard.webp` icon and neutral accent. Homepage warning cards show
+the severity badge alongside their warning icon and omit a separate
+**More information** action.
 
 For Matrix markup, keep the Incident or notice type fieldset with its
 `data-type-filters` list. Do not add a separate Declaration fieldset or

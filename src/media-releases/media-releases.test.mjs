@@ -97,7 +97,7 @@ test("homepage warning-card styles match the reference layout", () => {
   assert.match(css, /\.media-releases__item\[data-general-information=true\] \.media-releases__severity\{background:var\(--clr-bg-shade-alt,\s*#e7e7ea\);color:var\(--clr-text-default,\s*#1f1e27\)\}/);
   assert.match(css, /\.media-releases__item--planned-burn \.media-releases__severity\{background:#dbcde4;color:#634578\}/);
   assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__card-heading\{gap:4px;min-height:24px\}/);
-  assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__hazard-icon,\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__notice-icon\{width:24px;height:24px;font-size:24px\}/);
+  assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__hazard-icon\{width:24px;height:24px\}/);
   assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__meta\{color:#666774;font-size:14px;line-height:20px\}/);
   assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__region\{color:#666774;font-size:16px;line-height:24px\}/);
   assert.match(css, /\[data-latest-media-releases\] \.media-releases__item--featured \.media-releases__region i\{width:16px;font-size:16px;line-height:24px\}/);
@@ -217,7 +217,8 @@ test("renders declaration-only cards with their accent colors and checkbox style
     assert.ok(plannedBurn.classList.contains("media-releases__item--formatted"));
     assert.ok(plannedBurn.classList.contains("media-releases__item--planned-burn"));
     assert.equal(plannedBurn.querySelector(".media-releases__severity"), null);
-    assert.equal(plannedBurn.querySelector(".media-releases__notice-icon").getAttribute("aria-hidden"), "true");
+    assert.equal(plannedBurn.querySelector(".media-releases__notice-icon"), null);
+    assert.match(plannedBurn.querySelector(".media-releases__hazard-icon").src, /planned-burn\.webp$/);
     assert.deepEqual(
       [...plannedBurn.querySelector(".media-releases__content").children].map((element) => element.className),
       ["media-releases__meta", "media-releases__title", "media-releases__classification media-releases__region"],
@@ -226,7 +227,6 @@ test("renders declaration-only cards with their accent colors and checkbox style
     const plannedBurnLocationIcon = plannedBurn.querySelector(".media-releases__region i");
     assert.ok(plannedBurnLocationIcon.classList.contains("fa-location-dot"));
     assert.equal(plannedBurnLocationIcon.getAttribute("aria-hidden"), "true");
-    assert.equal(plannedBurn.querySelector(".media-releases__hazard-icon"), null);
     assert.match(plannedBurn.querySelector(".media-releases__region").textContent, /Region: Greater Darwin/);
     assert.equal(plannedBurn.querySelector(".media-releases__region .visually-hidden").textContent, "Region: ");
     assert.equal(fireBan.dataset.declaration, "fire-ban-declaration");
@@ -237,8 +237,10 @@ test("renders declaration-only cards with their accent colors and checkbox style
       assert.ok(card.classList.contains("media-releases__item--formatted"));
       assert.ok(card.classList.contains("media-releases__item--general-information"));
       assert.equal(card.querySelector(".media-releases__severity"), null);
-      assert.ok(card.querySelector(".media-releases__notice-icon").classList.contains("fa-triangle-exclamation"));
-      assert.equal(card.querySelector(".media-releases__notice-icon").getAttribute("aria-hidden"), "true");
+      const hazardIcon = card.querySelector(".media-releases__hazard-icon");
+      assert.ok(hazardIcon);
+      assert.match(hazardIcon.src, /other-hazard\.webp$/);
+      assert.equal(hazardIcon.alt, "");
     }
     assert.ok(fireBan.querySelector(".media-releases__region .fa-location-dot"));
     const incidentNoticeFilters = listing.querySelector("[data-type-filters]");
@@ -316,7 +318,7 @@ test("renders declaration-only cards with their accent colors and checkbox style
     assert.match(css, /\.media-releases__item--formatted\.media-releases__item--planned-burn\{--media-releases-accent:\s*#865aa5\}/);
     assert.match(css, /\.media-releases__item--formatted\.media-releases__item--general-information\{--media-releases-accent:\s*#343741\}/);
     assert.match(css, /\.media-releases__item--formatted \.media-releases__link\{grid-template-columns:48px minmax\(0,1fr\)\}/);
-    assert.match(css, /\.media-releases__notice-icon\{[^}]*color:var\(--media-releases-accent\);[^}]*font-size:48px/);
+    assert.match(css, /\.media-releases__hazard-icon\{[^}]*width:79px;[^}]*height:75px;[^}]*object-fit:contain/);
     assert.match(css, /\.media-releases__item--formatted \.media-releases__meta\{[^}]*font-size:14px;[^}]*line-height:20px/);
     assert.match(css, /\.media-releases__item--formatted \.media-releases__region\{[^}]*font-size:16px;[^}]*line-height:24px/);
     assert.match(css, /\.media-releases__item--formatted \.media-releases__hazard-icon\{width:48px;height:48px\}/);
@@ -641,6 +643,47 @@ test("listing retains warnings and reports source and mapping failures together"
 });
 
 for (const page of ["listing", "homepage"]) {
+  test(`${page} uses the planned-burn icon for planned and prescribed burns`, async () => {
+    const window = new Window({ url: "http://localhost/" });
+    window.document.write(page === "listing" ? html : `<section data-latest-media-releases>
+      <p data-results-status></p><p data-feed-note hidden></p><div data-results></div></section>`);
+    const originals = { window: globalThis.window, document: globalThis.document, fetch: globalThis.fetch };
+    const burns = ["Planned", "Prescribed"].map((kind) => ({
+      ...notice,
+      CampaignID: `${kind.toLowerCase()}-burn`,
+      Name: `${kind} burn advice - Darwin`,
+      Subject: `${kind} burn advice - Darwin`,
+    }));
+    globalThis.window = window;
+    globalThis.document = window.document;
+    globalThis.fetch = async (url) => ({
+      ok: true,
+      json: async () => url === "/api/media-releases/mapped-warnings" || url === emergencyWarningsEndpoint
+        ? []
+        : url === "/api/media-releases/latest" || url === "/bushfires-nt.json" ? burns : [],
+    });
+    try {
+      await import(`../../dist/${page === "homepage" ? "latest-media-releases" : "media-releases"}.js?planned-burn-icon-${page}`);
+      await new Promise((resolve) => setImmediate(resolve));
+      const listing = window.document.querySelector(page === "homepage" ? "[data-latest-media-releases]" : "[data-media-releases]");
+      const cards = [...listing.querySelectorAll(".media-releases__item")];
+      assert.equal(cards.length, 2);
+      for (const card of cards) {
+        assert.equal(card.dataset.declaration, "planned-burn-advice");
+        assert.match(card.querySelector(".media-releases__hazard-icon").src, /planned-burn\.webp$/);
+        assert.equal(card.querySelector(".media-releases__notice-icon"), null);
+        if (page === "homepage") {
+          assert.equal(card.querySelector(".media-releases__severity").textContent, "Planned burn");
+        } else {
+          assert.equal(card.querySelector(".media-releases__severity"), null);
+        }
+      }
+    } finally {
+      Object.assign(globalThis, originals);
+      await window.happyDOM.close();
+    }
+  });
+
   test(`${page} renders a Squiz decreasing-threat level when campaign IDs differ`, async () => {
     const window = new Window({ url: "http://localhost/" });
     window.document.write(page === "listing" ? html : `<section data-latest-media-releases>
@@ -846,14 +889,11 @@ for (const { scenario, cmsMarkup } of [false, true].flatMap((cmsMarkup) =>
         const heading = cards[0].querySelector(".media-releases__card-heading");
         assert.ok(heading.querySelector(".media-releases__severity"));
         assert.deepEqual([...heading.children].map((element) => element.className), [
-          scenario === "missing icon" || scenario === "unknown region"
-            ? "fa-light fa-triangle-exclamation media-releases__notice-icon"
-            : "media-releases__hazard-icon",
+          "media-releases__hazard-icon",
           "media-releases__severity",
         ]);
         if (["missing icon", "unknown region"].includes(scenario)) {
-          assert.equal(heading.querySelector("img"), null);
-          assert.ok(heading.querySelector(".media-releases__notice-icon"));
+          assert.match(heading.querySelector("img").src, /\/SecureNT_files\/other-hazard\.webp$/);
         } else {
           assert.match(heading.querySelector("img").src, /\/SecureNT_files\/flood-advice\.webp$/);
         }
