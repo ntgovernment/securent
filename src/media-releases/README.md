@@ -122,6 +122,9 @@ If a Campaign Monitor record is missing from either page:
    date with the newest displayed card.
 2. Check the operational-notice rules in `curation.mjs`. A successful feed
    response does not mean every returned campaign is eligible for display.
+   The Campaign Monitor URL
+   `https://createsend.com/t/t-69E2E37C2DCAF7EE2540EF23F30FEDED` is explicitly
+   excluded, whether the feed returns it over HTTP or HTTPS.
 3. Confirm that the Matrix Git File Bridge is serving the branch and commit
    containing the intended fix. A push to `dev` does not update a bridge
    configured for `main`.
