@@ -885,12 +885,9 @@ header.ntg-header .header-navigation .ntg-main-nav__links > li.mobile-only-link 
   }
 }
 
-.mobile-banner.banner-search {
+.mobile-banner.banner-search,
+.mobile-search-backdrop {
   display: none !important;
-}
-
-body.mobile-search-open .mobile-banner.banner-search {
-  display: block !important;
 }
 
 /* ==========================================================================
@@ -1108,15 +1105,16 @@ nav.nav-masthead .cms-main-nav a {
     outline: 2px solid #ffffff;
     outline-offset: -3px;
   }
+}
 
+@media screen and (max-width: 991.98px) {
   .mobile-banner.banner-search {
     position: fixed;
     top: var(--search-overlay-top, 12px);
     right: var(--search-overlay-right, 64px);
-    z-index: 1001;
-    display: block !important;
+    z-index: 1102;
     width: 296px;
-    max-width: calc(100vw - 24px);
+    max-width: calc(100% - var(--search-overlay-right, 64px) - 16px);
     margin: 0;
     padding: 0 !important;
     clip-path: inset(0 0 0 100%);
@@ -1125,11 +1123,26 @@ nav.nav-masthead .cms-main-nav a {
     transition: clip-path 180ms ease, visibility 0s linear 180ms;
   }
 
+  body.search-popup-ready .mobile-banner.banner-search {
+    display: block !important;
+  }
+
   body.mobile-search-open .mobile-banner.banner-search {
     clip-path: inset(0);
     visibility: visible;
     pointer-events: auto;
     transition: clip-path 180ms ease;
+  }
+
+  body.mobile-search-open .mobile-search-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1101;
+    display: block !important;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: rgba(0, 25, 41, 0.24);
   }
 
   body.mobile-search-open header.ntg-header.search-toggle-enhanced .mobile-search-toggle {
@@ -1153,9 +1166,17 @@ nav.nav-masthead .cms-main-nav a {
   }
 }
 
-@media (min-width: 768px) and (max-width: 991.98px) and (prefers-reduced-motion: reduce) {
+@media screen and (max-width: 991.98px) and (prefers-reduced-motion: reduce) {
   .mobile-banner.banner-search {
     transition: none;
+  }
+}
+
+@media screen and (max-width: 767.98px) {
+  .mobile-banner.banner-search {
+    inset-inline: 16px;
+    width: auto;
+    max-width: none;
   }
 }
 

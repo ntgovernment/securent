@@ -31,6 +31,19 @@ For the hover-only update on an already migrated menu, publish the refreshed
 `dist/theme.css` and refresh its CMS cache reference. No additional Bodycopy or
 JavaScript changes are required; URLs and mobile interaction remain unchanged.
 
+## Compact Header Search
+
+On an already migrated header, no listing or search markup changes are needed.
+Keep the existing `.mobile-banner.banner-search` form and its submission URL.
+Run `npm run build`, publish `dist/theme.css` and `dist/theme.js` together, and
+refresh both Matrix cache references. A Git push alone does not publish these
+assets to Matrix.
+
+On the published page, verify that the popup covers the logo and menu icon
+below 768px, stays on the icon row at tablet widths, and does not replace the
+inline search at 992px and above. Confirm that the clear button does not submit
+the form and that clicking the backdrop or pressing Escape closes the popup.
+
 ## Main Listing (Level 1)
 
 ### Page Contents
