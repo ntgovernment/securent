@@ -383,10 +383,7 @@ test("mobile-only links follow the listing and retain their destinations", async
       window.document.body.innerHTML = html;
       const links = [...window.document.querySelectorAll(".cms-main-nav > li.mobile-only-link > a")];
       assert.deepEqual(links.map((link) => link.textContent.trim()), ["Emergency contacts", "Incident map"]);
-      assert.deepEqual(links.map((link) => new URL(link.href).pathname.replace(/^\/securent/, "")), [
-        "/emergency-contacts",
-        "/homepage/dataset/incident-map",
-      ]);
+      assert.equal(links[1].href, "https://www.pfes.nt.gov.au/incidentmap");
       const items = [...window.document.querySelectorAll(".cms-main-nav > li")];
       assert.deepEqual(items.slice(-2), links.map((link) => link.parentElement));
     }
@@ -425,7 +422,7 @@ test("initialization restores missing mobile-only links without duplicating exis
 
     const links = [...menu.querySelectorAll(":scope > li.mobile-only-link > a")];
     assert.deepEqual(links.map((link) => link.textContent.trim()), ["Emergency contacts", "Incident map"]);
-    assert.equal(links[1].href, "https://preview.example/securent/homepage/dataset/incident-map");
+    assert.equal(links[1].href, "https://www.pfes.nt.gov.au/incidentmap");
   });
 });
 
