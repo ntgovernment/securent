@@ -100,6 +100,7 @@ main.ntg-body--homepage #current-conditions > #local-conditions > .container-xl 
 .lc-card-group {
   display: flex;
   flex-direction: column;
+  min-width: 340px;
 }
 
 .lc-card-group .lc-card {
