@@ -38,9 +38,7 @@ initializeEventNavigation(window);
   const emergencyContactsHref = emergencyContacts
     ? emergencyContacts.getAttribute("href")
     : "/emergency-contacts";
-  const incidentMapHref = emergencyContacts
-    ? new URL("./homepage/dataset/incident-map", emergencyContacts.href).href
-    : "/homepage/dataset/incident-map";
+  const incidentMapHref = "https://www.pfes.nt.gov.au/incidentmap";
   [
     { label: "Emergency contacts", href: emergencyContactsHref },
     { label: "Incident map", href: incidentMapHref },

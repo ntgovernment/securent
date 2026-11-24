@@ -452,9 +452,10 @@ test("the feed populates every station and shows its observed temperatures", asy
   assert.equal(temperatures[0].querySelector("i").getAttribute("aria-hidden"), "true");
   const groups = context.window.document.querySelectorAll(".lc-card-group");
   assert.deepEqual(Array.from(groups, (group) => group.querySelector(".lc-attribution").textContent),
-    ["Source: Bushfires NT", "Source: NTEPA", "Source: Bureau of Meteorology"]);
+    ["Source: NT Fire and Emergency Services", "Source: NTEPA", "Source: Bureau of Meteorology"]);
   assert.equal(context.window.document.querySelectorAll(".lc-attribution").length, 3);
   assert.equal(context.window.document.querySelectorAll(".lc-card .lc-attribution").length, 3);
+  assert.equal(groups[0].querySelector("a").textContent, "NT Fire and Emergency Services");
   assert.equal(groups[0].querySelector("a").href, "https://www.pfes.nt.gov.au/incidentmap");
   assert.equal(groups[1].querySelector("a").href, "https://ntepa.nt.gov.au/");
   assert.equal(groups[2].querySelector("a").href, "https://www.bom.gov.au/location/australia/northern-territory#observations");
@@ -905,7 +906,7 @@ test("production reads mapped fire ratings from the CMS integration directly", a
   const sourceTime = card.querySelector(".lc-card__timestamp time");
   const timestampRow = card.querySelector(".lc-card__timestamp");
   assert.ok(sourceTime);
-  assert.equal(source.textContent, "Source: Bushfires NT");
+  assert.equal(source.textContent, "Source: NT Fire and Emergency Services");
   assert.equal(timestampRow.parentElement, card.querySelector(".lc-card__footer"));
   assert.equal(timestampRow.previousElementSibling, source);
   assert.doesNotMatch(source.textContent, /Issue date:/);

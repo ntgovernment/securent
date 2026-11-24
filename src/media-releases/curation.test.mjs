@@ -89,6 +89,21 @@ test("matches decreasing-threat data by WebVersionURL when campaign IDs differ",
   assert.equal(notice.warningLevel, "Decreasing threat");
 });
 
+test("excludes configured Campaign Monitor URLs regardless of HTTP scheme", () => {
+  const excluded = record({
+    CampaignID: "excluded-campaign",
+    WebVersionURL: "http://createsend.com/t/t-69E2E37C2DCAF7EE2540EF23F30FEDED?source=feed",
+  });
+  const newlyExcluded = record({
+    CampaignID: "newly-excluded-campaign",
+    WebVersionURL: "https://createsend.com/t/t-C5EBE1813BB44C412540EF23F30FEDED",
+  });
+  const included = record({ CampaignID: "included-campaign" });
+
+  assert.deepEqual(curateFeeds([{ source: "NTES", items: [excluded, newlyExcluded, included] }])
+    .map((notice) => notice.campaignId), ["included-campaign"]);
+});
+
 test("lowercases only a leading part-of phrase in mapped locations", () => {
   for (const [location, expected] of [
     ["Part of Darwin", "part of Darwin"],
@@ -312,20 +327,24 @@ test("classifies explicit fire bans without an emergency type or identified warn
   }
 });
 
-test("classifies planned burns without an emergency type and admits them as operational notices", () => {
+test("classifies planned and prescribed burns without an emergency type and admits them as operational notices", () => {
   for (const field of ["Subject", "Name", "title", "name"]) {
-    const notice = { [field]: "Planned burn - Darwin" };
-    const classified = classifyNotice(notice);
-    assert.deepEqual(classified.declarations, ["Planned burn advice"]);
-    assert.deepEqual(classified.emergencyTypes, []);
-    assert.equal(classified.warningLevel, "Not identified");
-    assert.equal(isOperationalNotice(notice), true);
+    for (const wording of ["Planned burn", "Prescribed burn"]) {
+      const notice = { [field]: `${wording} - Darwin` };
+      const classified = classifyNotice(notice);
+      assert.deepEqual(classified.declarations, ["Planned burn advice"]);
+      assert.deepEqual(classified.emergencyTypes, []);
+      assert.equal(classified.warningLevel, "Not identified");
+      assert.equal(isOperationalNotice(notice), true);
+    }
   }
 
-  assert.equal(isOperationalNotice({
-    Subject: "Community celebrates planned burn - Darwin",
-    FromName: "Local council",
-  }), true);
+  for (const wording of ["planned", "prescribed"]) {
+    assert.equal(isOperationalNotice({
+      Subject: `Community celebrates ${wording} burn - Darwin`,
+      FromName: "Local council",
+    }), true);
+  }
   assert.deepEqual(classifyNotice({ Subject: "Bushfire Advice - Darwin" }).declarations, []);
   const [plannedBurn] = curateFeeds([{ source: "Bushfires NT", items: [record({
     CampaignID: "planned-burn",

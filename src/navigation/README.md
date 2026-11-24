@@ -60,7 +60,7 @@ Replace the Main listing Page Contents with:
             <ul class="ntg-main-nav__links cms-main-nav">
               %asset_listing%
               <li class="mobile-only-link"><a href="https://securent.nt.gov.au/emergency-contacts">Emergency contacts</a></li>
-              <li class="mobile-only-link"><a href="https://securent.nt.gov.au/homepage/dataset/incident-map">Incident map</a></li>
+              <li class="mobile-only-link"><a href="https://www.pfes.nt.gov.au/incidentmap">Incident map</a></li>
             </ul>
           </div>
         </div>

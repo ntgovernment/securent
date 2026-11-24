@@ -100,6 +100,7 @@ main.ntg-body--homepage #current-conditions > #local-conditions > .container-xl 
 .lc-card-group {
   display: flex;
   flex-direction: column;
+  min-width: 340px;
 }
 
 .lc-card-group .lc-card {
@@ -425,8 +426,8 @@ main.ntg-body--homepage #current-conditions > #local-conditions > .container-xl 
   margin-right: 0.25rem;
 }
 
-.lc-attribution a {
-  color: inherit;
+.lc-card__footer .lc-attribution a:link {
+  color: var(--clr-text-muted, #9d9da7);
 }
 
 @media (max-width: 991.98px) {

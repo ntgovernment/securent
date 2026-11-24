@@ -324,7 +324,7 @@
     var fire = fireCard(data.fireDanger);
     var air = airCard(data.airQuality);
     var temperature = tempCard(data.temperature);
-    if (fire) groups.push(cardWithSource(fire, "Bushfires NT",
+    if (fire) groups.push(cardWithSource(fire, "NT Fire and Emergency Services",
       "https://www.pfes.nt.gov.au/incidentmap", data.fireDanger));
     else if (waiting.indexOf("fireDanger") >= 0) groups.push(skeletonGroup());
     else groups.push(cardWithoutData("Bushfire danger rating", "fa-fire-flame-curved"));

@@ -122,6 +122,10 @@ If a Campaign Monitor record is missing from either page:
    date with the newest displayed card.
 2. Check the operational-notice rules in `curation.mjs`. A successful feed
    response does not mean every returned campaign is eligible for display.
+   The Campaign Monitor URLs
+   `https://createsend.com/t/t-69E2E37C2DCAF7EE2540EF23F30FEDED` and
+   `https://createsend.com/t/t-C5EBE1813BB44C412540EF23F30FEDED` are explicitly
+   excluded, whether the feed returns them over HTTP or HTTPS.
 3. Confirm that the Matrix Git File Bridge is serving the branch and commit
    containing the intended fix. A push to `dev` does not update a bridge
    configured for `main`.
@@ -255,12 +259,14 @@ AWS WEBP icons and warning-level border accents. The region uses
 `fa-light fa-location-dot`
 instead of a visible **Region:** prefix, while keeping an accessible region
 label. The fire-ban option displays as **Fire ban notices**; its card uses the
-neutral warning icon and `#343741` accent. Planned burns display as **Planned
-burn advice** in the filter and use the `#865AA5` warning icon and accent.
-Boil-water notices display as **Boil water notice** in the filter; fire-ban,
-boil-water, other and general-information cards share the neutral icon and
-accent. Homepage warning cards show the severity badge alongside their
-warning icon and omit a separate **More information** action.
+`other-hazard.webp` icon and `#343741` accent. Planned and prescribed burns share
+the **Planned burn advice** filter value and show the **Planned burn** badge on
+the homepage. Both warning views use `assets/hazard-icons/planned-burn.webp`
+with the `#865AA5` accent. Boil-water notices display as **Boil water notice**
+in the filter; fire-ban, boil-water, other and general-information cards share
+the `other-hazard.webp` icon and neutral accent. Homepage warning cards show
+the severity badge alongside their warning icon and omit a separate
+**More information** action.
 
 For Matrix markup, keep the Incident or notice type fieldset with its
 `data-type-filters` list. Do not add a separate Declaration fieldset or

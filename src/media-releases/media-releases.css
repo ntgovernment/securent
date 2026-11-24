@@ -312,11 +312,9 @@ section.media-releases__hero {
   min-height: 24px;
 }
 
-[data-latest-media-releases] .media-releases__item--featured .media-releases__hazard-icon,
-[data-latest-media-releases] .media-releases__item--featured .media-releases__notice-icon {
+[data-latest-media-releases] .media-releases__item--featured .media-releases__hazard-icon {
   width: 24px;
   height: 24px;
-  font-size: 24px;
 }
 
 [data-latest-media-releases] .media-releases__item--featured .media-releases__severity {
@@ -429,16 +427,6 @@ section.media-releases__hero {
 
 .media-releases__item--formatted .media-releases__link {
   grid-template-columns: 48px minmax(0, 1fr);
-}
-
-.media-releases__notice-icon {
-  display: grid;
-  width: 48px;
-  height: 48px;
-  place-items: center;
-  color: var(--media-releases-accent);
-  font-size: 48px;
-  line-height: 1;
 }
 
 .media-releases__item:hover {

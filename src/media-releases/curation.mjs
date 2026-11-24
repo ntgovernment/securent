@@ -5,8 +5,8 @@ import localityData from "./nt-suburbs-by-government-region.json" with { type: "
 export const sourceOrder = ["Bushfires NT", "NTES", "NTG agencies"];
 
 const sourceRank = new Map(sourceOrder.map((source, index) => [source, index]));
-const alertLanguage = /\b(?:advice|warning|watch\s*(?:&|and)\s*act|emergency\s+(?:warning|alert|declaration)|decreasing[\s_-]+threats?|threat is reduced|evacu\w*|take shelter|shelter now|prepare now|stay informed|fire bans?|fire danger period|planned burns?|boil(?:ing)? water|public health alert|code yellow|rescue operation|incidents?\b|hazmat|dangerous surf|avoid (?:the )?flooded area)\b/i;
-const hazardLanguage = /\b(?:storm|flood|cyclone|bushfires?|fires?|planned burns?|emergency|incident|hazmat|health|boil(?:ing)? water|evacu\w*|surf)\b/i;
+const alertLanguage = /\b(?:advice|warning|watch\s*(?:&|and)\s*act|emergency\s+(?:warning|alert|declaration)|decreasing[\s_-]+threats?|threat is reduced|evacu\w*|take shelter|shelter now|prepare now|stay informed|fire bans?|fire danger period|(?:planned|prescribed) burns?|boil(?:ing)? water|public health alert|code yellow|rescue operation|incidents?\b|hazmat|dangerous surf|avoid (?:the )?flooded area)\b/i;
+const hazardLanguage = /\b(?:storm|flood|cyclone|bushfires?|fires?|(?:planned|prescribed) burns?|emergency|incident|hazmat|health|boil(?:ing)? water|evacu\w*|surf)\b/i;
 const generalNews = /\b(?:awards?|recruit(?:ment|ing)?|ceremon(?:y|ies)|outlook|symposium|funding|grant recipients|honours? list|anniversary|celebrates?\b|celebration)\b/i;
 const operationalSender = /\b(?:ntes|nt emergency services?|northern territory emergency services?|territory emergency operations centre|nt fire and emergency services|bushfires? nt|securent)\b|territorydutyofficer\.ntes@pfes\.nt\.gov\.au/i;
 const approvedDutyOfficer = /\bterritorydutyofficer\.ntes@pfes\.nt\.gov\.au\b/i;
@@ -76,7 +76,7 @@ function matchingRegions(content) {
 }
 
 const emergencyPatterns = [
-  ["Bushfire", /\b(?:bush\s*fires?(?:\s*nt)?|wildfires?|grass\s*fires?|fire bans?|fire danger|planned burn|vegetation fire)\b/i],
+  ["Bushfire", /\b(?:bush\s*fires?(?:\s*nt)?|wildfires?|grass\s*fires?|fire bans?|fire danger|(?:planned|prescribed) burn|vegetation fire)\b/i],
   ["Cyclone", /\b(?:cyclones?|tropical low)\b/i],
   ["Flooding", /\b(?:flood\w*|flash flooding|rising river)\b/i],
   ["Storm", /\b(?:storms?|thunderstorms?|damaging winds?|large hail)\b/i],
@@ -90,7 +90,7 @@ export function classifyNotice(record) {
   const content = [record.title || record.Subject, record.name || record.Name,
     ...getPlaceSearchValues(record)].filter(Boolean).join(" ");
   const isFireBan = /\bfire bans?\b/i.test(content);
-  const isPlannedBurn = /\bplanned burns?\b/i.test(content);
+  const isPlannedBurn = /\b(?:planned|prescribed) burns?\b/i.test(content);
   const isBoilWaterNotice = /\bboil(?:ing)? water\b/i.test(content);
   const declarations = [
     ...(isFireBan ? ["Fire ban declaration"] : []),
@@ -159,6 +159,23 @@ function normalizedWebVersionUrl(value) {
   }
 }
 
+function noticeUrlKey(value) {
+  const cleaned = cleanText(value);
+  if (!cleaned) return "";
+  try {
+    const url = new URL(cleaned);
+    if (!["http:", "https:"].includes(url.protocol)) return "";
+    return `${url.hostname.toLocaleLowerCase("en")}${url.pathname.replace(/\/+$/, "") || "/"}`;
+  } catch {
+    return "";
+  }
+}
+
+const excludedNoticeUrls = new Set([
+  noticeUrlKey("https://createsend.com/t/t-69E2E37C2DCAF7EE2540EF23F30FEDED"),
+  noticeUrlKey("https://createsend.com/t/t-C5EBE1813BB44C412540EF23F30FEDED"),
+]);
+
 function normalizeRecord(record, source, index) {
   const name = cleanText(record.Name);
   const subject = cleanText(record.Subject);
@@ -189,7 +206,7 @@ export function isOperationalNotice(record) {
     && operationalSender.test(sender)
     && hazardLanguage.test(content);
   if (!awsHazardNotice && !alertLanguage.test(content)) return false;
-  if (generalNews.test(content) && !/\b(?:warning|watch\s*(?:&|and)\s*act|emergency alert|evacu\w*|fire bans?|fire danger period|planned burns?|boil(?:ing)? water)\b/i.test(content)) {
+  if (generalNews.test(content) && !/\b(?:warning|watch\s*(?:&|and)\s*act|emergency alert|evacu\w*|fire bans?|fire danger period|(?:planned|prescribed) burns?|boil(?:ing)? water)\b/i.test(content)) {
     return false;
   }
   return hazardLanguage.test(content) || operationalSender.test(sender);
@@ -279,7 +296,7 @@ export function curateFeeds(feeds, mappedWarnings = [], emergencyWarnings = []) 
     for (const raw of items) {
       const record = normalizeRecord(raw, source, sequence);
       sequence += 1;
-      if (!record.title || !isOperationalNotice(record)) continue;
+      if (!record.title || excludedNoticeUrls.has(noticeUrlKey(record.url)) || !isOperationalNotice(record)) continue;
 
       const previous = records.get(record.id);
       if (!previous) {
