@@ -173,6 +173,7 @@ function noticeUrlKey(value) {
 
 const excludedNoticeUrls = new Set([
   noticeUrlKey("https://createsend.com/t/t-69E2E37C2DCAF7EE2540EF23F30FEDED"),
+  noticeUrlKey("https://createsend.com/t/t-C5EBE1813BB44C412540EF23F30FEDED"),
 ]);
 
 function normalizeRecord(record, source, index) {

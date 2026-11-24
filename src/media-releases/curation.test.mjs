@@ -89,14 +89,18 @@ test("matches decreasing-threat data by WebVersionURL when campaign IDs differ",
   assert.equal(notice.warningLevel, "Decreasing threat");
 });
 
-test("excludes the configured Campaign Monitor URL regardless of HTTP scheme", () => {
+test("excludes configured Campaign Monitor URLs regardless of HTTP scheme", () => {
   const excluded = record({
     CampaignID: "excluded-campaign",
     WebVersionURL: "http://createsend.com/t/t-69E2E37C2DCAF7EE2540EF23F30FEDED?source=feed",
   });
+  const newlyExcluded = record({
+    CampaignID: "newly-excluded-campaign",
+    WebVersionURL: "https://createsend.com/t/t-C5EBE1813BB44C412540EF23F30FEDED",
+  });
   const included = record({ CampaignID: "included-campaign" });
 
-  assert.deepEqual(curateFeeds([{ source: "NTES", items: [excluded, included] }])
+  assert.deepEqual(curateFeeds([{ source: "NTES", items: [excluded, newlyExcluded, included] }])
     .map((notice) => notice.campaignId), ["included-campaign"]);
 });
 
