@@ -4,12 +4,10 @@ import "../hero-banners/hero-banners.js";
 import { initializeBackToTop } from "./back-to-top.mjs";
 import { guardQuickExit } from "./quick-exit.mjs";
 import { initializeEventNavigation } from "../events/on-this-page.ts";
-import { initializeHomepageWarningBanners } from "./homepage-warning-banners.mjs";
 
 initializeBackToTop(window);
 guardQuickExit(window);
 initializeEventNavigation(window);
-initializeHomepageWarningBanners(window);
 
 /* Expand the desktop search field when the icon is activated empty. */
 (function () {
