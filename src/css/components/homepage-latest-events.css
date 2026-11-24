@@ -1,7 +1,7 @@
 #latest-warnings .warning-banner {
   --warning-accent: #d6410a;
-  --warning-border: #003251;
-  --warning-surface: #fff;
+  --warning-border: #343741;
+  --warning-surface: var(--clr-bg-shade, #f5f5f7);
   --warning-text: #343741;
 
   display: flex;
@@ -10,9 +10,20 @@
   margin: 0;
   padding: 16px 24px;
   border: 1px solid var(--warning-border);
-  border-left-width: 12px;
+  border-left-width: 8px;
   background: var(--warning-surface);
   color: var(--warning-text);
+}
+
+#latest-warnings .warning-banner--recovery {
+  --warning-border: var(--clr-status-info, #107cc0);
+  --warning-surface: var(--clr-status-info-bg, #e4f0f8);
+
+  padding-right: 32px;
+}
+
+#latest-warnings .warning-banner--recovery > :is(i, img, svg, .warning-banner__icon) {
+  display: none;
 }
 
 .warning-grid {
@@ -21,22 +32,23 @@
   gap: 16px;
 }
 
-#latest-warnings .warning-banner__icon {
+#latest-warnings .warning-banner__icon,
+#latest-warnings .warning-banner > img {
   display: block;
   flex: 0 0 auto;
   width: 24px;
-  height: 24px;
+  height: 22px;
   margin: 0;
   color: var(--warning-text);
 }
 
 #latest-warnings .warning-banner > i {
   display: block;
-  height: 24px;
+  height: 22px;
   flex: 0 0 auto;
   color: var(--warning-text);
-  font-size: 24px;
-  line-height: 24px;
+  font-size: 22px;
+  line-height: 22px;
 }
 
 #latest-warnings .warning-banner__content {
@@ -70,7 +82,7 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 12px;
 }
 
 #latest-warnings .warning-banner__action {
@@ -118,6 +130,30 @@
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.7;
+}
+
+#latest-warnings .warning-banner--recovery .warning-banner__action {
+  min-height: 0;
+  justify-content: flex-start;
+  padding: 8px 12px;
+  border: 0;
+  background: transparent;
+  color: var(--warning-text);
+}
+
+#latest-warnings .warning-banner--recovery .warning-banner__action:hover,
+#latest-warnings .warning-banner--recovery .warning-banner__action:focus-visible {
+  background: transparent;
+  color: var(--warning-text);
+  text-decoration: underline;
+}
+
+#latest-warnings .warning-banner--recovery .warning-banner__action:focus-visible {
+  outline-color: var(--warning-border);
+}
+
+#latest-warnings .warning-banner--recovery .warning-banner__action svg {
+  stroke: var(--warning-border);
 }
 
 #latest-events-intro {

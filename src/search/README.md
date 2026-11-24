@@ -90,10 +90,12 @@ Expected layout measurements:
   use 14px/20px. Search controls are 48px high and have a visible keyboard focus.
 - Existing pagination uses teal active states; hidden results must stay hidden.
 
-The tracked `Search _ SecureNT.html` and `Search _ SecureNT_files/` are archived
-browser captures, not a current wired-up preview of this enhancement. They retain
-their captured theme assets. Validate using the CMS template/controller with the
-built assets, rather than treating an unchanged capture as a deployment check.
+The tracked `Search _ SecureNT.html` is a production-page capture using local
+theme and search-results build assets, alongside the retained
+`Search _ SecureNT_files/` dependencies. Its captured query is `warnings`.
+The production Coveo endpoints do not permit requests from a local preview origin,
+so validate searching and results on the CMS, not against the local capture.
+The capture is not a deployment check.
 
 To roll back, restore the original inline initialization and remove the module
 import; restore the previous theme stylesheet cache reference. The controller and
